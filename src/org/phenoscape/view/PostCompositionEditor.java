@@ -204,27 +204,23 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
   }
   
   private JToolBar createToolBar() {
-    final JToolBar toolBar = new JToolBar();
-    try {
-      this.addDifferentiaButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-add.png"))) {
+      final JToolBar toolBar = new JToolBar();
+      this.addDifferentiaButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
           public void actionPerformed(ActionEvent e) {
-            addDifferentia();
+              addDifferentia();
           }
-        });
+      });
       this.addDifferentiaButton.setToolTipText("Add Differentia");
       toolBar.add(this.addDifferentiaButton);
-      this.deleteDifferentiaButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-remove.png"))) {
+      this.deleteDifferentiaButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
           public void actionPerformed(ActionEvent e) {
-            deleteSelectedDifferentia();
+              deleteSelectedDifferentia();
           }
-        });
+      });
       this.deleteDifferentiaButton.setToolTipText("Delete Differentia");
       toolBar.add(this.deleteDifferentiaButton);
-    } catch (FileNotFoundException e) {
-      log().error("Couldn't find toolbar icons", e);
-    }
-    toolBar.setFloatable(false);
-    return toolBar;
+      toolBar.setFloatable(false);
+      return toolBar;
   }
   
   private JPopupMenu createTablePopupMenu() {

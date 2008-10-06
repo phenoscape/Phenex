@@ -58,10 +58,8 @@ public class LogViewComponentFactory extends AbstractComponentFactory<LogViewCom
       return this.messages;
     }
 
-    @Override
     public void close() {}
 
-    @Override
     public boolean requiresLayout() {
       return false;
     }

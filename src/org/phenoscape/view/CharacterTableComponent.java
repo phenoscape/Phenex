@@ -85,27 +85,24 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
   }
   
   private JToolBar createToolBar() {
-    final JToolBar toolBar = new JToolBar();
-    try {
-      this.addCharacterButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-add.png"))) {
+      final JToolBar toolBar = new JToolBar();
+      this.addCharacterButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
           public void actionPerformed(ActionEvent e) {
-            addCharacter();
+              addCharacter();
           }
-        });
+      });
       this.addCharacterButton.setToolTipText("Add Character");
       toolBar.add(this.addCharacterButton);
-      this.deleteCharacterButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-remove.png"))) {
+      this.deleteCharacterButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
           public void actionPerformed(ActionEvent e) {
-            deleteSelectedCharacter();
+              deleteSelectedCharacter();
           }
-        });
+      });
       this.deleteCharacterButton.setToolTipText("Delete Character");
       toolBar.add(this.deleteCharacterButton);
-    } catch (FileNotFoundException e) {
-      log().error("Couldn't find toolbar icons", e);
-    }
-    toolBar.setFloatable(false);
-    return toolBar;
+
+      toolBar.setFloatable(false);
+      return toolBar;
   }
 
   private class CharactersTableFormat implements WritableTableFormat<Character>, AdvancedTableFormat<Character> {

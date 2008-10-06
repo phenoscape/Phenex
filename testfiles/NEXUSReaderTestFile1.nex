@@ -1,0 +1,198 @@
+#NEXUS
+[written Fri Aug 22 17:20:04 CDT 2008 by Mesquite  version 2.5 (build j77) at sc2-29.sc.usd.edu/206.176.6.29]
+
+BEGIN TAXA;
+	TITLE Taxa;
+	DIMENSIONS NTAX=23;
+	TAXLABELS
+		Ancestor Ictalurus_furcatus Ictalurus_balsanus Ictalurus_punctatus Ictalurus_lupus Ictalurus_dugesi Ictalurus_pricei Ictalurus_mexicanus Ictalurus_australis Ameiurus_catus Ameiurus_serracanthus Ameiurus_brunneus Ameiurus_platycephalus Ameiurus_natalis Ameiurus_melas Ameiurus_nebulosus Noturus_flavus Noturus_insignis Noturus_stigmosus Pylodictis_olivaris Trogloglanis_pattersoni Prietella_phreatophila Satan_eurystomus 
+	;
+
+END;
+
+
+BEGIN CHARACTERS;
+	TITLE  Character_Matrix;
+	DIMENSIONS  NCHAR=147;
+	FORMAT DATATYPE = STANDARD GAP = - MISSING = ? SYMBOLS = "  0 1 2 3 4 5";
+	CHARSTATELABELS 
+12 12.1, 13 12.2, 14 12.3, 15 12.4, 16 12.5, 17 12.6, 21 16.1, 22 16.2, 23 16.3, 24 16.4, 25 16.5, 26 16.6, 27 16.7, 30 19.1, 31 19.2, 57 45.1, 58 45.2, 59 45.3, 60 45.4, 61 45.5, 62 45.6, 63 46.1, 64 46.2, 65 46.3, 66 46.4, 80 60.1, 81 60.2, 82 60.3, 83 60.4, 84 60.5, 91 67.1, 92 67.2, 93 67.3, 94 67.4, 101 74.1, 102 74.2, 103 74.3, 122 93.1, 123 93.2, 124 93.3, 125 93.4 ; 
+	MATRIX
+	Ancestor                 000000010200000000100000000010000000000000010010000010000000000000101001000001100000100100000000100000010000001011021010000001100001010000120020100
+	Ictalurus_furcatus       000002110111000000110001001031100010200000112100000110001001000000220121100002110010110100000020100000010001202102341010001005200001212010100021200
+	Ictalurus_balsanus       000002110110010000110001001031100010200000122100000110001001100000220121100002110010110100000020100000011001201212421011001103300101112010001011200
+	Ictalurus_punctatus      000002000110000001010001100031100010000000122100000010001001000000220121101102110011110100100020100000011001201211331010000004102001212010120031200
+	Ictalurus_lupus          000002000010100002010001110031100010000000122101000010001001000000230121101202110010110100100020100000011001201211121011000002103101112010120031200
+	Ictalurus_dugesi         000002100110100001010001110031100010000000122100000110001001000000230121101202110010110100100020100000011001201211121010000002102002112010111011200
+	Ictalurus_pricei         000002000110100001010001100031100010000000122100000010001001000000220121101202110010110100100020100000011001201211221011000002202001112010120031200
+	Ictalurus_mexicanus      000002000110100001010001100031100010000000122100000010001001000000220121101202110010110100100020100000011001201211221011000002102001212010110031200
+	Ictalurus_australis      000002000110000001010001100031100010000000122100000010001001000000220121101202110010110100100020100000011001201211121010000004102001212010120031200
+	Ameiurus_catus           000112321200010002130000000021100121000000101012000220211000000000131121011201111000121201100000200000010101111211121010000002104112010010221120100
+	Ameiurus_serracanthus    000212211110010002120000000011100121000000101012000220211000000000131121011201110000121201100000200000010101111211121010000002103102010010120130100
+	Ameiurus_brunneus        000212322120010003120100000021100121000000101012000220201001000000331122011201110000120201100000200010022101121221121010100001203102020010132330100
+	Ameiurus_platycephalus   000212322120010003120100000021100121000000101012000220211000000000131122011201110000120201100000200010022101121221121010100002203212010010132330100
+	Ameiurus_natalis         000222221020011003030100000011101222100000101011010320121000000000132121011101100000121201101000200000010101101211021011000003002211010010211220100
+	Ameiurus_melas           000221221110010002221000000011102222100000101011000220111000000010132121011201210000121201101110200001010101111211011010000002101221001010012110100
+	Ameiurus_nebulosus       000222111110010002221000000011102222100000101011000220111000000011132121011201310000121201101110200001010101101211021010000002102232001010121130100
+	Noturus_flavus           2012121120200101133100100001210101222111111200121101100011100000001101010112111100001212011000211000100311011202211201322100012003010101003?1000112
+	Noturus_insignis         2012221120100101133100100001210101222111111200121100100011000000001101010112111000001212011000211000100311011202210211322100011203010101003?2330112
+	Noturus_stigmosus        101222001010010113310010000121010122211111120012110010001100000000110111011211100000121201100020100110031101121221000121200000110302012100140040112
+	Pylodictis_olivaris      0102003220200101004000010011000002230021010210212210011010011101000010100113101111000012111100010110001022101230214210112000013003000101114?2240003
+	Trogloglanis_pattersoni  1022203000100100031?00100001?01000020?0??11100?01000?0?00000001000???1000001001000001010001000301000100100?00?0210002110000000100302000100000330?10
+	Prietella_phreatophila   2022421110000101133100100001210101020?111112001?0100000000000000001??111011010000000101000100030100000112100010221003003?0001011030101010100?000010
+	Satan_eurystomus         1122303120?001010????????????????2??????????????220001?000000000001?????????????????????????????????????????0????0113?11?000012?03?0???1?0000320??3
+
+;
+
+END;
+BEGIN ASSUMPTIONS;
+	OPTIONS  DEFTYPE = unord PolyTcount = MINSTEPS;
+	TYPESET * UNTITLED   =  ord:  1 -  147;
+
+END;
+
+BEGIN CODONS;
+	CODESET * UNTITLED   =  universal:  1 -  147;
+
+
+END;
+
+BEGIN MESQUITECHARMODELS;
+	ProbModelSet * UNTITLED   =  'Mk1 (est.)':  1 -  147;
+END;
+
+Begin MESQUITE;
+		MESQUITESCRIPTVERSION 2;
+		TITLE AUTO;
+		tell ProjectCoordinator;
+		getEmployee #mesquite.minimal.ManageTaxa.ManageTaxa;
+		tell It;
+			setID 0 4718437650599907737;
+		endTell;
+		getEmployee #mesquite.charMatrices.ManageCharacters.ManageCharacters;
+		tell It;
+			setID 0 7404198726706309303;
+			checksum 0 1798462516 null;
+		endTell;
+		getWindow;
+		tell It;
+			setResourcesState false false 100;
+			setPopoutState 400;
+			setExplanationSize 0;
+			setAnnotationSize 0;
+			setFontIncAnnot 0;
+			setFontIncExp 0;
+			setSize 1090 687;
+			setLocation 1937 17;
+			setFont SanSerif;
+			setFontSize 10;
+		endTell;
+		getEmployee  #mesquite.minimal.ManageTaxa.ManageTaxa;
+		tell It;
+			showTaxa #4718437650599907737 #mesquite.lists.TaxonList.TaxonList;
+			tell It;
+				setTaxa #4718437650599907737;
+				getWindow;
+				tell It;
+					newAssistant  #mesquite.lists.DefaultTaxaOrder.DefaultTaxaOrder;
+					newAssistant  #mesquite.lists.TaxonListCurrPartition.TaxonListCurrPartition;
+					setExplanationSize 30;
+					setAnnotationSize 20;
+					setFontIncAnnot 0;
+					setFontIncExp 0;
+					setSize 990 620;
+					setLocation 1937 17;
+					setFont SanSerif;
+					setFontSize 10;
+					getToolPalette;
+					tell It;
+					endTell;
+				endTell;
+				showWindow;
+				getEmployee #mesquite.lists.TaxonListAnnotPanel.TaxonListAnnotPanel;
+				tell It;
+					togglePanel off;
+				endTell;
+			endTell;
+		endTell;
+		getEmployee  #mesquite.charMatrices.BasicDataWindowCoord.BasicDataWindowCoord;
+		tell It;
+			showDataWindow #7404198726706309303 #mesquite.charMatrices.BasicDataWindowMaker.BasicDataWindowMaker;
+			tell It;
+				getWindow;
+				tell It;
+					getTable;
+					tell It;
+						rowNamesWidth 170;
+					endTell;
+					setExplanationSize 30;
+					setAnnotationSize 20;
+					setFontIncAnnot 0;
+					setFontIncExp 0;
+					setSize 990 620;
+					setLocation 1937 17;
+					setFont SanSerif;
+					setFontSize 10;
+					getToolPalette;
+					tell It;
+					endTell;
+					setActive;
+					setTool mesquite.charMatrices.BasicDataWindowMaker.BasicDataWindow.arrow;
+					colorCells  #mesquite.charMatrices.NoColor.NoColor;
+					colorRowNames  #mesquite.charMatrices.TaxonGroupColor.TaxonGroupColor;
+					colorColumnNames  #mesquite.charMatrices.CharGroupColor.CharGroupColor;
+					colorText  #mesquite.charMatrices.NoColor.NoColor;
+					setBackground White;
+					toggleShowNames on;
+					toggleShowTaxonNames on;
+					toggleTight off;
+					toggleShowChanges on;
+					toggleSeparateLines off;
+					toggleShowStates on;
+					toggleAutoWCharNames on;
+					toggleShowDefaultCharNames off;
+					toggleConstrainCW on;
+					toggleBirdsEye off;
+					toggleAllowAutosize on;
+					toggleColorsPanel off;
+					toggleDiagonal on;
+					setDiagonalHeight 80;
+					toggleLinkedScrolling on;
+					toggleScrollLinkedTables off;
+				endTell;
+				showWindow;
+				getWindow;
+				tell It;
+					forceAutosize;
+				endTell;
+				getEmployee #mesquite.charMatrices.ColorCells.ColorCells;
+				tell It;
+					setColor Red;
+					removeColor off;
+				endTell;
+				getEmployee #mesquite.categ.StateNamesStrip.StateNamesStrip;
+				tell It;
+					showStrip off;
+				endTell;
+				getEmployee #mesquite.charMatrices.AnnotPanel.AnnotPanel;
+				tell It;
+					togglePanel off;
+				endTell;
+				getEmployee #mesquite.charMatrices.CharReferenceStrip.CharReferenceStrip;
+				tell It;
+					showStrip off;
+				endTell;
+				getEmployee #mesquite.charMatrices.QuickKeySelector.QuickKeySelector;
+				tell It;
+					autotabOff;
+				endTell;
+				getEmployee #mesquite.categ.SmallStateNamesEditor.SmallStateNamesEditor;
+				tell It;
+					panelOpen true;
+				endTell;
+			endTell;
+		endTell;
+		endTell;
+end;
+
+

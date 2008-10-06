@@ -3,5 +3,28 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="lib/biojava.jar"/>
+	<classpathentry kind="lib" path="lib/nexmlbeans.jar"/>
+	<classpathentry kind="lib" path="lib/xbean.jar"/>
+	<classpathentry kind="lib" path="lib/glazedlists-1.7.0_java15.jar"/>
+	<classpathentry kind="lib" path="lib/junit-4.5.jar"/>
+	<classpathentry kind="lib" path="lib/bbop.jar"/>
+	<classpathentry kind="lib" path="lib/idw-gpl.jar"/>
+	<classpathentry kind="lib" path="lib/obdapi.jar"/>
+	<classpathentry kind="lib" path="lib/obo-vocab.jar"/>
+	<classpathentry kind="lib" path="lib/obo.jar"/>
+	<classpathentry kind="lib" path="lib/phenote.jar"/>
+	<classpathentry kind="lib" path="lib/oboedit.jar"/>
+	<classpathentry kind="lib" path="lib/phenoxmlbeans.jar"/>
+	<classpathentry kind="lib" path="lib/jsr173_1.0_api.jar"/>
+	<classpathentry kind="lib" path="lib/macify-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/tablelayout.jar"/>
+	<classpathentry kind="lib" path="lib/quaqua.jar"/>
+	<classpathentry kind="lib" path="lib/owlapi-api.jar"/>
+	<classpathentry kind="lib" path="lib/jh.jar"/>
+	<classpathentry kind="lib" path="lib/jwf-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/swingx-2007_10_14.jar"/>
+	<classpathentry kind="lib" path="lib/BrowserLauncher2-10rc4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

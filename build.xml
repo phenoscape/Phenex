@@ -1,0 +1,267 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+     ant build file
+     ====================================================================== -->
+<project name="phenex" default="compile" basedir=".">
+	<description>phenex ant build</description>
+	<property name="src" value="src"/>
+	<property name="test" value="test"/>
+	<property name="classfiles" value="bin"/>
+	<property name="lib" value="lib"/>
+	<property name="jarfile" value="phenex.jar"/>
+	<property name="dist" value="dist"/>
+	<property name="build-lib" value="build-lib"/>
+	<property name="main-class" value="org.phenoscape.main.Phenex"/>
+	<tstamp>
+		<format property="NOW" pattern="yyyy-MM-dd_HH:mm:ss"/>
+	</tstamp>
+	<property name="phenex.version" value="1.0-beta10"/>
+	<property name="phenex.build" value="${NOW}"/>
+	
+<!-- The init target makes sure that the prerequisite directories exist. -->
+	<target name="init">
+		<mkdir dir="${classfiles}"/>
+	</target>
+<!-- OBO dependency information -->
+	<property name="bbop_dest" location="../BBOP"/>
+	<property name="obo_dest" location="../OBO"/>
+	<property name="obdapi_dest" location="../OBDAPI"/>
+	<property name="obovocab_dest" location="../obo-vocab-java"/>
+	
+	<target name="buildbbop" if="bbop_dest">
+		<ant dir="${bbop_dest}" target="jar" inheritAll="false"/>
+		<copy file="${bbop_dest}/bbop.jar" todir="${lib}"/>
+	</target>
+	<target name="buildobo" if="obo_dest">
+		<ant dir="${obo_dest}" target="jar" inheritAll="false"/>
+		<copy file="${obo_dest}/obo.jar" todir="${lib}"/>
+	</target>
+	<target name="buildobdapi" if="obdapi_dest">
+		<ant dir="${obdapi_dest}" target="jar" inheritAll="false"/>
+		<copy file="${obdapi_dest}/lib/runlibs/obdapi.jar" todir="${lib}"/>
+	</target>
+	<target name="buildobovocab" if="obovocab_dest">
+		<ant dir="${obovocab_dest}" target="jar" inheritAll="false"/>
+		<copy file="${obovocab_dest}/obo-vocab.jar" todir="${lib}"/>
+	</target>
+	<target name="library_jars" depends="buildbbop, buildobo, buildobovocab, buildobdapi">
+    </target>
+	
+<!-- The classpath includes all the jar files jars dir, excluding jars/phenote.jar if it exists. -->
+	<path id="project.classpath">
+		<fileset dir="${lib}">
+			<include name="*"/>
+		</fileset>
+	</path>
+	
+<!-- The compile target runs javac on all the java files, and saves them into  the classfiles directory. excludes="test/**"  -->
+	<target name="compile" depends="init">
+		<javac srcdir="${src}" destdir="${classfiles}" debug="yes">
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+	
+<!-- runs off classfiles not jar, todo: run-jar -->
+	<target name="run" depends="compile">
+		<java classname="phenote.main.Phenote" fork="yes">
+			<jvmarg value="-Xmx500M"/>
+			<jvmarg value="-Dphenote.version=${phenote.version}"/>
+			<jvmarg value="-Dphenote.build=${phenote.build}"/>
+			<jvmarg value="-Djava.library.path=${lib}"/>
+<!-- arg value="-c configfilehereventually"/ -->
+			<classpath>
+				<pathelement path="${classfiles}"/>
+<!-- for log4j -->
+				<pathelement path="${conf}"/>
+				<fileset dir="${lib}">
+					<include name="*.jar"/>
+					<exclude name="phenote.jar"/>
+				</fileset>
+			</classpath>
+		</java>
+	</target>
+	
+    <target name="build-test" depends="compile">
+        <javac srcdir="${test}" destdir="${classfiles}" debug="yes">
+            <classpath refid="project.classpath"/>
+        </javac>
+    </target>
+	
+<!-- terse FAIL or PASS -->
+	<target name="test" depends="build-test" description="Unit tests">
+		<junit fork="yes" printsummary="on" maxmemory="1024m">
+			<classpath>
+				<pathelement path="${classfiles}"/>
+				<fileset dir="${lib}">
+					<include name="*.jar"/>
+					<exclude name="phenote.jar"/>
+				</fileset>
+			</classpath>
+			<batchtest>
+				<fileset dir="${test}"/>
+			</batchtest>
+		</junit>
+	</target>
+	
+<!-- prints to stdout all messages -->
+	<target name="verbose-test" depends="build-test" description="Unit tests">
+		<junit fork="yes" printsummary="withOutAndErr" maxmemory="1024m">
+			<classpath>
+				<pathelement path="${classfiles}"/>
+				<fileset dir="${lib}">
+					<include name="*.jar"/>
+					<exclude name="phenote.jar"/>
+				</fileset>
+			</classpath>
+			<batchtest>
+				<fileset dir="${test}"/>
+			</batchtest>
+		</junit>
+	</target>
+	
+<!-- set var junit.test.class.name from cmd line for example: ant runatest -Djunit.test.class.name="org.phenoscape.io.NEXUSReaderTest"-->
+	<target name="runatest" depends="build-test">
+		<junit fork="yes" printsummary="withOutAndErr" maxmemory="1024m" showoutput="true">
+			<classpath>
+				<pathelement path="${classfiles}"/>
+				<fileset dir="${lib}">
+					<include name="*.jar"/>
+					<exclude name="phenote.jar"/>
+				</fileset>
+			</classpath>
+			<test name="${junit.test.class.name}"/>
+		</junit>
+	</target>
+	
+<!-- The clean target just erases the classes -->
+	<target name="clean">
+		<delete dir="${classfiles}"/>
+		<delete dir="${dist}"/>
+	</target>
+	
+<!-- clean and compile everything -->
+	<target name="build-all" depends="clean,compile,build-test"/>
+	
+	<target name="javadoc">
+		<javadoc destdir="doc/api" author="true" version="true" use="true" windowtitle="Phenote API" package="true">
+<!-- this aint pickin everything up??? -->
+			<packageset dir="${src}" defaultexcludes="no">
+				<include name="phenote/*/**"/>
+<!-- exclude name="com/dummy/test/doc-files/**"/ -->
+			</packageset>
+			<classpath refid="project.classpath"/>
+			<doctitle><![CDATA[<h1>Phenote</h1>]]></doctitle>
+		</javadoc>
+	</target>
+	<property name="dist" value="0.6"/>
+	<target name="tar">
+		<mkdir dir="tars/${dist}"/>
+		<tar destfile="tars/${dist}/phenote-${dist}.tar">
+			<tarfileset dir=".">
+				<exclude name="${dist}/**"/>
+				<exclude name="svn-phenote/**"/>
+				<exclude name="tars/**"/>
+				<exclude name="src/obo-files/**"/>
+				<exclude name="*.tar"/>
+				<exclude name="*.jar"/>
+				<exclude name="garbage/**"/>
+				<exclude name="oldjars/**"/>
+				<exclude name="src/java/**"/>
+				<exclude name="web-classfiles/**"/>
+				<exclude name="web-interface/**"/>
+				<exclude name="web-deployment/**"/>
+			</tarfileset>
+		</tar>
+		<gzip zipfile="tars/${dist}/phenote-${dist}.tar.gz" src="tars/${dist}/phenote-${dist}.tar"/>
+	</target>
+	<target name="tar-source">
+		<mkdir dir="tars/${dist}"/>
+		<tar destfile="tars/${dist}/phenote-${dist}-src.tar">
+			<tarfileset dir=".">
+				<exclude name="${dist}/**"/>
+				<exclude name="svn-phenote/**"/>
+				<exclude name="tars/**"/>
+				<exclude name="src/obo-files/**"/>
+<!-- for now take out go as its 8.5M & not being used yet -->
+				<exclude name="obo-files/gene_ontology.obo"/>
+				<exclude name="*.tar"/>
+				<exclude name="*.jar"/>
+				<exclude name="garbage/**"/>
+				<exclude name="oldjars/**"/>
+<!-- exclude name="jars/phenote.jar"/ -->
+				<exclude name="doc/**"/>
+				<exclude name="classfiles/**"/>
+				<exclude name="web-classfiles/**"/>
+				<exclude name="web-interface/**"/>
+				<exclude name="web-deployment/**"/>
+			</tarfileset>
+		</tar>
+		<gzip zipfile="tars/${dist}/phenote-${dist}-src.tar.gz" src="tars/${dist}/phenote-${dist}-src.tar"/>
+	</target>
+	<target name="gzip-tar">
+		<gzip zipfile="tars/${dist}/phenote-${dist}.tar.gz" src="tars/${dist}/phenote-${dist}.tar"/>
+	</target>
+	<taskdef name="xmlbean" classname="org.apache.xmlbeans.impl.tool.XMLBean" classpath="${lib}/xbean.jar"/>
+<!-- classgendir="${build.dir}" - if not doing jar but classes, schema is directory where xsd files are (conf) -->
+	<target name="xml-beans">
+		<xmlbean schema="${conf}" destfile="${lib}/phenotexmlbeans.jar" classpath="${project.classpath}" failonerror="true" javasource="1.5">
+        </xmlbean>
+	</target>
+	
+	<target name="jar" depends="compile">
+		<jar destfile="${jarfile}">
+			<fileset dir="${classfiles}"/>
+			<fileset dir="${src}" includes="org/phenoscape/view/layouts/"/>
+			<fileset dir="${src}" includes="org/phenoscape/view/images/"/>
+			<fileset file="log4j.xml"/>
+			<manifest>
+				<attribute name="Main-Class" value="${main-class}"/>
+				<attribute name="SplashScreen-Image" value="org/phenoscape/view/images/Seal-of-Phenex-medium.png"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="dist-init">
+		<mkdir dir="${dist}"/>
+	</target>
+	
+	<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler" classpath="${build-lib}/jarbundler-2.0.0.jar"/>
+<!-- Create a self-contained double-clickable app bundle for Mac OS X in "dist/Phenex.app" -->
+	<target name="dist-mac" depends="jar, dist-init">
+		<jarbundler dir="${dist}" name="Phenex" mainclass="${main-class}" jvmversion="1.5+" vmoptions="-Xmx1024M" version="${phenex.version}" build="${phenex.build}" icon="launchers/macosx/Seal-of-Phenex.icns">
+			<jarfileset file="${jarfile}"/>
+			<jarfileset dir="${lib}"/>
+			<!-- splashfile="$JAVAROOT/phenote_logo.jpg" temp from jarbundler-->
+			<!--<javafilelist dir="images" files="phenote_logo.jpg"/>-->
+			<javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
+			<javaproperty name="phenex.version" value="${phenex.version}"/>
+			<javaproperty name="phenex.build" value="${phenex.build}"/>
+		</jarbundler>
+	</target>
+	
+<!-- Create a double-clickable batch file for Windows in "dist/Phenex".  Jars are placed in a nested lib folder. -->
+	<target name="dist-win" depends="jar, dist-init">
+		<mkdir dir="${dist}/Phenex/lib"/>
+		<copy todir="${dist}/Phenex" file="launchers/windows/Phenex.bat"/>
+		<replace file="${dist}/Phenex/Phenex.bat" token="@@phenex.version@@" value="${phenex.version}"/>
+		<replace file="${dist}/Phenex/Phenex.bat" token="@@phenex.build@@" value="${phenex.build}"/>
+		<copy todir="${dist}/Phenex/lib">
+			<fileset dir="${lib}"/>
+		</copy>
+		<copy todir="${dist}/Phenex/lib" file="${jarfile}"/>
+		<path id="libclasses">
+			<fileset dir="${dist}/Phenex/lib"/>
+		</path>
+		<manifestclasspath property="jar.classpath" jarfile="${dist}/Phenex/lib/phenex.jar">
+			<classpath refid="libclasses"/>
+		</manifestclasspath>
+		<jar destfile="${dist}/Phenex/lib/phenex.jar" update="yes">
+			<manifest>
+				<attribute name="Class-Path" value="${jar.classpath}"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="dist" depends="dist-mac, dist-win"/>
+	
+</project>

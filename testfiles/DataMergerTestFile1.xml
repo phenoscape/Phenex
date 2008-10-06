@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nex:nexml xmlns:nex="http://www.nexml.org/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:phen="http://www.bioontologies.org/obd/schema/pheno" generator="Phenex null" version="1.0">
+  <dict>
+    <key>phenex-metadata</key>
+    <any>
+      <curators/>
+      <publication/>
+      <publicationNotes/>
+    </any>
+  </dict>
+  <otus id="888243e2-dd30-4e4d-a7ca-1ddeaf1c402b"/>
+  <characters xmlns:ns="http://www.nexml.org/1.0" id="ea5b3b5e-a034-4a55-ae7f-8f3a5139ccde" xsi:type="ns:StandardCells" otus="888243e2-dd30-4e4d-a7ca-1ddeaf1c402b">
+    <format>
+      <states id="d945788e-3974-41fe-9dfb-decf66539de3">
+        <state id="876419a6-18f6-49fe-b1a2-4fcd349c951d" label="" symbol="0">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype>
+                <phen:phenotype_character>
+                  <phen:bearer>
+                    <phen:typeref about="TAO:0000512"/>
+                  </phen:bearer>
+                  <phen:quality>
+                    <phen:typeref about="PATO:0001167"/>
+                  </phen:quality>
+                </phen:phenotype_character>
+              </phen:phenotype>
+            </any>
+          </dict>
+        </state>
+        <state id="2a5263ef-0b63-4c18-8d22-f370b6ee0505" label="" symbol="1">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+      </states>
+      <states id="f8243c1b-380d-4bd0-83af-00332982c907">
+        <state id="092c0944-a4ce-416b-aa24-adf661fabf47" label="" symbol="1">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+        <state id="4071117d-9219-4e32-b96a-5d26290615fb" label="" symbol="2">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+      </states>
+      <states id="ad025a9b-1a43-4f92-82d0-6cbd654e1342">
+        <state id="2f962cb3-4810-4fb5-9d1e-70c243c404d3" label="" symbol="0">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+        <state id="c929c9e6-97e0-48ed-81d8-1b2165b3f56a" label="" symbol="1">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+      </states>
+      <char id="7b5f531f-16dd-4de2-a744-0a2350780edc" label="character 1" states="d945788e-3974-41fe-9dfb-decf66539de3"/>
+      <char id="e0d63bd8-2f65-4ee4-aa33-db436fe10cca" label="character 2" states="f8243c1b-380d-4bd0-83af-00332982c907"/>
+      <char id="088d1d98-15f5-4591-95c8-bf69696021d5" label="character 3" states="ad025a9b-1a43-4f92-82d0-6cbd654e1342"/>
+    </format>
+    <matrix/>
+  </characters>
+</nex:nexml>

@@ -134,36 +134,32 @@ public class SpecimenTableComponent extends PhenoscapeGUIComponent {
   }
   
   private JToolBar createToolBar() {
-    final JToolBar toolBar = new JToolBar();
-    try {
-      this.addSpecimenButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-add.png"))) {
-        public void actionPerformed(ActionEvent e) {
-          addSpecimen();
-        }
+      final JToolBar toolBar = new JToolBar();
+      this.addSpecimenButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
+          public void actionPerformed(ActionEvent e) {
+              addSpecimen();
+          }
       });
       this.addSpecimenButton.setToolTipText("Add Specimen");
       toolBar.add(this.addSpecimenButton);
-      
-      this.duplicateSpecimenButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-duplicate.png"))) {
-        public void actionPerformed(ActionEvent e) {
-          duplicateSelectedSpecimen();
-        }
+
+      this.duplicateSpecimenButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-duplicate.png"))) {
+          public void actionPerformed(ActionEvent e) {
+              duplicateSelectedSpecimen();
+          }
       });
       this.duplicateSpecimenButton.setToolTipText("Duplicate Specimen");
       toolBar.add(this.duplicateSpecimenButton);
-      
-      this.deleteSpecimenButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-remove.png"))) {
-        public void actionPerformed(ActionEvent e) {
-          deleteSelectedSpecimen();
-        }
+
+      this.deleteSpecimenButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
+          public void actionPerformed(ActionEvent e) {
+              deleteSelectedSpecimen();
+          }
       });
       this.deleteSpecimenButton.setToolTipText("Delete Specimen");
       toolBar.add(this.deleteSpecimenButton);
-    } catch (FileNotFoundException e) {
-      log().error("Couldn't find toolbar icons", e);
-    }
-    toolBar.setFloatable(false);
-    return toolBar;
+      toolBar.setFloatable(false);
+      return toolBar;
   }
   
   private class SpecimensTableFormat implements WritableTableFormat<Specimen>, AdvancedTableFormat<Specimen> {

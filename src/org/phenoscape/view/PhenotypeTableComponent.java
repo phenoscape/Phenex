@@ -165,27 +165,23 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
   }
 
   private JToolBar createToolBar() {
-    final JToolBar toolBar = new JToolBar();
-    try {
-      this.addPhenotypeButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-add.png"))) {
+      final JToolBar toolBar = new JToolBar();
+      this.addPhenotypeButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
           public void actionPerformed(ActionEvent e) {
-            addPhenotype();
+              addPhenotype();
           }
-        });
+      });
       this.addPhenotypeButton.setToolTipText("Add Phenotype");
       toolBar.add(this.addPhenotypeButton);
-      this.deletePhenotypeButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-remove.png"))) {
+      this.deletePhenotypeButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
           public void actionPerformed(ActionEvent e) {
-            deleteSelectedPhenotype();
+              deleteSelectedPhenotype();
           }
-        });
+      });
       this.deletePhenotypeButton.setToolTipText("Delete Phenotype");
       toolBar.add(this.deletePhenotypeButton);
-    } catch (FileNotFoundException e) {
-      log().error("Couldn't find toolbar icons", e);
-    }
-    toolBar.setFloatable(false);
-    return toolBar;
+      toolBar.setFloatable(false);
+      return toolBar;
   }
   
   private JPopupMenu createTablePopupMenu() {

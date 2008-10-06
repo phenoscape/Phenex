@@ -117,27 +117,23 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
   }
   
   private JToolBar createToolBar() {
-    final JToolBar toolBar = new JToolBar();
-    try {
-      this.addStateButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-add.png"))) {
+      final JToolBar toolBar = new JToolBar();
+      this.addStateButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
           public void actionPerformed(ActionEvent e) {
-            addState();
+              addState();
           }
-        });
+      });
       this.addStateButton.setToolTipText("Add State");
       toolBar.add(this.addStateButton);
-      this.deleteStateButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-remove.png"))) {
+      this.deleteStateButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
           public void actionPerformed(ActionEvent e) {
-            deleteSelectedState();
+              deleteSelectedState();
           }
-        });
+      });
       this.deleteStateButton.setToolTipText("Delete State");
       toolBar.add(this.deleteStateButton);
-    } catch (FileNotFoundException e) {
-      log().error("Couldn't find toolbar icons", e);
-    }
-    toolBar.setFloatable(false);
-    return toolBar;
+      toolBar.setFloatable(false);
+      return toolBar;
   }
 
   private class StatesTableFormat implements WritableTableFormat<State>, AdvancedTableFormat<State> {

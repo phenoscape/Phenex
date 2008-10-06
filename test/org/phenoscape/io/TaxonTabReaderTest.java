@@ -16,7 +16,7 @@ public class TaxonTabReaderTest {
     final OBOSession session = new OBOSessionImpl();
     final TermSet termset = new TermSet();
     termset.setOBOSession(session);
-    final TaxonTabReader reader = new TaxonTabReader(new File("test/testfiles/TaxonTabReaderTestFile1.tab"), session, termset);
+    final TaxonTabReader reader = new TaxonTabReader(new File("testfiles/TaxonTabReaderTestFile1.tab"), session, termset);
     reader.getTaxa();
   }
 

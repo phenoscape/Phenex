@@ -23,8 +23,8 @@ public class DataMergerTest {
   @Test
   public void mergeCharacters() throws IOException, XmlException {
     final OBOSession session = new OBOSessionImpl();
-    final CharacterTabReader reader = new CharacterTabReader(new File("test/testfiles/CharacterTabReaderTestFile1.tab"), session);
-    final NeXMLReader nexmlReader = new NeXMLReader(new File("test/testfiles/DataMergerTestFile1.xml"), session);
+    final CharacterTabReader reader = new CharacterTabReader(new File("testfiles/CharacterTabReaderTestFile1.tab"), session);
+    final NeXMLReader nexmlReader = new NeXMLReader(new File("testfiles/DataMergerTestFile1.xml"), session);
     final DataSet data = nexmlReader.getDataSet();
     Assert.assertNull("Character 2, State 0, should not exist in the original data set", this.findState(data.getCharacters().get(1).getStates(), "0"));
     final Phenotype originalPhenotypeC1S0 = data.getCharacters().get(0).getStates().get(0).getPhenotypes().get(0);
@@ -41,8 +41,8 @@ public class DataMergerTest {
   @Test
   public void mergeMatrix() throws ParseException, IOException, XmlException {
     final OBOSession session = new OBOSessionImpl();
-    final NEXUSReader nexusReader = new NEXUSReader(new File("test/testfiles/DataMergerTestFile3.nex"));
-    final NeXMLReader nexmlReader = new NeXMLReader(new File("test/testfiles/DataMergerTestFile2.xml"), session);
+    final NEXUSReader nexusReader = new NEXUSReader(new File("testfiles/DataMergerTestFile3.nex"));
+    final NeXMLReader nexmlReader = new NeXMLReader(new File("testfiles/DataMergerTestFile2.xml"), session);
     final DataSet data = nexmlReader.getDataSet();
     Assert.assertEquals("Original data set should have 3 characters", 3, data.getCharacters().size());
     Assert.assertNull("Cell 0,0 should be empty in the original data set", this.getCellValue(data, 0, 0));

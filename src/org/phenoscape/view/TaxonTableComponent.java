@@ -89,27 +89,23 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
   }
   
   private JToolBar createToolBar() {
-    final JToolBar toolBar = new JToolBar();
-    try {
-      this.addTaxonButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-add.png"))) {
+      final JToolBar toolBar = new JToolBar();
+      this.addTaxonButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
           public void actionPerformed(ActionEvent e) {
-            addTaxon();
+              addTaxon();
           }
-        });
+      });
       this.addTaxonButton.setToolTipText("Add Taxon");
       toolBar.add(this.addTaxonButton);
-      this.deleteTaxonButton = new JButton(new AbstractAction(null, new ImageIcon(FileUtil.findUrl("images/list-remove.png"))) {
+      this.deleteTaxonButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
           public void actionPerformed(ActionEvent e) {
-            deleteSelectedTaxon();
+              deleteSelectedTaxon();
           }
-        });
+      });
       this.deleteTaxonButton.setToolTipText("Delete Taxon");
       toolBar.add(this.deleteTaxonButton);
-    } catch (FileNotFoundException e) {
-      log().error("Couldn't find toolbar icons", e);
-    }
-    toolBar.setFloatable(false);
-    return toolBar;
+      toolBar.setFloatable(false);
+      return toolBar;
   }
 
   private class TaxaTableFormat implements WritableTableFormat<Taxon>, AdvancedTableFormat<Taxon> {

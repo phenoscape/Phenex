@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nex:nexml xmlns:nex="http://www.nexml.org/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:phen="http://www.bioontologies.org/obd/schema/pheno" generator="Phenex null" version="1.0">
+  <dict>
+    <key>phenex-metadata</key>
+    <any>
+      <curators/>
+      <publication/>
+      <publicationNotes/>
+    </any>
+  </dict>
+  <otus id="169c22cf-0b38-444d-b8d1-6a80e92f96b1">
+    <otu id="fc7dfa42-3942-44d0-bb6f-c95d5ab0ae53" label="Species 1"/>
+    <otu id="f8dc3a84-bcc3-43f0-ab52-4ea0762f71e6" label="Species 2"/>
+    <otu id="836a0348-10c1-4425-ab40-d6de25c1b3a1" label="Species not in NEXUS"/>
+  </otus>
+  <characters xmlns:ns="http://www.nexml.org/1.0" id="ad34be6b-6010-48cb-8847-4c1da67704db" xsi:type="ns:StandardCells" otus="169c22cf-0b38-444d-b8d1-6a80e92f96b1">
+    <format>
+      <states id="89b376f8-57ab-4adf-a3c3-33b18df31623">
+        <state id="b8ca60fb-7c86-40db-ac0e-a086070a7abf" label="" symbol="0">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+        <state id="b9914dc7-4cfd-464e-bfd4-c329a9f6df3e" label="" symbol="1">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+      </states>
+      <states id="52bd2b9d-d4ef-48a6-8a97-b6f4d9d5797f">
+        <state id="ab84ed16-e518-4536-864c-a8ea0625c3c5" label="xml state 0" symbol="0">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+        <state id="d766204b-cb64-4397-83a4-2ad97bae1715" label="" symbol="1">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+      </states>
+      <states id="713597f7-5dd1-4960-9fbd-23b9d943f8c6">
+        <state id="6966c426-8887-4acb-ad21-7a6bbab610aa" label="" symbol="0">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+        <state id="6a2d6592-12d7-4086-96ce-aee879ce213f" label="" symbol="1">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+        <state id="c5fac4a2-fa53-4200-b135-64f9e9af3ee9" label="" symbol="2">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype/>
+            </any>
+          </dict>
+        </state>
+      </states>
+      <char id="a0319a96-0639-4b65-91d5-8625a0ef959a" label="label in xml" states="89b376f8-57ab-4adf-a3c3-33b18df31623"/>
+      <char id="a93cd328-9c78-41b6-9ffa-8f3aeb44bf8d" label="" states="52bd2b9d-d4ef-48a6-8a97-b6f4d9d5797f"/>
+      <char id="d42fa0b8-1a69-4024-81f9-81f746826120" label="" states="713597f7-5dd1-4960-9fbd-23b9d943f8c6"/>
+    </format>
+    <matrix>
+      <row id="0b793807-26a5-45d1-9ebd-c6969bcbf479" otu="fc7dfa42-3942-44d0-bb6f-c95d5ab0ae53"/>
+      <row id="94e90f1a-b779-48ab-bef0-d3f2a1c7ebe7" otu="f8dc3a84-bcc3-43f0-ab52-4ea0762f71e6">
+        <cell char="a0319a96-0639-4b65-91d5-8625a0ef959a" state="b9914dc7-4cfd-464e-bfd4-c329a9f6df3e"/>
+        <cell char="a93cd328-9c78-41b6-9ffa-8f3aeb44bf8d" state="d766204b-cb64-4397-83a4-2ad97bae1715"/>
+        <cell char="d42fa0b8-1a69-4024-81f9-81f746826120" state="6a2d6592-12d7-4086-96ce-aee879ce213f"/>
+      </row>
+      <row id="ec37c3ca-fb19-4fb2-8d52-8d46c48bddc3" otu="836a0348-10c1-4425-ab40-d6de25c1b3a1"/>
+    </matrix>
+  </characters>
+</nex:nexml>

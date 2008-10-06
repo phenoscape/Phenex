@@ -21,7 +21,7 @@ public class CharacterTabReaderTest {
   public static void initialize() throws DataAdapterException {
     OBOFileAdapter fileAdapter = new OBOFileAdapter();
     OBOFileAdapter.OBOAdapterConfiguration config = new OBOFileAdapter.OBOAdapterConfiguration();
-    config.setReadPaths(Arrays.asList(new String[] {"test/testfiles/normal_test_ontology.obo"}));
+    config.setReadPaths(Arrays.asList(new String[] {"testfiles/normal_test_ontology.obo"}));
     config.setBasicSave(false);
     config.setAllowDangling(true);
     config.setFollowImports(false);
@@ -30,7 +30,7 @@ public class CharacterTabReaderTest {
 
   @Test
   public void readNormalFile() throws IOException {
-    final CharacterTabReader reader = new CharacterTabReader(new File("test/testfiles/CharacterTabReaderTestFile1.tab"), session);
+    final CharacterTabReader reader = new CharacterTabReader(new File("testfiles/CharacterTabReaderTestFile1.tab"), session);
     Assert.assertEquals("Reader should create same number of distinct characters as labeled in file", 72, reader.getCharacters().size());
     Assert.assertEquals("Reader should create same number of distinct states for a character as labeled in file", 2, reader.getCharacters().get(55).getStates().size());
     final Character character3 = reader.getCharacters().get(3);
@@ -40,7 +40,7 @@ public class CharacterTabReaderTest {
     // PATO:0001653 is not in the test ontology
     Assert.assertNull("A term ID not in the OBOSession should result in a null value", character3.getStates().get(0).getPhenotypes().get(0).getQuality());
     final Character character22 = reader.getCharacters().get(22);
-    Assert.assertEquals("A parsable integer should be put in the Count field of the phenotype", 1, character22.getStates().get(0).getPhenotypes().get(0).getCount());
+    Assert.assertEquals("A parsable integer should be put in the Count field of the phenotype", 1, character22.getStates().get(0).getPhenotypes().get(0).getCount().intValue());
     Assert.assertNull("An unparsable count value should be null in the Count field of the phenotype", character22.getStates().get(1).getPhenotypes().get(0).getCount());
     Assert.assertEquals("An unparsable count value should be appended prefixed with a semicolon and 'count=' to the Note field of the phenotype", "need to complete; count=2 >/= 5", character22.getStates().get(1).getPhenotypes().get(0).getComment());
     final Character character41 = reader.getCharacters().get(41);
@@ -50,7 +50,7 @@ public class CharacterTabReaderTest {
   @Test
   public void testReadLineLackingSomeTabs() throws IOException {
     // if this doesn't work an ArrayIndexOutOfBoundsException will be thrown
-    final CharacterTabReader reader = new CharacterTabReader(new File("test/testfiles/CharacterTabReaderTestFile2.tab"), session);
+    final CharacterTabReader reader = new CharacterTabReader(new File("testfiles/CharacterTabReaderTestFile2.tab"), session);
     reader.getCharacters();
   }
   

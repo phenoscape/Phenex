@@ -91,10 +91,10 @@
 	<target name="test" depends="build-test" description="Unit tests">
 		<junit fork="yes" printsummary="on" maxmemory="1024m">
 			<classpath>
+				<pathelement path="."/>
 				<pathelement path="${classfiles}"/>
 				<fileset dir="${lib}">
 					<include name="*.jar"/>
-					<exclude name="phenote.jar"/>
 				</fileset>
 			</classpath>
 			<batchtest>
@@ -107,10 +107,10 @@
 	<target name="verbose-test" depends="build-test" description="Unit tests">
 		<junit fork="yes" printsummary="withOutAndErr" maxmemory="1024m">
 			<classpath>
+				<pathelement path="."/>
 				<pathelement path="${classfiles}"/>
 				<fileset dir="${lib}">
 					<include name="*.jar"/>
-					<exclude name="phenote.jar"/>
 				</fileset>
 			</classpath>
 			<batchtest>
@@ -123,10 +123,10 @@
 	<target name="runatest" depends="build-test">
 		<junit fork="yes" printsummary="withOutAndErr" maxmemory="1024m" showoutput="true">
 			<classpath>
+				<pathelement path="."/>
 				<pathelement path="${classfiles}"/>
 				<fileset dir="${lib}">
 					<include name="*.jar"/>
-					<exclude name="phenote.jar"/>
 				</fileset>
 			</classpath>
 			<test name="${junit.test.class.name}"/>

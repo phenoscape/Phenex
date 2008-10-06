@@ -5,7 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -33,7 +32,6 @@ import org.phenoscape.swing.TablePopupListener;
 
 import phenote.datamodel.OboUtil;
 import phenote.gui.BugWorkaroundTable;
-import phenote.util.FileUtil;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;

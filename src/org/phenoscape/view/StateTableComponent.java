@@ -2,7 +2,6 @@ package org.phenoscape.view;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
 import java.util.Comparator;
 import java.util.List;
 
@@ -24,7 +23,6 @@ import org.phenoscape.swing.PlaceholderRenderer;
 import phenote.gui.BugWorkaroundTable;
 import phenote.gui.SortDisabler;
 import phenote.gui.TableColumnPrefsSaver;
-import phenote.util.FileUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.gui.WritableTableFormat;
@@ -217,7 +215,8 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
     
   }
   
-  private Logger log() {
+  @SuppressWarnings("unused")
+private Logger log() {
     return Logger.getLogger(this.getClass());
   }
 

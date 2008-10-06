@@ -3,7 +3,6 @@ package org.phenoscape.view;
 import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
 import java.util.Comparator;
 import java.util.List;
 
@@ -32,7 +31,6 @@ import org.phenoscape.swing.PopupListener;
 import phenote.gui.BugWorkaroundTable;
 import phenote.gui.SortDisabler;
 import phenote.gui.TableColumnPrefsSaver;
-import phenote.util.FileUtil;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
@@ -321,7 +319,8 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
     
   }
     
-  private Logger log() {
+  @SuppressWarnings("unused")
+private Logger log() {
     return Logger.getLogger(this.getClass());
   }
   

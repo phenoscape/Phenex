@@ -11,7 +11,6 @@ import org.obd.model.LinkStatement;
 import org.obd.model.Node;
 import org.obd.model.CompositionalDescription.Predicate;
 import org.obd.model.Node.Metatype;
-import org.obd.model.bridge.OBOBridge;
 import org.obd.model.vocabulary.TermVocabulary;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.OBOClass;

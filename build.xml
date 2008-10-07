@@ -27,6 +27,8 @@
 	<property name="obo_dest" location="../OBO"/>
 	<property name="obdapi_dest" location="../OBDAPI"/>
 	<property name="obovocab_dest" location="../obo-vocab-java"/>
+	<property name="oboedit_dest" location="../OBO-Edit2"/>
+	<property name="phenote_dest" location="../Phenote"/>
 	
 	<target name="buildbbop" if="bbop_dest">
 		<ant dir="${bbop_dest}" target="jar" inheritAll="false"/>
@@ -36,15 +38,23 @@
 		<ant dir="${obo_dest}" target="jar" inheritAll="false"/>
 		<copy file="${obo_dest}/obo.jar" todir="${lib}"/>
 	</target>
+	<target name="buildobovocab" if="obovocab_dest">
+	        <ant dir="${obovocab_dest}" target="jar" inheritAll="false"/>
+	        <copy file="${obovocab_dest}/obo-vocab.jar" todir="${lib}"/>
+	    </target>
 	<target name="buildobdapi" if="obdapi_dest">
 		<ant dir="${obdapi_dest}" target="jar" inheritAll="false"/>
 		<copy file="${obdapi_dest}/lib/runlibs/obdapi.jar" todir="${lib}"/>
 	</target>
-	<target name="buildobovocab" if="obovocab_dest">
-		<ant dir="${obovocab_dest}" target="jar" inheritAll="false"/>
-		<copy file="${obovocab_dest}/obo-vocab.jar" todir="${lib}"/>
+	<target name="buildoboedit" if="oboedit_dest">
+	        <ant dir="${oboedit_dest}" target="jar" inheritAll="false"/>
+	        <copy file="${oboedit_dest}/runtime/oboedit.jar" todir="${lib}"/>
 	</target>
-	<target name="library_jars" depends="buildbbop, buildobo, buildobovocab, buildobdapi">
+	<target name="buildphenote" if="phenote_dest">
+	            <ant dir="${phenote_dest}" target="jar" inheritAll="false"/>
+	            <copy file="${phenote_dest}/jars/phenote.jar" todir="${lib}"/>
+	</target>
+	<target name="library_jars" depends="buildbbop, buildobo, buildobovocab, buildobdapi, buildoboedit, buildphenote">
     </target>
 	
 <!-- The classpath includes all the jar files jars dir, excluding jars/phenote.jar if it exists. -->

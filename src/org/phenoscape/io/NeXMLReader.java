@@ -151,7 +151,7 @@ public class NeXMLReader {
   private void parseTaxa(Taxa taxa) {
     for (org.nexml.x10.Taxon xmlTaxon : taxa.getOtuArray()) {
       final Taxon newTaxon = new Taxon(xmlTaxon.getId());
-      newTaxon.setPublicationName(xmlTaxon.getLabel());
+      newTaxon.setPublicationName((xmlTaxon.getLabel() == null || xmlTaxon.getLabel().equals("")) ? null : xmlTaxon.getLabel());
       final Dict oboIDDict = NeXMLUtil.findOrCreateDict(xmlTaxon, "OBO_ID", xmlTaxon.getDomNode().getOwnerDocument().createElement("string"));
       for (String id : oboIDDict.getStringArray()) {
         final IdentifiedObject term = this.session.getObject(id.trim());

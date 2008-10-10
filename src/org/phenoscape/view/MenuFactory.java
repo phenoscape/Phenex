@@ -55,13 +55,17 @@ public class MenuFactory {
     final Action mergeCharactersAction = new AbstractAction("Tab-delimited Characters...") {
       public void actionPerformed(ActionEvent e) { controller.openMergeCharacters(); }
     };
-    final Action mergeMatrixAction = new AbstractAction("NEXUS Matrix...") {
+    final Action mergeNEXUSAction = new AbstractAction("NEXUS Data...") {
       public void actionPerformed(ActionEvent e) { controller.openMergeNEXUS(); }
     };
+    final Action mergeNeXMLAction = new AbstractAction("NeXML Data...") {
+        public void actionPerformed(ActionEvent e) { controller.openMergeNeXML(); }
+      };
     final JMenu mergeMenu = new JMenu("Merge");
     mergeMenu.add(new JMenuItem(mergeTaxaAction));
     mergeMenu.add(new JMenuItem(mergeCharactersAction));
-    mergeMenu.add(new JMenuItem(mergeMatrixAction));
+    mergeMenu.add(new JMenuItem(mergeNEXUSAction));
+    mergeMenu.add(new JMenuItem(mergeNeXMLAction));
     menu.add(mergeMenu);
     menu.addSeparator();
     final Action saveAction = new AbstractAction("Save") {

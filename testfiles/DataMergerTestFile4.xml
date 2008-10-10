@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nex:nexml xmlns:nex="http://www.nexml.org/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" generator="Phenex 1.0-beta10" version="1.0">
+  <dict>
+    <key>phenex-metadata</key>
+    <any>
+      <curators/>
+      <publication/>
+      <publicationNotes/>
+    </any>
+  </dict>
+  <otus id="ce0e771d-84e2-4250-9294-df776ccc7b22">
+    <otu id="311b53bf-d7db-4885-b395-916e447f8b79" label="">
+      <dict>
+        <key>OBO_ID</key>
+        <string>TTO:1052189</string>
+      </dict>
+    </otu>
+    <otu id="98bbe7b6-03dc-407d-ad10-998039e67071" label="Ictalurus punctatus">
+    </otu>
+    <otu id="6391291f-eb49-4c02-84fe-22f57f6b3ee5" label="Japanoconger africanus">
+    </otu>
+  </otus>
+  <characters xmlns:ns="http://www.nexml.org/1.0" id="bde96785-ac84-4735-9135-0dee345b60ee" xsi:type="ns:StandardCells" otus="ce0e771d-84e2-4250-9294-df776ccc7b22">
+    <format/>
+    <matrix>
+      <row id="aca77914-ceb9-4631-a35a-2f49d4778dee" otu="311b53bf-d7db-4885-b395-916e447f8b79"/>
+      <row id="cb1f15b0-2012-4181-94be-bcf4aecbfce4" otu="98bbe7b6-03dc-407d-ad10-998039e67071"/>
+      <row id="83a35ccc-c652-4a4b-8eec-d0f025c7ff78" otu="6391291f-eb49-4c02-84fe-22f57f6b3ee5"/>
+      <row id="7b8c0ed1-6470-4ff3-a9f8-ffa24bc3ba2e" otu="cca128c5-6bf1-4940-a05c-c186c4a94cfa"/>
+    </matrix>
+  </characters>
+</nex:nexml>

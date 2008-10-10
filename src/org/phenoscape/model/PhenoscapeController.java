@@ -208,6 +208,15 @@ public class PhenoscapeController extends DocumentController {
     }
   }
   
+  public void openMergeNeXML() {
+      final JFileChooser fileChooser = new JFileChooser();
+      final int result = fileChooser.showOpenDialog(GUIManager.getManager().getFrame());
+      if (result == JFileChooser.APPROVE_OPTION) {
+        final File file = fileChooser.getSelectedFile();
+        this.mergeNeXML(file);
+      }
+    }
+  
   public JFrame getWindow() {
     return GUIManager.getManager().getFrame();
   }
@@ -246,7 +255,7 @@ public class PhenoscapeController extends DocumentController {
   private void mergeTaxa(File aFile) {
     try {
       final TaxonTabReader reader = new TaxonTabReader(aFile, this.getOntologyController().getOBOSession(), this.getOntologyController().getCollectionTermSet());
-      DataMerger.mergeTaxa(reader, this.getDataSet());
+      DataMerger.mergeTaxa(reader.getDataSet(), this.getDataSet());
     } catch (IOException e) {
       log().error("Error reading taxon list file", e);
     }
@@ -256,7 +265,7 @@ public class PhenoscapeController extends DocumentController {
   private void mergeCharacters(File aFile) {
     try {
       final CharacterTabReader reader = new CharacterTabReader(aFile, this.getOntologyController().getOBOSession());
-      DataMerger.mergeCharacters(reader, this.getDataSet());
+      DataMerger.mergeCharacters(reader.getDataSet(), this.getDataSet());
     } catch (IOException e) {
       log().error("Error reading character list file", e);
     }
@@ -273,6 +282,18 @@ public class PhenoscapeController extends DocumentController {
       log().error("Error reading NEXUS file", e);
     }
     this.fireDataChanged();
+  }
+  
+  private void mergeNeXML(File aFile) {
+      try {
+        final NeXMLReader reader = new NeXMLReader(aFile, this.getOntologyController().getOBOSession());
+        DataMerger.mergeDataSets(reader.getDataSet(), this.getDataSet());
+    } catch (XmlException e) {
+        log().error("Error parsing NeXML file", e);
+    } catch (IOException e) {
+        log().error("Error reading NeXML file", e);
+    }
+      
   }
   
   private Logger log() {

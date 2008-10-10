@@ -57,38 +57,17 @@
 	<target name="library_jars" depends="buildbbop, buildobo, buildobovocab, buildobdapi, buildoboedit, buildphenote">
     </target>
 	
-<!-- The classpath includes all the jar files jars dir, excluding jars/phenote.jar if it exists. -->
 	<path id="project.classpath">
 		<fileset dir="${lib}">
 			<include name="*"/>
 		</fileset>
 	</path>
 	
-<!-- The compile target runs javac on all the java files, and saves them into  the classfiles directory. excludes="test/**"  -->
+<!-- The compile target runs javac on all the java files, and saves them into  the classfiles directory  -->
 	<target name="compile" depends="init">
 		<javac srcdir="${src}" destdir="${classfiles}" debug="yes">
 			<classpath refid="project.classpath"/>
 		</javac>
-	</target>
-	
-<!-- runs off classfiles not jar, todo: run-jar -->
-	<target name="run" depends="compile">
-		<java classname="phenote.main.Phenote" fork="yes">
-			<jvmarg value="-Xmx500M"/>
-			<jvmarg value="-Dphenote.version=${phenote.version}"/>
-			<jvmarg value="-Dphenote.build=${phenote.build}"/>
-			<jvmarg value="-Djava.library.path=${lib}"/>
-<!-- arg value="-c configfilehereventually"/ -->
-			<classpath>
-				<pathelement path="${classfiles}"/>
-<!-- for log4j -->
-				<pathelement path="${conf}"/>
-				<fileset dir="${lib}">
-					<include name="*.jar"/>
-					<exclude name="phenote.jar"/>
-				</fileset>
-			</classpath>
-		</java>
 	</target>
 	
     <target name="build-test" depends="compile">

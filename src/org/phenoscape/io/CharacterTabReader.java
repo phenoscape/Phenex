@@ -8,11 +8,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOSession;
 import org.phenoscape.model.Character;
+import org.phenoscape.model.DataSet;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.State;
 
@@ -30,6 +32,16 @@ public class CharacterTabReader {
 
   public Map<Integer, Character> getCharacters() {
     return this.characterMap;
+  }
+  
+  public DataSet getDataSet() {
+      final DataSet data = new DataSet();
+      final Character[] characters = new Character[this.maxCharacterNumber(this.characterMap)];
+      for (Entry<Integer, Character> entry : this.characterMap.entrySet()) {
+          characters[entry.getKey() - 1] = entry.getValue();
+      }
+      data.getCharacters().addAll(Arrays.asList(characters));
+      return data;
   }
 
   private void parse(File aFile) throws IOException {
@@ -101,6 +113,14 @@ public class CharacterTabReader {
     final State state = character.newState();
     state.setSymbol(symbol);
     return state;
+  }
+  
+  private int maxCharacterNumber(Map<Integer, Character> map) {
+      int max = 0;
+      for (Integer index : map.keySet()) {
+          max = Math.max(max, index);
+      }
+      return max;
   }
   
   private Logger log() {

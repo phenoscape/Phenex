@@ -14,6 +14,7 @@ import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
 import org.phenoscape.io.NeXMLReader;
 import org.phenoscape.model.DataSet;
+import org.phenoscape.model.OntologyController;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
@@ -30,7 +31,7 @@ public class DataMergerTest {
     final Phenotype originalPhenotypeC1S0 = data.getCharacters().get(0).getStates().get(0).getPhenotypes().get(0);
     final int originalPhenotypeCountC2S0 = data.getCharacters().get(1).getStates().get(0).getPhenotypes().size();
     Assert.assertEquals("Character 2, State 1, should not have any Phenotypes", 0, originalPhenotypeCountC2S0);
-    DataMerger.mergeCharacters(reader, data);
+    DataMerger.mergeCharacters(reader.getDataSet(), data);
     Assert.assertNotNull("Character 2, State 0, should now exist because there is data for it in the tab file", this.findState(data.getCharacters().get(1).getStates(), "0"));
     final Phenotype newPhenotypeC1S0 = data.getCharacters().get(0).getStates().get(0).getPhenotypes().get(0);
     Assert.assertNotSame("The phenotypes for this state should have been replaced with new ones", newPhenotypeC1S0, originalPhenotypeC1S0);
@@ -39,7 +40,25 @@ public class DataMergerTest {
   }
   
   @Test
-  public void mergeMatrix() throws ParseException, IOException, XmlException {
+  public void mergeTaxa() throws XmlException, IOException {
+      final OBOSession session = new OntologyController().getOBOSession();
+      final NeXMLReader nexmlReader4 = new NeXMLReader(new File("testfiles/DataMergerTestFile4.xml"), session);
+      final NeXMLReader nexmlReader5 = new NeXMLReader(new File("testfiles/DataMergerTestFile5.xml"), session);
+      final DataSet existingData = nexmlReader4.getDataSet();
+      Assert.assertEquals("Three taxa to start out with", 3, existingData.getTaxa().size());
+      DataMerger.mergeTaxa(nexmlReader5.getDataSet(), existingData);
+      Assert.assertEquals("First taxon was matched by valid name and now has a specimen", 1, existingData.getTaxa().get(0).getSpecimens().size());
+      Assert.assertNull("First taxon still has no publication name", existingData.getTaxa().get(0).getPublicationName());
+      Assert.assertEquals("Second taxon was matched by publication name and now has a specimen", 1, existingData.getTaxa().get(1).getSpecimens().size());
+      Assert.assertNull("Second taxon still has no valid name", existingData.getTaxa().get(1).getValidName());
+      Assert.assertNotNull("Third taxon was matched by publication name and now has valid name", existingData.getTaxa().get(2).getValidName());
+      Assert.assertEquals("Five taxa after merging", 5, existingData.getTaxa().size());
+      Assert.assertEquals("Check fourth taxon's name", "Species 8472", existingData.getTaxa().get(3).getPublicationName());
+      Assert.assertEquals("Check fifth taxon's valid name", session.getObject("TTO:10000106"), existingData.getTaxa().get(4).getValidName());
+  }
+  
+  @Test
+  public void mergeData() throws ParseException, IOException, XmlException {
     final OBOSession session = new OBOSessionImpl();
     final NEXUSReader nexusReader = new NEXUSReader(new File("testfiles/DataMergerTestFile3.nex"));
     final NeXMLReader nexmlReader = new NeXMLReader(new File("testfiles/DataMergerTestFile2.xml"), session);
@@ -55,11 +74,12 @@ public class DataMergerTest {
     Assert.assertEquals("Cell 0,0 should have state with symbol 0", "0", this.getCellValue(data, 0, 0).getSymbol());
     Assert.assertEquals("Cell 0,1 should have state with symbol 0", "0", this.getCellValue(data, 1, 0).getSymbol());
     Assert.assertEquals("Cell 0,4 should have state with symbol 1", "1", this.getCellValue(data, 0, 4).getSymbol());
-    Assert.assertEquals("First character label should not have changed", "label in xml", data.getCharacters().get(0).getLabel());
+    Assert.assertEquals("First character label should have changed", "char1", data.getCharacters().get(0).getLabel());
     Assert.assertNotNull("Second character should now have a state with symbol '2'", this.findState(data.getCharacters().get(1).getStates(), "2"));
-    Assert.assertEquals("Second character state '0' should have original label since it was already there", "xml state 0", this.findState(data.getCharacters().get(1).getStates(), "0").getLabel());
+    Assert.assertEquals("Second character state '0' should have imported label instead of original", "label 2,0", this.findState(data.getCharacters().get(1).getStates(), "0").getLabel());
     Assert.assertEquals("Second character state '2' should have imported label since it was added", "label 2,2", this.findState(data.getCharacters().get(1).getStates(), "2").getLabel());
     Assert.assertEquals("Fourth character should have label from NEXUS file, since a new character was added", "char4", data.getCharacters().get(3).getLabel());
+    Assert.assertEquals("Fifth character should have label from NEXUS file, since a new character was added", "char5", data.getCharacters().get(4).getLabel());
     Assert.assertEquals("Merged data set should have 4 taxa", 4, data.getTaxa().size());
     Assert.assertNotNull("New taxon should have been added", this.findTaxon(data.getTaxa(), "Species not in NeXML"));
   }

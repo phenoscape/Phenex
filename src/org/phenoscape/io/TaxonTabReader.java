@@ -11,6 +11,7 @@ import java.util.List;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOSession;
+import org.phenoscape.model.DataSet;
 import org.phenoscape.model.Specimen;
 import org.phenoscape.model.Taxon;
 import org.phenoscape.model.TermSet;
@@ -33,6 +34,12 @@ public class TaxonTabReader {
     return this.taxa;
   }
   
+  public DataSet getDataSet() {
+      final DataSet data = new DataSet();
+      data.getTaxa().addAll(this.taxa);
+      return data;
+  }
+  
   private void parse(File aFile) throws IOException {
     final LineNumberReader reader = new LineNumberReader(new FileReader(aFile));
     final String header = reader.readLine();
@@ -46,7 +53,7 @@ public class TaxonTabReader {
       final String taxonID = Collections.get(cells, fields.indexOf("Valid Taxon ID"));
       taxon.setValidName((OBOClass)(session.getObject(taxonID)));
       final String pubName = Collections.get(cells, fields.indexOf("Publication Taxon"));
-      taxon.setPublicationName(pubName);
+      taxon.setPublicationName("".equals(pubName) ? null : pubName);
       final String comments = Collections.get(cells, fields.indexOf("Taxon Comments"));
       taxon.setComment(comments);
       final String specimensString = Collections.get(cells, fields.indexOf("Specimens"));
@@ -55,6 +62,7 @@ public class TaxonTabReader {
         for (String specimenString : specimens) {
           final Specimen specimen = new Specimen();
           String adjustedString = specimenString;
+          if (specimenString.equals("\"\"")) { continue; }
           if (specimenString.startsWith("\"")) { adjustedString = adjustedString.split("\"")[1]; }
           final String[] pieces = adjustedString.split(" ");
           if (pieces.length > 0) {
@@ -70,7 +78,7 @@ public class TaxonTabReader {
           }
           if (pieces.length > 1) {
             final String catalogNum = pieces[1];
-            specimen.setCatalogID(catalogNum);
+            specimen.setCatalogID(catalogNum.trim());
           }
           taxon.addSpecimen(specimen);
         }

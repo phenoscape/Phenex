@@ -31,6 +31,7 @@ public class AnatomyTermFilter implements TermFilter {
     "TAO:0005143", //dentine
     "TAO:0005142", //enameloid
     "TAO:0001621", //otolith
+    "TAO:0001738", //fontanel
     "PATO:0000462", //absent
     "PATO:0000467", //present
     "PATO:0000052", //shape

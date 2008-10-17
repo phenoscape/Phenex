@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nex:nexml xmlns:nex="http://www.nexml.org/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:phen="http://www.bioontologies.org/obd/schema/pheno" generator="Phenex null" version="1.0">
+  <dict>
+    <key>phenex-metadata</key>
+    <any>
+      <curators/>
+      <publication/>
+      <publicationNotes/>
+    </any>
+  </dict>
+  <otus id="869f9de6-739f-4a1f-95c0-4dc1cb385fad">
+    <otu id="08c5bb9d-f815-414c-832f-e51808b13d5d" label="">
+      <dict>
+        <key>OBO_ID</key>
+        <string>TTO:1052189</string>
+      </dict>
+      <dict>
+        <key>OBO_specimens</key>
+        <any>
+          <specimen collection="COLLECTION:0000194" accession="1234"/>
+        </any>
+      </dict>
+    </otu>
+  </otus>
+  <characters xmlns:ns="http://www.nexml.org/1.0" id="3e93347b-39a7-40e6-8602-34b77e329a22" xsi:type="ns:StandardCells" otus="869f9de6-739f-4a1f-95c0-4dc1cb385fad">
+    <format>
+      <states id="12d63611-51ec-4ae4-9a1e-af2ec941ab9c">
+        <state id="45a896db-d1a2-47f3-9d59-163dfcfe1f96" label="" symbol="0">
+          <dict>
+            <key>OBO_phenotype</key>
+            <any>
+              <phen:phenotype>
+                <phen:phenotype_character>
+                  <phen:bearer>
+                    <phen:typeref about="TAO:0001173"/>
+                  </phen:bearer>
+                  <phen:quality>
+                    <phen:typeref about="PATO:0000318"/>
+                  </phen:quality>
+                </phen:phenotype_character>
+              </phen:phenotype>
+            </any>
+          </dict>
+        </state>
+      </states>
+      <char id="f9c2f63f-13f5-4f1c-9e7c-6681ca71a499" label="" states="12d63611-51ec-4ae4-9a1e-af2ec941ab9c"/>
+    </format>
+    <matrix>
+      <row id="62bb0329-7b11-4e30-b806-8ab5689087d6" otu="08c5bb9d-f815-414c-832f-e51808b13d5d"/>
+    </matrix>
+  </characters>
+</nex:nexml>

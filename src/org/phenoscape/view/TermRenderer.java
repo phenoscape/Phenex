@@ -33,9 +33,11 @@ public class TermRenderer extends PlaceholderRenderer {
           final Component component = super.getTableCellRendererComponent(table, (term.getName() != null ? term.getName() : term.getID()), isSelected, hasFocus, row, column);
           if (this.isDangling(term)) {
               component.setForeground(Color.BLUE);
+              this.setToolTipText("Dangling Term: " + term.getID());
           }
           if (term.isObsolete()) {
               component.setForeground(Color.RED);
+              this.setToolTipText("Obsolete Term: " + term.getID());
           }
           return component;
       } else {

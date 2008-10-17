@@ -77,11 +77,17 @@ public class NeXMLReader {
     public String getCharactersBlockID() {
         return this.charactersBlockID;
     }
-    
+
+    /**
+     * Returns true if the reader had to create dangling terms for referenced IDs not found in the OBOSession.
+     */
     public boolean didCreateDanglers() {
         return !this.danglers.isEmpty();
     }
-    
+
+    /**
+     * Returns the list of IDs referenced in the file that were not found in the OBOSession.
+     */
     public List<String> getDanglersList() {
         return this.danglers;
     }
@@ -228,7 +234,7 @@ public class NeXMLReader {
         }
         return null;
     }
-    
+
     private OBOClass getTerm(String id) {
         final IdentifiedObject term = this.session.getObject(id);
         if (term instanceof OBOClass) {
@@ -240,7 +246,7 @@ public class NeXMLReader {
             return dangler;
         }
     }  
-  
+
     private Logger log() {
         return Logger.getLogger(this.getClass());
     }

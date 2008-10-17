@@ -5,7 +5,6 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -24,7 +23,6 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
   private JTextField curatorsField;
   private JTextField publicationField;
   private JTextArea pubNotesField;
-  private JButton applyButton;
 
   public DataSetComponent(String id, PhenoscapeController controller) {
     super(id, controller);
@@ -56,14 +54,6 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
     this.pubNotesField.setLineWrap(true);
     this.pubNotesField.setWrapStyleWord(true);
     this.pubNotesField.getDocument().addDocumentListener(new PubNotesListener());
-    this.applyButton = new JButton();
-    this.applyButton.setEnabled(false);
-    this.applyButton.setAction(new AbstractAction("Apply Changes") {
-      public void actionPerformed(ActionEvent e) {
-        getController().getDataSet().setPublicationNotes(pubNotesField.getText());
-        applyButton.setEnabled(false);
-      }
-    });
     
     final GridBagConstraints curatorsLabelConstraints = new GridBagConstraints();
     curatorsLabelConstraints.anchor = GridBagConstraints.EAST;
@@ -98,12 +88,6 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
     pubNotesFieldConstraints.weighty = 1.0;
     this.add(new JScrollPane(this.pubNotesField), pubNotesFieldConstraints);
     
-    final GridBagConstraints applyButtonConstraints = new GridBagConstraints();
-    applyButtonConstraints.gridy = 4;
-    applyButtonConstraints.gridwidth = 2;
-    applyButtonConstraints.anchor = GridBagConstraints.EAST;
-    this.add(this.applyButton, applyButtonConstraints);
-    
     this.getController().addNewDataListener(new DataListener());
     this.updateInterface();
   }
@@ -129,7 +113,7 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
     }
     
     private void documentChanged() {
-      applyButton.setEnabled(true);
+      getController().getDataSet().setPublicationNotes(pubNotesField.getText());
     }
     
   }

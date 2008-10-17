@@ -138,18 +138,17 @@ public class PhenoscapeController extends DocumentController {
         return this.currentSpecimensSelectionModel;
     }
 
-    //@Override
-    public boolean readData(File aFile) {
-        log().debug("Read file: " + aFile);
-        return this.readNeXML(aFile);
+    @Override
+    public void readData(File aFile) throws IOException {
+        this.readNeXML(aFile);
     }
 
-    private boolean readNeXML(File aFile) {
+    private void readNeXML(File aFile) throws IOException {
         try {
             final NeXMLReader reader = new NeXMLReader(aFile, this.getOntologyController().getOBOSession());
             if (reader.didCreateDanglers()) {
                 final boolean result = this.runDanglerAlert(aFile, reader.getDanglersList());
-                if (!result) { return false; }
+                if (!result) { return; }
             }
             this.xmlDoc = reader.getXMLDoc();
             this.charactersBlockID = reader.getCharactersBlockID();
@@ -162,27 +161,19 @@ public class PhenoscapeController extends DocumentController {
             this.getDataSet().setPublicationNotes(reader.getDataSet().getPublicationNotes());
             this.getDataSet().setMatrixData(reader.getDataSet().getMatrixData());
             this.fireDataChanged();
-            return true;
         } catch (XmlException e) {
-            log().error("Unable to parse XML", e);
-        } catch (IOException e) {
-            log().error("Unable to read file", e);
+            final IOException ioe = new IOException(e.getLocalizedMessage());
+            ioe.initCause(e);
+            throw ioe;
         }
-        return false;
     }
 
     @Override
-    public boolean writeData(File aFile) {
+    public void writeData(File aFile) throws IOException {
         final NeXMLWriter writer = new NeXMLWriter(this.charactersBlockID, this.xmlDoc);
         writer.setDataSet(this.dataSet);
         writer.setGenerator(this.getAppName() + " " + this.getAppVersion());
-        try {
-            writer.write(aFile);
-            return true;
-        } catch (IOException e) {
-            log().error("Unable to write NeXML file", e);
-            return false;
-        }
+        writer.write(aFile);
     }
 
     public void openMergeTaxa() {

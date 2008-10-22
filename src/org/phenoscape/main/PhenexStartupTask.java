@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -20,9 +21,12 @@ import org.bbop.framework.GUIManager;
 import org.bbop.framework.GUITask;
 import org.bbop.framework.dock.LayoutDriver;
 import org.bbop.framework.dock.idw.IDWDriver;
+import org.jdesktop.swingworker.SwingWorker;
 import org.oboedit.gui.tasks.DefaultGUIStartupTask;
 import org.phenoscape.app.CrossPlatform;
+import org.phenoscape.model.OntologyController;
 import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.swing.BlockingProgressDialog;
 import org.phenoscape.swing.WindowSizePrefsSaver;
 import org.phenoscape.view.CharacterMatrixComponentFactory;
 import org.phenoscape.view.CharacterTableComponentFactory;
@@ -99,7 +103,28 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
   @Override
   protected void configureSystem() {
     super.configureSystem();
-    this.controller = new PhenoscapeController();
+    final SwingWorker<OntologyController, Void> ontologyLoader = new SwingWorker<OntologyController, Void>() {
+        @Override
+        protected OntologyController doInBackground() {
+            return new OntologyController();
+        }
+    };
+    // you would expect that displaying the progress dialog would make the splash screen go away, but it doesn't
+    this.flashJFrameToMakeSplashScreenGoAway();
+    final BlockingProgressDialog<OntologyController, Void> dialog = new BlockingProgressDialog<OntologyController, Void>(ontologyLoader, "Phenex is checking for ontology updates.  It may take some time to download and configure ontologies.");
+    dialog.setTitle("Launching " + this.getAppName());
+    dialog.setSize(400, 150);
+    dialog.setLocationRelativeTo(null);
+    dialog.run();
+    try {
+        this.controller = new PhenoscapeController(ontologyLoader.get());
+    } catch (InterruptedException e) {
+        log().fatal("Failed to create ontology controller", e);
+        GUIManager.exit(1);
+    } catch (ExecutionException e) {
+        log().fatal("Failed to create ontology controller", e);
+        GUIManager.exit(1);
+    }
     this.controller.setAppName(this.getAppName());
   }
   
@@ -187,6 +212,12 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
     // OBO-Edit startup task adds some things we don't want
     // hopefully none of these tasks are needed for operations in Phenex
     return new ArrayList<GUITask>();
+  }
+  
+  private void flashJFrameToMakeSplashScreenGoAway() {
+      final JFrame frame = new JFrame();
+      frame.setVisible(true);
+      frame.setVisible(false);
   }
 
   private Logger log() {

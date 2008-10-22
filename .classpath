@@ -84,5 +84,6 @@
 	<classpathentry kind="lib" path="lib/jpl.jar"/>
 	<classpathentry kind="lib" path="lib/arq.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/swing-worker-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -32,7 +32,7 @@ import ca.odell.glazedlists.swing.EventSelectionModel;
 
 public class PhenoscapeController extends DocumentController {
 
-    private final OntologyController ontologyController = new OntologyController();
+    private final OntologyController ontologyController;
     private final DataSet dataSet = new DataSet();
     private final SortedList<Character> sortedCharacters;
     private final EventSelectionModel<Character> charactersSelectionModel;
@@ -49,8 +49,9 @@ public class PhenoscapeController extends DocumentController {
     private String appName;
     private final List<NewDataListener> newDataListeners = new ArrayList<NewDataListener>();
 
-    public PhenoscapeController() {
+    public PhenoscapeController(OntologyController ontologyController) {
         super();
+        this.ontologyController = ontologyController;
         this.sortedCharacters = new SortedList<Character>(this.dataSet.getCharacters(), new EverythingEqualComparator<Character>());
         this.charactersSelectionModel = new EventSelectionModel<Character>(this.sortedCharacters);
         new ListSelectionMaintainer<Character>(this.sortedCharacters, this.charactersSelectionModel);

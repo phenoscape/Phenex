@@ -205,7 +205,7 @@
 			<fileset file="log4j.xml"/>
 			<manifest>
 				<attribute name="Main-Class" value="${main-class}"/>
-				<attribute name="SplashScreen-Image" value="org/phenoscape/view/images/Seal-of-Phenex-medium.png"/>
+				<!--	<attribute name="SplashScreen-Image" value="org/phenoscape/view/images/Seal-of-Phenex-medium.png"/> -->
 			</manifest>
 		</jar>
 	</target>
@@ -217,11 +217,10 @@
 	<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler" classpath="${build-lib}/jarbundler-2.0.0.jar"/>
 <!-- Create a self-contained double-clickable app bundle for Mac OS X in "dist/Phenex.app" -->
 	<target name="dist-mac" depends="jar, dist-init">
-		<jarbundler dir="${dist}" name="Phenex" mainclass="${main-class}" jvmversion="1.5+" vmoptions="-Xmx1024M" version="${phenex.version}" build="${phenex.build}" icon="launchers/macosx/Seal-of-Phenex.icns">
+		<jarbundler dir="${dist}" name="Phenex" mainclass="${main-class}" jvmversion="1.5+" vmoptions="-Xmx1024M" version="${phenex.version}" build="${phenex.build}" icon="launchers/macosx/Seal-of-Phenex.icns" splashfile="$JAVAROOT/Seal-of-Phenex-medium.png">
 			<jarfileset file="${jarfile}"/>
 			<jarfileset dir="${lib}"/>
-			<!-- splashfile="$JAVAROOT/phenote_logo.jpg" temp from jarbundler-->
-			<!--<javafilelist dir="images" files="phenote_logo.jpg"/>-->
+			<javafilelist dir="src/org/phenoscape/view/images" files="Seal-of-Phenex-medium.png"/>
 			<javaproperty name="apple.laf.useScreenMenuBar" value="true"/>
 			<javaproperty name="phenex.version" value="${phenex.version}"/>
 			<javaproperty name="phenex.build" value="${phenex.build}"/>

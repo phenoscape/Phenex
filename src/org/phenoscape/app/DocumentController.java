@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 
@@ -23,6 +24,19 @@ public abstract class DocumentController {
 
     public void open() {
         final JFileChooser fileChooser = new JFileChooser();
+        final FileFilter filter = new FileFilter() {
+            
+            @Override
+            public boolean accept(File file) {
+                return file.isDirectory() || file.getName().endsWith("." + getDefaultFileExtension());
+            }
+
+            @Override
+            public String getDescription() {
+                return "NeXML Files";
+            }
+        };
+        fileChooser.setFileFilter(filter);
         final int result = fileChooser.showOpenDialog(this.getWindow());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();

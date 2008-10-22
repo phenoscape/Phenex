@@ -69,9 +69,23 @@ public abstract class DocumentController {
         final int result = fileChooser.showSaveDialog(this.getWindow());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
+            final String suffix = "." + this.getDefaultFileExtension();
+            final File correctedFile;
+            if (file.getName().endsWith(suffix)) {
+                correctedFile = file;
+            } else {
+                correctedFile = new File(file.getPath() + suffix);
+            }
+            if (correctedFile.exists()) {
+                String[] options = {"Replace", "Cancel"};
+                final int replace = JOptionPane.showOptionDialog(this.getWindow(), "\"" + correctedFile.getName() + "\" already exists. Do you want to replace it?  Replacing it will overwrite its current contents.", null, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+                if (replace == JOptionPane.NO_OPTION) {
+                    return;
+                }
+            }
             try {
-                this.writeData(file);
-                this.setCurrentFile(file);
+                this.writeData(correctedFile);
+                this.setCurrentFile(correctedFile);
             } catch (IOException e) {
                 log().error("Unable to save file", e);
                 this.runFileWriteErrorMessage(file, e.getLocalizedMessage());
@@ -91,10 +105,12 @@ public abstract class DocumentController {
     public abstract void readData(File aFile) throws IOException;
 
     public abstract void writeData(File aFile) throws IOException;
-
+    
     public abstract JFrame getWindow();
 
     public abstract String getAppName();
+    
+    public abstract String getDefaultFileExtension();
 
     private void setWindowTitle(File aFile) {
         final JFrame window = this.getWindow();
@@ -113,10 +129,6 @@ public abstract class DocumentController {
         if (result == JOptionPane.YES_OPTION) {
             this.saveAs();
         }
-    }
-
-    protected static class Error {
-
     }
 
     private Logger log() {

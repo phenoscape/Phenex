@@ -229,6 +229,11 @@ public class PhenoscapeController extends DocumentController {
     public String getAppVersion() {
         return System.getProperty("phenex.version");
     }
+    
+    public String getDefaultFileExtension() {
+        return "xml";
+    }
+
 
     public SelectionManager getPhenoteSelectionManager() {
         return SelectionManager.inst();

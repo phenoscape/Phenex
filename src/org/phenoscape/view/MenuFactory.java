@@ -13,12 +13,16 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import org.apache.log4j.Logger;
 import org.bbop.framework.GUIManager;
 import org.bbop.framework.ViewMenu;
 import org.phenoscape.app.CrossPlatform;
 import org.phenoscape.model.PhenoscapeController;
 
 import phenote.gui.actions.ResponderChainAction;
+import edu.stanford.ejalbert.BrowserLauncher;
+import edu.stanford.ejalbert.exception.BrowserLaunchingInitializingException;
+import edu.stanford.ejalbert.exception.UnsupportedOperatingSystemException;
 
 public class MenuFactory {
   
@@ -39,6 +43,7 @@ public class MenuFactory {
     showMenu.setText("View");
     menus.add(showMenu);
     menus.add(perspectivesMenu);
+    menus.add(this.createHelpMenu());
     return menus;
   }
 
@@ -112,6 +117,28 @@ public class MenuFactory {
     selectAllAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
     menu.add(new JMenuItem(selectAllAction));
     return menu;
+  }
+  
+  private JMenuItem createHelpMenu() {
+      final JMenu menu = new JMenu("Help");
+      final Action trackerAction = new AbstractAction("Submit Bug Report or Feature Request...") {
+        public void actionPerformed(ActionEvent e) {
+            try {
+                (new BrowserLauncher()).openURLinBrowser("https://sourceforge.net/tracker/?func=add&group_id=76834&atid=1116214");
+            } catch (BrowserLaunchingInitializingException e1) {
+                log().error("Unable to open URL in browser", e1);
+                e1.printStackTrace();
+            } catch (UnsupportedOperatingSystemException e1) {
+                log().error("Unable to open URL in browser", e1);
+            }
+        }
+      };
+      menu.add(trackerAction);
+      return menu;
+  }
+  
+  private Logger log() {
+      return Logger.getLogger(this.getClass());
   }
 
 }

@@ -25,7 +25,6 @@
 	<classpathentry kind="lib" path="lib/jh.jar"/>
 	<classpathentry kind="lib" path="lib/jwf-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/swingx-2007_10_14.jar"/>
-	<classpathentry kind="lib" path="lib/BrowserLauncher2-10rc4.jar"/>
 	<classpathentry kind="lib" path="lib/batik-gvt.jar"/>
 	<classpathentry kind="lib" path="lib/batik-anim.jar"/>
 	<classpathentry kind="lib" path="lib/batik-awt-util.jar"/>
@@ -85,5 +84,6 @@
 	<classpathentry kind="lib" path="lib/arq.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/swing-worker-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/BrowserLauncher2-1_3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

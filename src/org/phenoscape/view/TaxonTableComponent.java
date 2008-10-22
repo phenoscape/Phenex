@@ -117,12 +117,13 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
       case 0: taxon.setValidName((OBOClass)editedValue); break;
       case 1: taxon.setPublicationName(editedValue.toString()); break;
       case 2: taxon.setComment(editedValue.toString()); break;
+      case 3: taxon.setMatrixTaxonName(editedValue.toString()); break;
       }
       return taxon;
     }
 
     public int getColumnCount() {
-      return 3;
+      return 4;
     }
 
     public String getColumnName(int column) {
@@ -130,6 +131,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
       case 0: return "Valid Taxon";
       case 1: return "Publication Taxon";
       case 2: return "Comment";
+      case 3: return "Matrix Taxon";
       default: return null;
       }
     }
@@ -139,6 +141,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
       case 0: return taxon.getValidName();
       case 1: return taxon.getPublicationName();
       case 2: return taxon.getComment();
+      case 3: return taxon.getMatrixTaxonName();
       default: return null;
       }
     }
@@ -148,6 +151,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
       case 0: return OBOObject.class;
       case 1: return String.class;
       case 2: return String.class;
+      case 3: return String.class;
       default: return null;
       }
     }
@@ -157,6 +161,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
       case 0: return GlazedLists.comparableComparator();
       case 1: return Strings.getNaturalComparator();
       case 2: return Strings.getNaturalComparator();
+      case 3: return Strings.getNaturalComparator();
       default: return null;
       }
     }

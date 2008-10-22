@@ -179,6 +179,7 @@ public class NeXMLReader {
                 break; // there should only be one String element anyway
             }
             newTaxon.setComment(this.getComment(xmlTaxon));
+            newTaxon.setMatrixTaxonName(this.getMatrixTaxon(xmlTaxon));
             final Dict specimensDict = NeXMLUtil.findOrCreateDict(xmlTaxon, "OBO_specimens", xmlTaxon.getDomNode().getOwnerDocument().createElement("any"));
             for (XmlObject xmlObj : specimensDict.getAnyArray()) {
                 final NodeList nodes = ((Element)(xmlObj.getDomNode())).getElementsByTagName("specimen");
@@ -231,6 +232,14 @@ public class NeXMLReader {
         final Dict commentDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.COMMENT_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
         for (String comment : commentDict.getStringArray()) {
             return comment;
+        }
+        return null;
+    }
+    
+    private String getMatrixTaxon(Annotated node) {
+        final Dict matrixTaxonDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.MATRIX_TAXON_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+        for (String matrixTaxon : matrixTaxonDict.getStringArray()) {
+            return matrixTaxon;
         }
         return null;
     }

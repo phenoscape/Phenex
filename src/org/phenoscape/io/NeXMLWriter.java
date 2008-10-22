@@ -193,6 +193,7 @@ public class NeXMLWriter {
       this.writeOBOID(otu, taxon);
       this.writeSpecimens(otu, taxon);
       this.writeComment(otu, taxon.getComment());
+      this.writeMatrixTaxon(otu, taxon.getMatrixTaxonName());
     }
     taxaBlock.setOtuArray(newOTUs.toArray(new org.nexml.x10.Taxon[] {}));
   }
@@ -299,6 +300,16 @@ public class NeXMLWriter {
       NeXMLUtil.setTextContent(stringNode, comment);
     }
   }
+  
+  private void writeMatrixTaxon(Annotated node, String matrixTaxon) {
+      final Dict matrixTaxonDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.MATRIX_TAXON_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+      if ((matrixTaxon == null) || (matrixTaxon.equals(""))) {
+        NeXMLUtil.removeDict(node, matrixTaxonDict);
+      } else {
+        final Element stringNode = NeXMLUtil.getFirstChildWithTagName((Element)(matrixTaxonDict.getDomNode()), "string");
+        NeXMLUtil.setTextContent(stringNode, matrixTaxon);
+      }
+    }
   
   private void writePhenotypes(AbstractState xmlState, State state) {
     final Dict phenotypeDict = NeXMLUtil.findOrCreateDict(xmlState, "OBO_phenotype", xmlState.getDomNode().getOwnerDocument().createElement("any"));

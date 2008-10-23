@@ -40,7 +40,8 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
     private final EventList<State> allStates;
     private static enum TaxonDisplay {
         PUBLICATION_NAME { public String toString() { return "Display Publication Name"; }},
-        VALID_NAME { public String toString() { return "Display Valid Name"; }}
+        VALID_NAME { public String toString() { return "Display Valid Name"; }},
+        MATRIX_NAME { public String toString() { return "Display Matrix Name"; }}
     }
     private static enum CharacterDisplay {
         CHARACTER_NUMBER { public String toString() { return "Display Character Number"; }},
@@ -293,7 +294,12 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
                 final Object newValue = value != null ? ((Taxon)value).getValidName() : value;
                 return super.getTableCellRendererComponent(table, newValue, isSelected, hasFocus, row, column);
             } else {
-                final Object newValue = value != null ? ((Taxon)value).getPublicationName() : value;
+                final Object newValue;
+                if (value != null) {
+                    newValue = taxonOption.equals(TaxonDisplay.PUBLICATION_NAME) ? ((Taxon)value).getPublicationName() : ((Taxon)value).getMatrixTaxonName();
+                } else {
+                    newValue = value;
+                }
                 return super.getTableCellRendererComponent(table, newValue, isSelected, hasFocus, row, column);
             }
         }

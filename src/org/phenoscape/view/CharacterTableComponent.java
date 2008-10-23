@@ -124,7 +124,7 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 
     public String getColumnName(int column) {
       switch(column) {
-      case 0: return "Number";
+      case 0: return " ";
       case 1: return "Character Description";
       case 2: return "Comment";
       default: return null;

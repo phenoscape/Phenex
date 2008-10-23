@@ -76,7 +76,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
     taxaTable.setSelectionModel(this.getController().getTaxaSelectionModel());
     taxaTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
     taxaTable.setDefaultRenderer(OBOObject.class, new TermRenderer("None"));
-    taxaTable.getColumnModel().getColumn(0).setCellEditor(this.createAutocompleteEditor(this.getController().getOntologyController().getTaxonTermSet().getTerms()));
+    taxaTable.getColumnModel().getColumn(1).setCellEditor(this.createAutocompleteEditor(this.getController().getOntologyController().getTaxonTermSet().getTerms()));
     taxaTable.putClientProperty("Quaqua.Table.style", "striped");
     new TableColumnPrefsSaver(taxaTable, this.getClass().getName());
     final TableComparatorChooser<Taxon> sortChooser = new TableComparatorChooser<Taxon>(taxaTable, this.getController().getSortedTaxa(), false);
@@ -109,49 +109,53 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
   private class TaxaTableFormat implements WritableTableFormat<Taxon>, AdvancedTableFormat<Taxon> {
 
     public boolean isEditable(Taxon taxon, int column) {
-      return true;
+        return column != 0;
     }
 
     public Taxon setColumnValue(Taxon taxon, Object editedValue, int column) {
       switch (column) {
-      case 0: taxon.setValidName((OBOClass)editedValue); break;
-      case 1: taxon.setPublicationName(editedValue.toString()); break;
-      case 2: taxon.setComment(editedValue.toString()); break;
-      case 3: taxon.setMatrixTaxonName(editedValue.toString()); break;
+      case 0: break;
+      case 1: taxon.setValidName((OBOClass)editedValue); break;
+      case 2: taxon.setPublicationName(editedValue.toString()); break;
+      case 3: taxon.setComment(editedValue.toString()); break;
+      case 4: taxon.setMatrixTaxonName(editedValue.toString()); break;
       }
       return taxon;
     }
 
     public int getColumnCount() {
-      return 4;
+      return 5;
     }
 
     public String getColumnName(int column) {
       switch (column) {
-      case 0: return "Valid Taxon";
-      case 1: return "Publication Taxon";
-      case 2: return "Comment";
-      case 3: return "Matrix Taxon";
+      case 0: return " ";
+      case 1: return "Valid Taxon";
+      case 2: return "Publication Taxon";
+      case 3: return "Comment";
+      case 4: return "Matrix Taxon";
       default: return null;
       }
     }
 
     public Object getColumnValue(Taxon taxon, int column) {
       switch (column) {
-      case 0: return taxon.getValidName();
-      case 1: return taxon.getPublicationName();
-      case 2: return taxon.getComment();
-      case 3: return taxon.getMatrixTaxonName();
+      case 0: return getController().getDataSet().getTaxa().indexOf(taxon) + 1;
+      case 1: return taxon.getValidName();
+      case 2: return taxon.getPublicationName();
+      case 3: return taxon.getComment();
+      case 4: return taxon.getMatrixTaxonName();
       default: return null;
       }
     }
 
     public Class<?> getColumnClass(int column) {
       switch (column) {
-      case 0: return OBOObject.class;
-      case 1: return String.class;
+      case 0: return Integer.class;
+      case 1: return OBOObject.class;
       case 2: return String.class;
       case 3: return String.class;
+      case 4: return String.class;
       default: return null;
       }
     }
@@ -159,9 +163,10 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
     public Comparator<?> getColumnComparator(int column) {
       switch (column) {
       case 0: return GlazedLists.comparableComparator();
-      case 1: return Strings.getNaturalComparator();
+      case 1: return GlazedLists.comparableComparator();
       case 2: return Strings.getNaturalComparator();
       case 3: return Strings.getNaturalComparator();
+      case 4: return Strings.getNaturalComparator();
       default: return null;
       }
     }

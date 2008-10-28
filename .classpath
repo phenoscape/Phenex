@@ -7,7 +7,11 @@
 	<classpathentry kind="lib" path="lib/biojava.jar"/>
 	<classpathentry kind="lib" path="lib/nexmlbeans.jar"/>
 	<classpathentry kind="lib" path="lib/xbean.jar"/>
-	<classpathentry kind="lib" path="lib/glazedlists-1.7.0_java15.jar"/>
+	<classpathentry kind="lib" path="lib/glazedlists-1.7.0_java15.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://publicobject.com/glazedlists/glazedlists-1.7.0/api/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/junit-4.5.jar"/>
 	<classpathentry kind="lib" path="lib/bbop.jar" sourcepath="/BBOP/src"/>
 	<classpathentry kind="lib" path="lib/idw-gpl.jar"/>
@@ -85,5 +89,10 @@
 	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/swing-worker-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/BrowserLauncher2-1_3.jar"/>
+	<classpathentry kind="lib" path="lib/beansbinding-1.2.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/Users/jim/Work/Source/Java/beansbinding/beansbinding-1.2.1-doc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -85,7 +85,7 @@ public class MenuFactory {
     menu.add(new JMenuItem(saveAsAction));
     if (CrossPlatform.shouldPutExitInFileMenu()) {
       menu.addSeparator();
-      final Action exitAction = new AbstractAction("Exit"){
+      final Action exitAction = new AbstractAction("Exit") {
         public void actionPerformed(ActionEvent e) { GUIManager.exit(0); }
       };
       menu.add(new JMenuItem(exitAction));
@@ -95,14 +95,12 @@ public class MenuFactory {
   
   private JMenuItem createEditMenu() {
     final JMenu menu = new JMenu("Edit");
-    final Action undoAction = new ResponderChainAction("undo", "Undo");
-    undoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-    undoAction.setEnabled(false); //TODO add Undo support
-    menu.add(new JMenuItem(undoAction));
-    final Action redoAction = new ResponderChainAction("redo", "Redo");
-    redoAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK));
-    redoAction.setEnabled(false); //TODO add Redo support
-    menu.add(new JMenuItem(redoAction));
+    final Action undo = this.controller.getUndoController().getUndoAction();
+    undo.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+    menu.add(new JMenuItem(undo));
+    final Action redo = this.controller.getUndoController().getRedoAction();
+    redo.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK));
+    menu.add(new JMenuItem(redo));
     menu.addSeparator();
     final Action cutAction = new ResponderChainAction("cut", "Cut");
     cutAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));

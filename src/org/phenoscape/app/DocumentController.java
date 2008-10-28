@@ -125,7 +125,7 @@ public abstract class DocumentController {
     public abstract String getAppName();
     
     public abstract String getDefaultFileExtension();
-
+    
     private void setWindowTitle(File aFile) {
         final JFrame window = this.getWindow();
         if (window != null) {

@@ -3,16 +3,20 @@ package org.phenoscape.view;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.apache.log4j.Logger;
+import org.phenoscape.model.DataSet;
 import org.phenoscape.model.NewDataListener;
 import org.phenoscape.model.PhenoscapeController;
 import org.phenoscape.swing.PlaceholderText;
@@ -88,8 +92,24 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
     pubNotesFieldConstraints.weighty = 1.0;
     this.add(new JScrollPane(this.pubNotesField), pubNotesFieldConstraints);
     
+    //TODO can probably remove this
     this.getController().addNewDataListener(new DataListener());
     this.updateInterface();
+    this.getController().getDataSet().addPropertyChangeListener(DataSet.CURATORS, new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            curatorsField.setText(getController().getDataSet().getCurators());
+        }
+    });
+    this.getController().getDataSet().addPropertyChangeListener(DataSet.PUBLICATION, new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            publicationField.setText(getController().getDataSet().getPublication());
+        }
+    });
+    this.getController().getDataSet().addPropertyChangeListener(DataSet.PUBLICATION_NOTES, new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            pubNotesField.setText(getController().getDataSet().getPublicationNotes());
+        }
+    });
   }
   
   private void updateInterface() {
@@ -113,11 +133,16 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
     }
     
     private void documentChanged() {
-      getController().getDataSet().setPublicationNotes(pubNotesField.getText());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                getController().getDataSet().setPublicationNotes(pubNotesField.getText());                
+            }
+        });
     }
     
   }
   
+  //TODO get rid of this and just use observer
   private class DataListener implements NewDataListener {
 
     public void reloadData() {

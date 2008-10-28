@@ -3,83 +3,110 @@ package org.phenoscape.model;
 import java.util.UUID;
 
 import org.obo.datamodel.OBOClass;
+import org.phenoscape.app.AbstractPropertyChangeObject;
+import org.phenoscape.util.ObservableEventList;
 
 import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.EventList;
 
-public class Taxon {
-  
-  private final String nexmlID;
-  private OBOClass validName;
-  private String publicationName;
-  private String matrixTaxonName;
-  private String comment;
-  private final EventList<Specimen> specimens = new BasicEventList<Specimen>();
-  
-  public Taxon() {
-    this(UUID.randomUUID().toString());
-  }
-  
-  public Taxon(String nexmlID) {
-    this.nexmlID = nexmlID;
-  }
-  
-  public String getNexmlID() {
-    return this.nexmlID;
-  }
-  
-  public OBOClass getValidName() {
-    return this.validName;
-  }
-  
-  public void setValidName(OBOClass validName) {
-    this.validName = validName;
-  }
-  
-  public String getPublicationName() {
-    return this.publicationName;
-  }
-  
-  public void setPublicationName(String publicationName) {
-    this.publicationName = publicationName;
-  }
-  
-  public String getMatrixTaxonName() {
-      return this.matrixTaxonName;
-  }
-  
-  public void setMatrixTaxonName(String matrixName) {
-      this.matrixTaxonName = matrixName;
-  }
-  
-  public String getComment() {
-    return this.comment;
-  }
-  
-  public void setComment(String comment) {
-    this.comment = comment;
-  }
-  
-  public Specimen newSpecimen() {
-    final Specimen newSpecimen = new Specimen();
-    this.addSpecimen(newSpecimen);
-    return newSpecimen;
-  }
-  
-  public void addSpecimen(Specimen aSpecimen) {
-    this.specimens.add(aSpecimen);
-  }
-  
-  public void removeSpecimen(Specimen aSpecimen) {
-    this.specimens.remove(aSpecimen);
-  }
-  
-  public EventList<Specimen> getSpecimens() {
-    return this.specimens;
-  }
-  
-  public String toString() {
-    return this.getValidName() != null ? this.getValidName().toString() : "untitled";
-  }
+public class Taxon extends AbstractPropertyChangeObject {
 
+    private final String nexmlID;
+    private OBOClass validName;
+    private String publicationName;
+    private String matrixTaxonName;
+    private String comment;
+    private final ObservableEventList<Specimen> specimens = new ObservableEventList<Specimen>(new BasicEventList<Specimen>());
+    public static String VALID_NAME = "validName";
+    public static String PUBLICATION_NAME = "publicationName";
+    public static String MATRIX_TAXON_NAME = "matrixTaxonName";
+    public static String COMMENT = "comment";
+
+    public Taxon() {
+        this(UUID.randomUUID().toString());
+    }
+
+    public Taxon(String nexmlID) {
+        this.nexmlID = nexmlID;
+    }
+
+    public String getNexmlID() {
+        return this.nexmlID;
+    }
+
+    public OBOClass getValidName() {
+        return this.validName;
+    }
+
+    public void setValidName(OBOClass validName) {
+        final OBOClass oldValue = this.validName;
+        this.validName = validName;
+        this.firePropertyChange(VALID_NAME, oldValue, validName);
+    }
+
+    public String getPublicationName() {
+        return this.publicationName;
+    }
+
+    public void setPublicationName(String publicationName) {
+        final String oldValue = this.publicationName;
+        this.publicationName = publicationName;
+        this.firePropertyChange(PUBLICATION_NAME, oldValue, publicationName);
+    }
+
+    public String getMatrixTaxonName() {
+        return this.matrixTaxonName;
+    }
+
+    public void setMatrixTaxonName(String matrixName) {
+        final String oldValue = this.matrixTaxonName;
+        this.matrixTaxonName = matrixName;
+        this.firePropertyChange(MATRIX_TAXON_NAME, oldValue, matrixName);
+    }
+
+    public String getComment() {
+        return this.comment;
+    }
+
+    public void setComment(String comment) {
+        final String oldValue = this.comment;
+        this.comment = comment;
+        this.firePropertyChange(COMMENT, oldValue, comment);
+    }
+
+    public Specimen newSpecimen() {
+        final Specimen newSpecimen = new Specimen();
+        this.addSpecimen(newSpecimen);
+        return newSpecimen;
+    }
+
+    public void addSpecimen(Specimen aSpecimen) {
+        this.specimens.add(aSpecimen);
+    }
+
+    public void removeSpecimen(Specimen aSpecimen) {
+        this.specimens.remove(aSpecimen);
+    }
+
+    public ObservableEventList<Specimen> getSpecimens() {
+        return this.specimens;
+    }
+
+    public String toString() {
+        return this.getValidName() != null ? this.getValidName().toString() : "untitled";
+    }
+
+    public Class<?> getClass(String propertyKey) throws UndefinedKeyException {
+        if (propertyKey.equals(VALID_NAME)) {
+            return OBOClass.class;
+        } else if (propertyKey.equals(PUBLICATION_NAME)) {
+            return String.class;
+        } else if (propertyKey.equals(MATRIX_TAXON_NAME)) {
+            return String.class;
+        } else if (propertyKey.equals(COMMENT)) {
+            return String.class;
+        } else {
+            return super.getClass(propertyKey);
+        }
+    }
+    
 }

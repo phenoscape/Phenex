@@ -25,108 +25,143 @@ import org.phenoscape.io.URLProxy;
  */
 public class OntologyController {
 
-  private final OBOFileAdapter fileAdapter;
-  private final OBOMetaData metadata;
-  
-  private String TTO = "";
-  private String COLLECTION = "";
-  private String TAO = "";
-  private String PATO = "";
-  private String SPATIAL = "";
-  private String UNIT = "";
-  private String REL = "";
-  private String REL_PROPOSED = "";
+    private final OBOFileAdapter fileAdapter;
+    private final OBOMetaData metadata;
 
-  public OntologyController() {
-    this.fileAdapter = new OBOFileAdapter();
-    OBOFileAdapter.OBOAdapterConfiguration config = new OBOFileAdapter.OBOAdapterConfiguration();
-    config.setReadPaths(Arrays.asList(this.getPaths()));
-    config.setBasicSave(false);
-    config.setAllowDangling(true);
-    config.setFollowImports(false); // this is required because OBO currently fails if it tries to follow an import and there is no network connection
-    try {
-      SessionManager.getManager().setSession(this.fileAdapter.doOperation(OBOAdapter.READ_ONTOLOGY, config, null));
-    } catch (DataAdapterException e) {
-      log().fatal("Failed to load ontologies", e);
+    private String TTO = "";
+    private String COLLECTION = "";
+    private String TAO = "";
+    private String PATO = "";
+    private String SPATIAL = "";
+    private String UNIT = "";
+    private String REL = "";
+    private String REL_PROPOSED = "";
+
+    private TermSet entityTermSet = null;
+    private TermSet taxonTermSet = null;
+    private TermSet collectionTermSet = null;
+    private TermSet unitTermSet = null;
+    private TermSet relationsTermSet = null;
+
+    public OntologyController() {
+        this.fileAdapter = new OBOFileAdapter();
+        OBOFileAdapter.OBOAdapterConfiguration config = new OBOFileAdapter.OBOAdapterConfiguration();
+        config.setReadPaths(Arrays.asList(this.getPaths()));
+        config.setBasicSave(false);
+        config.setAllowDangling(true);
+        config.setFollowImports(false); // this is required because OBO currently fails if it tries to follow an import and there is no network connection
+        try {
+            SessionManager.getManager().setSession(this.fileAdapter.doOperation(OBOAdapter.READ_ONTOLOGY, config, null));
+        } catch (DataAdapterException e) {
+            log().fatal("Failed to load ontologies", e);
+        }
+        this.metadata = this.fileAdapter.getMetaData();
+        this.prefetchTermSets();
     }
-    this.metadata = this.fileAdapter.getMetaData();
-  }
-  
-  private String[] getPaths () {
-    URLProxy proxy = new URLProxy(new File(GUIManager.getPrefsDir(),"Ontology Cache"));
-    try {
-      this.TTO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/taxonomy/teleost_taxonomy.obo")).toURI().toString();
-      this.COLLECTION = proxy.get(new URL("http://phenoscape.svn.sourceforge.net/viewvc/*checkout*/phenoscape/trunk/vocab/fish_collection_abbreviation.obo")).toURI().toString();
-      this.TAO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/fish/teleost_anatomy.obo")).toURI().toString();
-      this.PATO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo")).toURI().toString();
-      this.SPATIAL = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/anatomy/caro/spatial.obo")).toURI().toString();
-      this.UNIT = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/unit.obo")).toURI().toString();
-      this.REL = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro.obo")).toURI().toString();
-      this.REL_PROPOSED = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro_proposed.obo")).toURI().toString();
-      String[] paths = { TTO, COLLECTION, TAO, PATO, SPATIAL, UNIT, REL, REL_PROPOSED };
-      return paths;
-    } catch (MalformedURLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      //TODO alert user somehow
-      log().fatal("Unable to read one or more ontologies", e);
+
+    private String[] getPaths () {
+        URLProxy proxy = new URLProxy(new File(GUIManager.getPrefsDir(),"Ontology Cache"));
+        try {
+            this.TTO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/taxonomy/teleost_taxonomy.obo")).toURI().toString();
+            this.COLLECTION = proxy.get(new URL("http://phenoscape.svn.sourceforge.net/viewvc/*checkout*/phenoscape/trunk/vocab/fish_collection_abbreviation.obo")).toURI().toString();
+            this.TAO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/fish/teleost_anatomy.obo")).toURI().toString();
+            this.PATO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo")).toURI().toString();
+            this.SPATIAL = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/anatomy/caro/spatial.obo")).toURI().toString();
+            this.UNIT = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/unit.obo")).toURI().toString();
+            this.REL = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro.obo")).toURI().toString();
+            this.REL_PROPOSED = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro_proposed.obo")).toURI().toString();
+            String[] paths = { TTO, COLLECTION, TAO, PATO, SPATIAL, UNIT, REL, REL_PROPOSED };
+            return paths;
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            //TODO alert user somehow
+            log().fatal("Unable to read one or more ontologies", e);
+        }
+        return new String[] {};
     }
-    return new String[] {};
-  }
 
-  public OBOSession getOBOSession() {
-    return SessionManager.getManager().getSession();
-  }
-
-  public TermSet getTaxonTermSet() {
-    return this.getTermSet(TTO);
-  }
-  
-  public TermSet getCollectionTermSet() {
-    return this.getTermSet(COLLECTION);
-  }
-
-  public TermSet getEntityTermSet() {
-    final TermSet terms = this.getTermSet(TAO, SPATIAL, PATO);
-    terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
-    return terms;
-  }
-
-  public TermSet getQualityTermSet() {
-    final TermSet terms = this.getTermSet(PATO, SPATIAL, TAO);
-    terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
-    return terms;
-  }
-
-  public TermSet getRelatedEntityTermSet() {
-    return this.getEntityTermSet();
-  }
-
-  public TermSet getUnitTermSet() {
-    return this.getTermSet(UNIT);
-  }
-  
-  public TermSet getRelationsTermSet() {
-    final TermSet set = this.getTermSet();
-    set.setTermFilter(new RelationTermFilter(this.getOBOSession()));
-    set.setIncludesProperties(true);
-    return set;
-  }
-  
-  private TermSet getTermSet(String... urls) {
-    final Collection<Namespace> namespaces = new ArrayList<Namespace>();
-    for (String url : urls) {
-      namespaces.addAll(this.metadata.getNamespaces(url));
+    public OBOSession getOBOSession() {
+        return SessionManager.getManager().getSession();
     }
-    final TermSet terms =  new TermSet();
-    terms.setOBOSession(this.getOBOSession());
-    terms.setNamespaces(namespaces);
-    return terms;
-  }
-  
-  private Logger log() {
-    return Logger.getLogger(this.getClass());
-  }
+
+    public TermSet getTaxonTermSet() {
+        if (this.taxonTermSet == null) {
+            this.taxonTermSet = this.getTermSet(TTO); 
+        }
+        return this.taxonTermSet;
+    }
+
+    public TermSet getCollectionTermSet() {
+        if (this.collectionTermSet == null) {
+            this.collectionTermSet = this.getTermSet(COLLECTION); 
+        }
+        return this.collectionTermSet;
+    }
+
+    public TermSet getEntityTermSet() {
+        if (this.entityTermSet == null) {
+            final TermSet terms = this.getTermSet(TAO, SPATIAL, PATO);
+            terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
+            this.entityTermSet = terms;
+        }
+        
+        return this.entityTermSet;
+    }
+
+    public TermSet getQualityTermSet() {
+        return this.getEntityTermSet();
+    }
+
+    public TermSet getRelatedEntityTermSet() {
+        return this.getEntityTermSet();
+    }
+
+    public TermSet getUnitTermSet() {
+        if (this.unitTermSet == null) {
+            this.unitTermSet = this.getTermSet(UNIT);
+        }
+        return this.unitTermSet;
+    }
+
+    public TermSet getRelationsTermSet() {
+        if (this.relationsTermSet == null) {
+            final TermSet set = this.getTermSet();
+            set.setTermFilter(new RelationTermFilter(this.getOBOSession()));
+            set.setIncludesProperties(true);
+            this.relationsTermSet = set;
+        }
+        return this.relationsTermSet;
+    }
+
+    private TermSet getTermSet(String... urls) {
+        final Collection<Namespace> namespaces = new ArrayList<Namespace>();
+        for (String url : urls) {
+            namespaces.addAll(this.metadata.getNamespaces(url));
+        }
+        final TermSet terms =  new TermSet();
+        terms.setOBOSession(this.getOBOSession());
+        terms.setNamespaces(namespaces);
+        return terms;
+    }
+    
+    /**
+     * This is just a startup "optimization" - it makes the term searches
+     * happen while the ontology loading panel is displayed.  This reduces
+     * the blank time between that panel disappearing and the interface being
+     * displayed.
+     */
+    private void prefetchTermSets() {
+        this.getEntityTermSet().getTerms();
+        this.getTaxonTermSet().getTerms();
+        this.getCollectionTermSet().getTerms();
+        this.getUnitTermSet().getTerms();
+        this.getRelationsTermSet().getTerms();
+    }
+
+    private Logger log() {
+        return Logger.getLogger(this.getClass());
+    }
 
 }

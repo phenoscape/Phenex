@@ -217,7 +217,9 @@
 	<taskdef name="jarbundler" classname="net.sourceforge.jarbundler.JarBundler" classpath="${build-lib}/jarbundler-2.0.0.jar"/>
 <!-- Create a self-contained double-clickable app bundle for Mac OS X in "dist/Phenex.app" -->
 	<target name="dist-mac" depends="jar, dist-init">
-		<jarbundler dir="${dist}" name="Phenex" mainclass="${main-class}" jvmversion="1.5+" vmoptions="-Xmx1024M" version="${phenex.version}" build="${phenex.build}" icon="launchers/macosx/Seal-of-Phenex.icns" splashfile="$JAVAROOT/Seal-of-Phenex-medium.png">
+		<property name="mac-folder" value="${dist}/macosx"/>
+		<mkdir dir="${mac-folder}"/>
+		<jarbundler dir="${mac-folder}" name="Phenex" mainclass="${main-class}" jvmversion="1.5+" vmoptions="-Xmx1024M" version="${phenex.version}" build="${phenex.build}" icon="launchers/macosx/Seal-of-Phenex.icns" splashfile="$JAVAROOT/Seal-of-Phenex-medium.png">
 			<jarfileset file="${jarfile}"/>
 			<jarfileset dir="${lib}"/>
 			<javafilelist dir="src/org/phenoscape/view/images" files="Seal-of-Phenex-medium.png"/>
@@ -229,27 +231,53 @@
 	
 <!-- Create a double-clickable batch file for Windows in "dist/Phenex".  Jars are placed in a nested lib folder. -->
 	<target name="dist-win" depends="jar, dist-init">
-		<mkdir dir="${dist}/Phenex/lib"/>
-		<copy todir="${dist}/Phenex" file="launchers/windows/Phenex.bat"/>
-		<replace file="${dist}/Phenex/Phenex.bat" token="@@phenex.version@@" value="${phenex.version}"/>
-		<replace file="${dist}/Phenex/Phenex.bat" token="@@phenex.build@@" value="${phenex.build}"/>
-		<copy todir="${dist}/Phenex/lib">
+		<property name="win-folder" value="${dist}/windows/Phenex"/>
+		<mkdir dir="${win-folder}/lib"/>
+		<copy todir="${win-folder}" file="launchers/windows/Phenex.bat"/>
+		<replace file="${win-folder}/Phenex.bat" token="@@phenex.version@@" value="${phenex.version}"/>
+		<replace file="${win-folder}/Phenex.bat" token="@@phenex.build@@" value="${phenex.build}"/>
+		<copy todir="${win-folder}/lib">
 			<fileset dir="${lib}"/>
 		</copy>
-		<copy todir="${dist}/Phenex/lib" file="${jarfile}"/>
+		<copy todir="${win-folder}/lib" file="${jarfile}"/>
 		<path id="libclasses">
-			<fileset dir="${dist}/Phenex/lib"/>
+			<fileset dir="${win-folder}/lib"/>
 		</path>
-		<manifestclasspath property="jar.classpath" jarfile="${dist}/Phenex/lib/phenex.jar">
+		<manifestclasspath property="jar.classpath" jarfile="${win-folder}/lib/phenex.jar">
 			<classpath refid="libclasses"/>
 		</manifestclasspath>
-		<jar destfile="${dist}/Phenex/lib/phenex.jar" update="yes">
+		<jar destfile="${win-folder}/lib/phenex.jar" update="yes">
 			<manifest>
 				<attribute name="Class-Path" value="${jar.classpath}"/>
 			</manifest>
 		</jar>
 	</target>
 	
-	<target name="dist" depends="dist-mac, dist-win"/>
+<!-- Create a shell-script package for Unix in "dist/Phenex".  Jars are placed in a nested lib folder. -->
+	<!-- This isn't finished yet. -->
+    <target name="dist-unix" depends="jar, dist-init">
+    	<property name="unix-folder" value="${dist}/unix/Phenex"/>
+        <mkdir dir="${unix-folder}/lib"/>
+        <copy todir="${unix-folder}" file="launchers/unix/Phenex.sh"/>
+        <replace file="${unix-folder}/Phenex.sh" token="@@phenex.version@@" value="${phenex.version}"/>
+        <replace file="${unix-folder}/Phenex.sh" token="@@phenex.build@@" value="${phenex.build}"/>
+        <copy todir="${unix-folder}/lib">
+            <fileset dir="${lib}"/>
+        </copy>
+        <copy todir="${unix-folder}/lib" file="${jarfile}"/>
+        <path id="libclasses">
+            <fileset dir="${unix-folder}/lib"/>
+        </path>
+        <manifestclasspath property="jar.unixclasspath" jarfile="${unix-folder}/lib/phenex.jar">
+            <classpath refid="libclasses"/>
+        </manifestclasspath>
+        <jar destfile="${unix-folder}/lib/phenex.jar" update="yes">
+            <manifest>
+                <attribute name="Class-Path" value="${jar.unixclasspath}"/>
+            </manifest>
+        </jar>
+    </target>
+	
+	<target name="dist" depends="dist-mac, dist-win, dist-unix"/>
 	
 </project>

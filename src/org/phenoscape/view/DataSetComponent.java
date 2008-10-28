@@ -16,10 +16,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.apache.log4j.Logger;
+import org.jdesktop.xswingx.PromptSupport;
 import org.phenoscape.model.DataSet;
-import org.phenoscape.model.NewDataListener;
 import org.phenoscape.model.PhenoscapeController;
-import org.phenoscape.swing.PlaceholderText;
 import org.phenoscape.swing.TabActionTextField;
 
 public class DataSetComponent extends PhenoscapeGUIComponent {
@@ -41,14 +40,14 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
   private void initializeInterface() {
     this.setLayout(new GridBagLayout());
     this.curatorsField = new TabActionTextField();
-    new PlaceholderText(this.curatorsField, "None");
+    PromptSupport.setPrompt("None", this.curatorsField);
     this.curatorsField.setAction(new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
         getController().getDataSet().setCurators(curatorsField.getText());
       }
     });
     this.publicationField = new TabActionTextField();
-    new PlaceholderText(this.publicationField, "None");
+    PromptSupport.setPrompt("None", this.publicationField);
     this.publicationField.setAction(new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
         getController().getDataSet().setPublication(publicationField.getText());
@@ -92,8 +91,6 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
     pubNotesFieldConstraints.weighty = 1.0;
     this.add(new JScrollPane(this.pubNotesField), pubNotesFieldConstraints);
     
-    //TODO can probably remove this
-    this.getController().addNewDataListener(new DataListener());
     this.updateInterface();
     this.getController().getDataSet().addPropertyChangeListener(DataSet.CURATORS, new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
@@ -138,15 +135,6 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
                 getController().getDataSet().setPublicationNotes(pubNotesField.getText());                
             }
         });
-    }
-    
-  }
-  
-  //TODO get rid of this and just use observer
-  private class DataListener implements NewDataListener {
-
-    public void reloadData() {
-      updateInterface();      
     }
     
   }

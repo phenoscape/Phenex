@@ -2,6 +2,7 @@ package org.phenoscape.model;
 
 import java.util.UUID;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.phenoscape.app.AbstractPropertyChangeObject;
 import org.phenoscape.util.ObservableEventList;
 
@@ -66,6 +67,7 @@ public class Character extends AbstractPropertyChangeObject {
     }
 
     public void setLabel(String aLabel) {
+        if (ObjectUtils.equals(this.label, aLabel)) return;
         final String oldLabel = this.label;
         this.label = aLabel;
         this.firePropertyChange(LABEL, oldLabel, aLabel);
@@ -76,6 +78,7 @@ public class Character extends AbstractPropertyChangeObject {
     }
 
     public void setComment(String notes) {
+        if (ObjectUtils.equals(this.comment, notes)) return;
         final String oldValue = this.comment;
         this.comment = notes;
         this.firePropertyChange(COMMENT, oldValue, notes);

@@ -1,5 +1,6 @@
 package org.phenoscape.model;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.obo.datamodel.OBOClass;
 import org.phenoscape.app.AbstractPropertyChangeObject;
 
@@ -28,6 +29,7 @@ public class Specimen extends AbstractPropertyChangeObject {
     }
     
     public void setCollectionCode(OBOClass collectionCode) {
+        if (ObjectUtils.equals(this.collectionCode, collectionCode)) return;
         final OBOClass oldValue = this.collectionCode;
         this.collectionCode = collectionCode;
         this.firePropertyChange("collectionCode", oldValue, collectionCode);
@@ -38,6 +40,7 @@ public class Specimen extends AbstractPropertyChangeObject {
     }
     
     public void setCatalogID(String catalogID) {
+        if (ObjectUtils.equals(this.catalogID, catalogID)) return;
         final String oldValue = this.catalogID;
         this.catalogID = catalogID;
         this.firePropertyChange("catalogID", oldValue, catalogID);

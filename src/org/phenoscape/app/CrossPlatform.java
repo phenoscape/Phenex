@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 public class CrossPlatform {
   
   public static enum Platform { MAC, WINDOWS, UNIX; }
+  final private static String BULLET = String.format("%c", '\u2022');
   
   public static Platform getCurrentPlatform() {
     final String name = System.getProperty("os.name");
@@ -53,6 +54,24 @@ public class CrossPlatform {
     }
     window.setTitle(windowTitle);
     window.getRootPane().putClientProperty("Window.documentFile", file);
+  }
+  
+  public static void setWindowModified(JFrame window, boolean modified) {
+      if (CrossPlatform.getCurrentPlatform().equals(Platform.MAC)) {
+          window.getRootPane().putClientProperty("windowModified", modified);
+      } else {
+          final String currentTitle = window.getTitle();
+          final boolean currentModified = currentTitle.startsWith(BULLET);
+          if (modified == currentModified) {
+              return;
+          } else {
+              if (modified) {
+                  window.setTitle(BULLET + " " + currentTitle);
+              } else {
+                  window.setTitle(currentTitle.substring(2));
+              }
+          }
+      }
   }
   
   /**

@@ -1,5 +1,6 @@
 package org.phenoscape.model;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.obo.datamodel.OBOClass;
 import org.phenoscape.app.AbstractPropertyChangeObject;
 
@@ -29,6 +30,7 @@ public class Phenotype extends AbstractPropertyChangeObject {
     }
 
     public void setEntity(OBOClass entity) {
+        if (ObjectUtils.equals(this.entity, entity)) return;
         final OBOClass oldValue = this.entity;
         this.entity = entity;
         this.firePropertyChange(ENTITY, oldValue, entity);
@@ -39,6 +41,7 @@ public class Phenotype extends AbstractPropertyChangeObject {
     }
 
     public void setQuality(OBOClass quality) {
+        if (ObjectUtils.equals(this.quality, quality)) return;
         final OBOClass oldValue = this.quality;
         this.quality = quality;
         this.firePropertyChange(QUALITY, oldValue, quality);
@@ -49,6 +52,7 @@ public class Phenotype extends AbstractPropertyChangeObject {
     }
 
     public void setRelatedEntity(OBOClass relatedEntity) {
+        if (ObjectUtils.equals(this.relatedEntity, relatedEntity)) return;
         final OBOClass oldValue = relatedEntity;
         this.relatedEntity = relatedEntity;
         this.firePropertyChange(RELATED_ENTITY, oldValue, relatedEntity);
@@ -59,6 +63,7 @@ public class Phenotype extends AbstractPropertyChangeObject {
     }
 
     public void setCount(Integer count) {
+        if (ObjectUtils.equals(this.count, count)) return;
         final Integer oldValue = this.count;
         this.count = count;
         this.firePropertyChange(COUNT, oldValue, count);
@@ -69,6 +74,7 @@ public class Phenotype extends AbstractPropertyChangeObject {
     }
 
     public void setMeasurement(Float measurement) {
+        if (ObjectUtils.equals(this.measurement, measurement)) return;
         final Float oldValue = this.measurement;
         this.measurement = measurement;
         this.firePropertyChange(MEASUREMENT, oldValue, measurement);
@@ -79,6 +85,7 @@ public class Phenotype extends AbstractPropertyChangeObject {
     }
 
     public void setUnit(OBOClass unit) {
+        if (ObjectUtils.equals(this.unit, unit)) return;
         final OBOClass oldValue = this.unit;
         this.unit = unit;
         this.firePropertyChange(UNIT, oldValue, unit);
@@ -89,6 +96,7 @@ public class Phenotype extends AbstractPropertyChangeObject {
     }
 
     public void setComment(String notes) {
+        if (ObjectUtils.equals(this.comment, notes)) return;
         final String oldValue = this.comment;
         this.comment = notes;
         this.firePropertyChange(COMMENT, oldValue, notes);

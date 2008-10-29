@@ -2,6 +2,7 @@ package org.phenoscape.model;
 
 import java.util.UUID;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.obo.datamodel.OBOClass;
 import org.phenoscape.app.AbstractPropertyChangeObject;
 import org.phenoscape.util.ObservableEventList;
@@ -38,6 +39,7 @@ public class Taxon extends AbstractPropertyChangeObject {
     }
 
     public void setValidName(OBOClass validName) {
+        if (ObjectUtils.equals(this.validName, validName)) return;
         final OBOClass oldValue = this.validName;
         this.validName = validName;
         this.firePropertyChange(VALID_NAME, oldValue, validName);
@@ -48,6 +50,7 @@ public class Taxon extends AbstractPropertyChangeObject {
     }
 
     public void setPublicationName(String publicationName) {
+        if (ObjectUtils.equals(this.publicationName, publicationName)) return;
         final String oldValue = this.publicationName;
         this.publicationName = publicationName;
         this.firePropertyChange(PUBLICATION_NAME, oldValue, publicationName);
@@ -58,6 +61,7 @@ public class Taxon extends AbstractPropertyChangeObject {
     }
 
     public void setMatrixTaxonName(String matrixName) {
+        if (ObjectUtils.equals(this.matrixTaxonName, matrixName)) return;
         final String oldValue = this.matrixTaxonName;
         this.matrixTaxonName = matrixName;
         this.firePropertyChange(MATRIX_TAXON_NAME, oldValue, matrixName);
@@ -68,6 +72,7 @@ public class Taxon extends AbstractPropertyChangeObject {
     }
 
     public void setComment(String comment) {
+        if (ObjectUtils.equals(this.comment, comment)) return;
         final String oldValue = this.comment;
         this.comment = comment;
         this.firePropertyChange(COMMENT, oldValue, comment);

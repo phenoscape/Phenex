@@ -15,6 +15,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.xswingx.PromptSupport;
 import org.phenoscape.model.DataSet;
@@ -41,16 +42,17 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
     this.setLayout(new GridBagLayout());
     this.curatorsField = new TabActionTextField();
     PromptSupport.setPrompt("None", this.curatorsField);
+    this.curatorsField.setBackground(new JTextField().getBackground());
     this.curatorsField.setAction(new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
-        getController().getDataSet().setCurators(curatorsField.getText());
+        getController().getDataSet().setCurators(StringUtils.stripToNull(curatorsField.getText()));
       }
     });
     this.publicationField = new TabActionTextField();
     PromptSupport.setPrompt("None", this.publicationField);
     this.publicationField.setAction(new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
-        getController().getDataSet().setPublication(publicationField.getText());
+        getController().getDataSet().setPublication(StringUtils.stripToNull(publicationField.getText()));
       }
     });
     this.pubNotesField = new JTextArea();

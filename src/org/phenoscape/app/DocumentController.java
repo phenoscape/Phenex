@@ -9,6 +9,8 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
+import org.phenoscape.model.UndoController;
+import org.phenoscape.model.UndoController.UnsavedChangesListener;
 
 /**
  * A general class managing reading and writing of document files and the data loaded from those files.
@@ -17,6 +19,8 @@ import org.apache.log4j.Logger;
 public abstract class DocumentController {
 
     private File currentFile;
+    private UndoController undo;
+    private final DirtyDocumentIndicator dirtyIndicator = new DirtyDocumentIndicator();
 
     public DocumentController() {
         this.setWindowTitle(null);
@@ -43,6 +47,8 @@ public abstract class DocumentController {
             try {
                 this.readData(file);
                 this.setCurrentFile(file);
+                this.getUndoController().discardAllEdits();
+                this.getUndoController().markChangesSaved();
             } catch (IOException e) {
                 log().error("Failed to load file data", e);
                 this.runFileReadErrorMessage(file, e.getLocalizedMessage());
@@ -58,6 +64,8 @@ public abstract class DocumentController {
             try {
                 this.readData(file);
                 this.setCurrentFile(null);
+                this.getUndoController().discardAllEdits();
+                this.getUndoController().markChangesSaved();
             } catch (IOException e) {
                 log().error("Failed to load file data", e);
                 this.runFileReadErrorMessage(file, e.getLocalizedMessage());
@@ -71,6 +79,7 @@ public abstract class DocumentController {
         } else {
             try {
                 this.writeData(this.getCurrentFile());
+                this.getUndoController().markChangesSaved();
             } catch (IOException e) {
                 log().error("Unable to save file", e);
                 this.runFileWriteErrorMessage(this.getCurrentFile(), e.getLocalizedMessage());
@@ -100,6 +109,7 @@ public abstract class DocumentController {
             try {
                 this.writeData(correctedFile);
                 this.setCurrentFile(correctedFile);
+                this.getUndoController().markChangesSaved();
             } catch (IOException e) {
                 log().error("Unable to save file", e);
                 this.runFileWriteErrorMessage(file, e.getLocalizedMessage());
@@ -120,11 +130,31 @@ public abstract class DocumentController {
 
     public abstract void writeData(File aFile) throws IOException;
     
+    public UndoController getUndoController() {
+        return this.undo;
+    }
+    
+    public void setUndoController(UndoController controller) {
+        if (this.undo != null) {
+            this.undo.removeUnsavedChangesListener(this.dirtyIndicator);
+        }
+        this.undo = controller;
+        this.undo.addUnsavedChangesListener(this.dirtyIndicator);
+    }
+    
     public abstract JFrame getWindow();
 
     public abstract String getAppName();
     
     public abstract String getDefaultFileExtension();
+    
+    public boolean canCloseDocument() {
+        if (this.getUndoController().hasUnsavedChanges()) {
+            return this.runUnsavedChangesDialog();
+        } else {
+            return true;
+        }
+    }
     
     private void setWindowTitle(File aFile) {
         final JFrame window = this.getWindow();
@@ -143,6 +173,29 @@ public abstract class DocumentController {
         if (result == JOptionPane.YES_OPTION) {
             this.saveAs();
         }
+    }
+    
+    private boolean runUnsavedChangesDialog() {
+        final String[] options = {"Save", "Don't Save", "Cancel"};
+        String message = "You have unsaved changes.  Would you like to save before quitting?";
+        final int result =  JOptionPane.showOptionDialog(this.getWindow(), message, "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        if (result == JOptionPane.YES_OPTION) {
+            this.save();
+            return this.canCloseDocument();
+        } else if (result == JOptionPane.CANCEL_OPTION) {
+            return false;
+        } else if (result == JOptionPane.NO_OPTION) {
+            return true;
+        }
+        return false;
+    }
+    
+    private class DirtyDocumentIndicator implements UnsavedChangesListener {
+
+        public void setUnsavedChanges(boolean unsaved) {
+            CrossPlatform.setWindowModified(getWindow(), unsaved);
+        }
+
     }
 
     private Logger log() {

@@ -2,6 +2,7 @@ package org.phenoscape.model;
 
 import java.util.UUID;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.phenoscape.app.AbstractPropertyChangeObject;
 import org.phenoscape.util.ObservableEventList;
 
@@ -59,6 +60,7 @@ public class State extends AbstractPropertyChangeObject {
     }
 
     public void setLabel(String aLabel) {
+        if (ObjectUtils.equals(this.label, aLabel)) return;
         final String oldValue = this.label;
         this.label = aLabel;
         this.firePropertyChange(LABEL, oldValue, aLabel);
@@ -77,6 +79,7 @@ public class State extends AbstractPropertyChangeObject {
      * an single-character string. A symbol is required for each state.
      */
     public void setSymbol(String aSymbol) {
+        if (ObjectUtils.equals(this.symbol, aSymbol)) return;
         final String oldValue = this.symbol;
         this.symbol = aSymbol;
         this.firePropertyChange(SYMBOL, oldValue, aSymbol);
@@ -87,6 +90,7 @@ public class State extends AbstractPropertyChangeObject {
     }
 
     public void setComment(String notes) {
+        if (ObjectUtils.equals(this.comment, notes)) return;
         final String oldValue = this.comment;
         this.comment = notes;
         this.firePropertyChange(COMMENT, oldValue, notes);

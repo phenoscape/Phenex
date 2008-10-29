@@ -86,7 +86,11 @@
 	<classpathentry kind="lib" path="lib/jlibeps.jar"/>
 	<classpathentry kind="lib" path="lib/jpl.jar"/>
 	<classpathentry kind="lib" path="lib/arq.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.4.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://commons.apache.org/lang/api-release/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/swing-worker-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/BrowserLauncher2-1_3.jar"/>
 	<classpathentry kind="lib" path="lib/beansbinding-1.2.1.jar">
@@ -94,10 +98,6 @@
 			<attribute name="javadoc_location" value="file:/Users/jim/Work/Source/Java/beansbinding/beansbinding-1.2.1-doc/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/xswingx.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/Users/jim/Work/Source/Java/xswingx-0.2/doc/api/"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="lib/prompt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

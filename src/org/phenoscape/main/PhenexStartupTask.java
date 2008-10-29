@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.bbop.framework.GUIComponentFactory;
 import org.bbop.framework.GUIManager;
 import org.bbop.framework.GUITask;
+import org.bbop.framework.VetoableShutdownListener;
 import org.bbop.framework.dock.LayoutDriver;
 import org.bbop.framework.dock.idw.IDWDriver;
 import org.jdesktop.swingworker.SwingWorker;
@@ -192,8 +193,11 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
   
   @Override
   protected void installSystemListeners() {
-    //TODO make dirty document indicator work (and Undo/Redo)
-    //GUIManager.addVetoableShutdownListener(DirtyDocumentIndicator.inst());
+    GUIManager.addVetoableShutdownListener(new VetoableShutdownListener() {
+        public boolean willShutdown() {
+            return controller.canCloseDocument();
+        }
+    });
   }
   
   @Override

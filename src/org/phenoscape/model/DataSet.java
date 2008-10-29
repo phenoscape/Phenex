@@ -3,6 +3,7 @@ package org.phenoscape.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.phenoscape.app.AbstractPropertyChangeObject;
 import org.phenoscape.util.ObservableEventList;
 
@@ -65,6 +66,7 @@ public class DataSet extends AbstractPropertyChangeObject {
     }
 
     public void setPublication(String aPublication) {
+        if (ObjectUtils.equals(this.publication, aPublication)) return;
         final String oldPub = this.publication;
         this.publication = aPublication;
         this.firePropertyChange(PUBLICATION, oldPub, aPublication);
@@ -75,6 +77,7 @@ public class DataSet extends AbstractPropertyChangeObject {
     }
 
     public void setPublicationNotes(String publicationNotes) {
+        if (ObjectUtils.equals(this.publicationNotes, publicationNotes)) return;
         final String oldNotes = this.publicationNotes;
         this.publicationNotes = publicationNotes;
         this.firePropertyChange(PUBLICATION_NOTES, oldNotes, publicationNotes);
@@ -85,6 +88,7 @@ public class DataSet extends AbstractPropertyChangeObject {
     }
 
     public void setCurators(String curators) {
+        if (ObjectUtils.equals(this.curators, curators)) return;
         final String oldCurators = this.curators;
         this.curators = curators;
         this.firePropertyChange(CURATORS, oldCurators, curators);

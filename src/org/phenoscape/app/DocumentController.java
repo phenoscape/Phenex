@@ -27,6 +27,7 @@ public abstract class DocumentController {
     }
 
     public void open() {
+        if (!this.canCloseDocument()) return;
         final JFileChooser fileChooser = new JFileChooser();
         final FileFilter filter = new FileFilter() {
             
@@ -57,6 +58,7 @@ public abstract class DocumentController {
     }
 
     public void importFile() {
+        if (!this.canCloseDocument()) return;
         final JFileChooser fileChooser = new JFileChooser();
         final int result = fileChooser.showOpenDialog(this.getWindow());
         if (result == JFileChooser.APPROVE_OPTION) {
@@ -177,7 +179,7 @@ public abstract class DocumentController {
     
     private boolean runUnsavedChangesDialog() {
         final String[] options = {"Save", "Don't Save", "Cancel"};
-        String message = "You have unsaved changes.  Would you like to save before quitting?";
+        String message = "You have unsaved changes.  Would you like to save before closing" + ((this.getCurrentFile() == null) ? "" : (" \"" + this.getCurrentFile().getName() + "\"")) + "?";
         final int result =  JOptionPane.showOptionDialog(this.getWindow(), message, "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         if (result == JOptionPane.YES_OPTION) {
             this.save();

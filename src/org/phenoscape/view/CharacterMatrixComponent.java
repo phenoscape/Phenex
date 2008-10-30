@@ -3,6 +3,8 @@ package org.phenoscape.view;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Comparator;
 import java.util.List;
 
@@ -19,6 +21,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import org.apache.log4j.Logger;
 import org.phenoscape.model.Character;
+import org.phenoscape.model.DataSet;
 import org.phenoscape.model.PhenoscapeController;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
@@ -112,6 +115,11 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
         splitPane.setDividerSize(3);
         this.add(splitPane, BorderLayout.CENTER);
         this.add(this.createToolBar(), BorderLayout.SOUTH);
+        this.getController().getDataSet().addPropertyChangeListener(DataSet.MATRIX_CELL, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                matrixTableModel.fireTableDataChanged();
+            }
+        });
     }
 
     private JToolBar createToolBar() {

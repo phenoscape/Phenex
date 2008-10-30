@@ -85,6 +85,7 @@ public class UndoController {
         private final PropertyChangeListener publicationListener = new PropertyUndoer("Edit Publication");
         private final PropertyChangeListener pubNotesListener = new PropertyUndoer("Edit Publication Notes");
         private final PropertyChangeListener curatorsListener = new PropertyUndoer("Edit Curators");
+        private final PropertyChangeListener matrixListener = new MatrixCellUndoer();
         private final TaxonObserver taxonObserver = new TaxonObserver();
         private final ListObserver<Taxon> taxaObserver = new ListObserver<Taxon>(this.taxonObserver, "Taxon");
         private final CharacterObserver characterObserver = new CharacterObserver();
@@ -94,6 +95,7 @@ public class UndoController {
             data.addPropertyChangeListener(DataSet.PUBLICATION, this.publicationListener);
             data.addPropertyChangeListener(DataSet.PUBLICATION_NOTES, this.pubNotesListener);
             data.addPropertyChangeListener(DataSet.CURATORS, this.curatorsListener);
+            data.addPropertyChangeListener(DataSet.MATRIX_CELL, this.matrixListener);
             this.taxaObserver.startObserving(data.getTaxa());
             this.charactersObserver.startObserving(data.getCharacters());
         }
@@ -108,6 +110,7 @@ public class UndoController {
             data.removePropertyChangeListener(DataSet.PUBLICATION, this.publicationListener);
             data.removePropertyChangeListener(DataSet.PUBLICATION_NOTES, this.pubNotesListener);
             data.removePropertyChangeListener(DataSet.CURATORS, this.curatorsListener);
+            data.removePropertyChangeListener(DataSet.MATRIX_CELL, this.matrixListener);
             this.taxaObserver.stopObserving(data.getTaxa());
             this.charactersObserver.stopObserving(data.getCharacters());
         }
@@ -116,6 +119,41 @@ public class UndoController {
             for (DataSet data : objects) {
                 this.stopObserving(data);
             }
+        }
+        
+        private class MatrixCellUndoer implements PropertyChangeListener {
+
+            public void propertyChange(final PropertyChangeEvent change) {
+                if (undoing) {
+                    undoing = false;
+                    return; 
+                }
+                postEdit(new AbstractUndoableEdit() {
+
+                    @Override
+                    public String getPresentationName() {
+                        return "Edit Matrix Cell";
+                    }
+
+                    @Override
+                    public void redo() throws CannotRedoException {
+                        super.redo();
+                        undoing = true;
+                        final MatrixCellValue newValue = (MatrixCellValue)(change.getNewValue());
+                        ((DataSet)(change.getSource())).setStateForTaxon(newValue.getTaxon(), newValue.getCharacter(), newValue.getState());                        
+                    }
+
+                    @Override
+                    public void undo() throws CannotUndoException {
+                        super.undo();
+                        undoing = true;
+                        final MatrixCellValue oldValue = (MatrixCellValue)(change.getOldValue());
+                        ((DataSet)(change.getSource())).setStateForTaxon(oldValue.getTaxon(), oldValue.getCharacter(), oldValue.getState());
+                    }
+
+                });
+            }
+            
         }
         
     }

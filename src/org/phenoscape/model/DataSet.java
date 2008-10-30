@@ -14,6 +14,7 @@ public class DataSet extends AbstractPropertyChangeObject {
     public static final String CURATORS = "curators";
     public static final String PUBLICATION_NOTES = "publicationNotes";
     public static final String PUBLICATION = "publication";
+    public static final String MATRIX_CELL = "matrixCell";
     private final ObservableEventList<Character> characters = new ObservableEventList<Character>(new BasicEventList<Character>());
     private final ObservableEventList<Taxon> taxa = new ObservableEventList<Taxon>(new BasicEventList<Taxon>());
     /**
@@ -116,6 +117,7 @@ public class DataSet extends AbstractPropertyChangeObject {
 
     public void setStateForTaxon(Taxon taxon, Character character, State state) {
         if (taxon == null || character == null) { return; }
+        final MatrixCellValue oldValue = new MatrixCellValue(taxon, character, this.getStateForTaxon(taxon, character));
         final Map<String, String> states;
         if (this.matrix.containsKey(taxon.getNexmlID())) {
             states = this.matrix.get(taxon.getNexmlID());
@@ -124,6 +126,7 @@ public class DataSet extends AbstractPropertyChangeObject {
         }
         this.matrix.put(taxon.getNexmlID(), states);
         states.put(character.getNexmlID(), (state != null ? state.getNexmlID() : null));
+        this.firePropertyChange(MATRIX_CELL, oldValue, new MatrixCellValue(taxon, character, state));
     }
     
     public Class<?> getClass(String propertyKey) throws UndefinedKeyException {
@@ -133,6 +136,8 @@ public class DataSet extends AbstractPropertyChangeObject {
             return String.class;
         } else if (propertyKey.equals(PUBLICATION_NOTES)) {
             return String.class;
+        } else if (propertyKey.equals(MATRIX_CELL)) {
+            return MatrixCellValue.class;
         } else {
             return super.getClass(propertyKey);
         }

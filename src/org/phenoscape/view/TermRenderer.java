@@ -47,7 +47,7 @@ public class TermRenderer extends PlaceholderRenderer {
   }
   
   private boolean isDangling(OBOObject term) {
-      if (OboUtil.isPostCompTerm((OBOClass)term)) {
+      if (OboUtil.isPostCompTerm(term)) {
           if (this.isDangling(OboUtil.getGenusTerm((OBOClass)term))) {
               return true;
           } else {

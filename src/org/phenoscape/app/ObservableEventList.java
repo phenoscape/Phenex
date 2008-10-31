@@ -1,4 +1,4 @@
-package org.phenoscape.util;
+package org.phenoscape.app;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.observablecollections.ObservableListListener;
-import org.phenoscape.app.PropertyChangeObject;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.ObservableElementList;

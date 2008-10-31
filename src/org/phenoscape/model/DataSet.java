@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.phenoscape.app.AbstractPropertyChangeObject;
-import org.phenoscape.util.ObservableEventList;
+import org.phenoscape.app.ObservableEventList;
 
 import ca.odell.glazedlists.BasicEventList;
 

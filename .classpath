@@ -18,7 +18,7 @@
 	<classpathentry kind="lib" path="lib/obdapi.jar" sourcepath="/OBDAPI/src"/>
 	<classpathentry kind="lib" path="lib/obo-vocab.jar"/>
 	<classpathentry kind="lib" path="lib/obo.jar" sourcepath="/OBO/src"/>
-	<classpathentry kind="lib" path="lib/phenote.jar"/>
+	<classpathentry kind="lib" path="lib/phenote.jar" sourcepath="/Phenote/src/java"/>
 	<classpathentry kind="lib" path="lib/oboedit.jar" sourcepath="/OBO-Edit2/src"/>
 	<classpathentry kind="lib" path="lib/phenoxmlbeans.jar"/>
 	<classpathentry kind="lib" path="lib/jsr173_1.0_api.jar"/>

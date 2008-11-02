@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -80,6 +81,16 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
   
   private void updateButtonStates() {
     this.deleteCharacterButton.setEnabled(this.getSelectedCharacter() != null);
+  }
+  
+  private void selectFirstState() {
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+              if (!getController().getStatesForCurrentCharacterSelection().isEmpty()) {
+                  getController().getCurrentStatesSelectionModel().setSelectionInterval(0, 0);
+              }
+          }
+      });
   }
   
   private JToolBar createToolBar() {
@@ -167,7 +178,8 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
     }
 
     public void valueChanged(ListSelectionEvent e) {
-      updateButtonStates();      
+      updateButtonStates();
+      selectFirstState();
     }
     
   }

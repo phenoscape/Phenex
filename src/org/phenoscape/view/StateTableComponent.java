@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -107,11 +108,22 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
   
   private void stateSelectionDidChange() {
     this.updateButtonStates();
+    this.selectFirstPhenotype();
   }
   
   private void updateButtonStates() {
     this.addStateButton.setEnabled(this.getSelectedCharacter() != null);
     this.deleteStateButton.setEnabled(this.getSelectedState() != null);
+  }
+  
+  private void selectFirstPhenotype() {
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+              if (!getController().getPhenotypesForCurrentStateSelection().isEmpty()) {
+                  getController().getCurrentPhenotypesSelectionModel().setSelectionInterval(0, 0);
+              }
+          }
+      });
   }
   
   private JToolBar createToolBar() {

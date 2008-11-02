@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -67,6 +68,16 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
   
   private void updateButtonStates() {
     this.deleteTaxonButton.setEnabled(this.getSelectedTaxon() != null);
+  }
+  
+  private void selectFirstSpecimen() {
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+              if (!getController().getSpecimensForCurrentTaxonSelection().isEmpty()) {
+                  getController().getCurrentSpecimensSelectionModel().setSelectionInterval(0, 0);
+              }
+          }
+      });
   }
 
   private void initializeInterface() {
@@ -181,6 +192,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
 
     public void valueChanged(ListSelectionEvent e) {
       updateButtonStates();
+      selectFirstSpecimen();
     }
     
   }

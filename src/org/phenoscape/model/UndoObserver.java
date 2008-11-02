@@ -1,79 +1,32 @@
 package org.phenoscape.model;
 
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
-import javax.swing.undo.UndoableEditSupport;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.observablecollections.ObservableListListener;
 import org.phenoscape.app.Observer;
 import org.phenoscape.app.PropertyChangeObject;
+import org.phenoscape.app.UndoController;
 
-public class UndoController {
+public class UndoObserver {
     
-    private final UndoableEditSupport undoSupport = new UndoableEditSupport();
-    private final UndoManager undoManager = new UndoManager();
+    private final UndoController undoController;
     private final DataSetObserver dataSetObserver = new DataSetObserver();
-    private final Action undo;
-    private final Action redo;
+    // should this logic be in this class or UndoController?
     private boolean undoing = false;
-    private int dirtyStack = 0;
-    private boolean undoCleans = true;
-    private List<UnsavedChangesListener> unsavedChangesListeners = new ArrayList<UnsavedChangesListener>();
     
-    public UndoController() {
-        this.undoSupport.addUndoableEditListener(this.undoManager);
-        this.undo = new AbstractAction("Undo") {
-            public void actionPerformed(ActionEvent e) {
-                undoManager.undo();
-                updateUndoRedoActions();
-                undid();
-            }
-        };
-        this.redo = new AbstractAction("Redo") {
-            public void actionPerformed(ActionEvent e) {
-                undoManager.redo();
-                updateUndoRedoActions();
-                redid();
-            }
-        };
-        this.updateUndoRedoActions();
-    }
-    
-    public Action getUndoAction() {
-        return this.undo;
-    }
-    
-    public Action getRedoAction() {
-        return this.redo;
-    }
-    
-    public void discardAllEdits() {
-        this.undoManager.discardAllEdits();
-        this.updateUndoRedoActions();
-        this.dirtyStack = 0;
-    }
-    
-    public void markChangesSaved() {
-        this.dirtyStack = 0;
-        this.fireUnsavedChangesChanged();
-    }
-    
-    public boolean hasUnsavedChanges() {
-        return this.dirtyStack != 0;
+    public UndoObserver(UndoController controller) {
+        this.undoController = controller;
     }
     
     public void setDataSet(DataSet data) {
@@ -481,78 +434,7 @@ public class UndoController {
     }
     
     private void postEdit(UndoableEdit e) {
-        this.undoSupport.postEdit(e);
-        this.updateUndoRedoActions();
-        this.edited();
-    }
-    
-    private void updateUndoRedoActions() {
-        this.undo.setEnabled(this.undoManager.canUndo());
-        this.undo.putValue(Action.NAME, this.undoManager.getUndoPresentationName());
-        this.redo.setEnabled(this.undoManager.canRedo());
-        this.redo.putValue(Action.NAME, this.undoManager.getRedoPresentationName());
-    }
-    
-    private void undid() {
-        if (this.hasUnsavedChanges()) {
-            if (this.undoCleans) {
-                this.dirtyStack -= 1;
-            } else {
-                this.dirtyStack += 1;
-            }
-        } else {
-            this.undoCleans = false;
-            this.dirtyStack += 1;
-        }
-        this.fireUnsavedChangesChanged();
-    }
-    
-    private void redid() {
-        if (this.hasUnsavedChanges()) {
-            if (this.undoCleans) {
-                this.dirtyStack += 1;
-            } else {
-                this.dirtyStack -= 1;
-            }
-        } else {
-            this.undoCleans = true;
-            this.dirtyStack += 1;
-        }
-        this.fireUnsavedChangesChanged();
-    }
-    
-    private void edited() {
-        if (this.hasUnsavedChanges()) {
-            if (this.undoCleans) {
-                this.dirtyStack += 1;
-            } else {
-                // this should prevent dirtyStack from ever reaching 0
-                this.dirtyStack = 1;
-            }
-        } else {
-            this.undoCleans = true;
-            this.dirtyStack += 1;
-        }
-        this.fireUnsavedChangesChanged();
-    }
-    
-    public interface UnsavedChangesListener {
-        
-        public void setUnsavedChanges(boolean unsaved);
-    }
-    
-    public void addUnsavedChangesListener(UnsavedChangesListener listener) {
-        this.unsavedChangesListeners.add(listener);
-    }
-    
-    public void removeUnsavedChangesListener(UnsavedChangesListener listener) {
-        this.unsavedChangesListeners.remove(listener);
-    }
-    
-    private void fireUnsavedChangesChanged() {
-        for (UnsavedChangesListener listener : this.unsavedChangesListeners) {
-            listener.setUnsavedChanges(this.hasUnsavedChanges());
-        }
+        this.undoController.postEdit(e);
     }
     
     private Logger log() {

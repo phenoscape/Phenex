@@ -20,7 +20,6 @@ import org.obo.datamodel.OBOObject;
 import org.phenoscape.model.PhenoscapeController;
 import org.phenoscape.swing.AutoCompleteSupport;
 
-import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 
 public class PhenoscapeGUIComponent extends AbstractGUIComponent {
@@ -38,16 +37,6 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
    */
   public PhenoscapeController getController() {
     return this.controller;
-  }
-  
-  /**
-   * Prod an event list to send change notifications for an object it contains.
-   * This will cause interface objects displaying items in that list to display the
-   * changed value.  This is a Glazed Lists convention.
-   */
-  protected <T> void updateObjectForGlazedLists(T anObject, EventList<T> aList) {
-    final int index = aList.indexOf(anObject);
-    if (index > -1) { aList.set(index, anObject); }
   }
 
   /**
@@ -82,7 +71,6 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
   protected TableCellEditor createAutocompleteEditor(Collection<OBOObject> terms) {
     final JComboBox comboBox = this.createAutocompleteBox(terms, true);
     final DefaultCellEditor editor = new DefaultCellEditor(comboBox);
-    editor.setClickCountToStart(2);
     return editor;
   }
   

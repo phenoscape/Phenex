@@ -48,6 +48,7 @@ public class PhenoscapeController extends DocumentController {
     private NexmlDocument xmlDoc = NexmlDocument.Factory.newInstance();
     private String appName;
     private final List<NewDataListener> newDataListeners = new ArrayList<NewDataListener>();
+    private final UndoObserver undoObserver;
 
     public PhenoscapeController(OntologyController ontologyController) {
         super();
@@ -89,8 +90,8 @@ public class PhenoscapeController extends DocumentController {
         this.currentPhenotypesSelectionModel = new EventSelectionModel<Phenotype>(this.currentPhenotypes);
         new ListSelectionMaintainer<Phenotype>(this.currentPhenotypes, this.currentPhenotypesSelectionModel);
         this.currentPhenotypesSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        this.setUndoController(new UndoController());
-        this.getUndoController().setDataSet(this.dataSet);
+        this.undoObserver = new UndoObserver(this.getUndoController());
+        this.undoObserver.setDataSet(this.dataSet);
     }
 
     public OntologyController getOntologyController() {

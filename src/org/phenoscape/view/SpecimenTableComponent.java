@@ -172,7 +172,6 @@ public class SpecimenTableComponent extends PhenoscapeGUIComponent {
             case 0: specimen.setCollectionCode((OBOClass)editedValue); break;
             case 1: specimen.setCatalogID(editedValue.toString()); break;
             }
-            updateObjectForGlazedLists(specimen, getController().getSpecimensForCurrentTaxonSelection());
             return specimen;
         }
 

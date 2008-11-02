@@ -9,8 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
-import org.phenoscape.model.UndoController;
-import org.phenoscape.model.UndoController.UnsavedChangesListener;
+import org.phenoscape.app.UndoController.UnsavedChangesListener;
 
 /**
  * A general class managing reading and writing of document files and the data loaded from those files.
@@ -19,11 +18,12 @@ import org.phenoscape.model.UndoController.UnsavedChangesListener;
 public abstract class DocumentController {
 
     private File currentFile;
-    private UndoController undo;
+    private final UndoController undo = new UndoController();
     private final DirtyDocumentIndicator dirtyIndicator = new DirtyDocumentIndicator();
 
     public DocumentController() {
         this.setWindowTitle(null);
+        this.undo.addUnsavedChangesListener(this.dirtyIndicator);
     }
 
     public void open() {
@@ -134,14 +134,6 @@ public abstract class DocumentController {
     
     public UndoController getUndoController() {
         return this.undo;
-    }
-    
-    public void setUndoController(UndoController controller) {
-        if (this.undo != null) {
-            this.undo.removeUnsavedChangesListener(this.dirtyIndicator);
-        }
-        this.undo = controller;
-        this.undo.addUnsavedChangesListener(this.dirtyIndicator);
     }
     
     public abstract JFrame getWindow();

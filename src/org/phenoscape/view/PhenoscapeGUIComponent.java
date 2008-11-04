@@ -71,6 +71,7 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
   protected TableCellEditor createAutocompleteEditor(Collection<OBOObject> terms) {
     final JComboBox comboBox = this.createAutocompleteBox(terms, true);
     final DefaultCellEditor editor = new DefaultCellEditor(comboBox);
+    editor.setClickCountToStart(2);
     return editor;
   }
   

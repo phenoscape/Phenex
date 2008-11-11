@@ -13,13 +13,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/junit-4.5.jar"/>
-	<classpathentry kind="lib" path="lib/bbop.jar" sourcepath="/BBOP/src"/>
 	<classpathentry kind="lib" path="lib/idw-gpl.jar"/>
-	<classpathentry kind="lib" path="lib/obdapi.jar" sourcepath="/OBDAPI/src"/>
-	<classpathentry kind="lib" path="lib/obo-vocab.jar"/>
-	<classpathentry kind="lib" path="lib/obo.jar" sourcepath="/OBO/src"/>
-	<classpathentry kind="lib" path="lib/phenote.jar" sourcepath="/Phenote/src/java"/>
-	<classpathentry kind="lib" path="lib/oboedit.jar" sourcepath="/OBO-Edit2/src"/>
 	<classpathentry kind="lib" path="lib/phenoxmlbeans.jar"/>
 	<classpathentry kind="lib" path="lib/jsr173_1.0_api.jar"/>
 	<classpathentry kind="lib" path="lib/macify-1.1.jar"/>
@@ -99,5 +93,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/prompt.jar"/>
+	<classpathentry kind="lib" path="/home/cartik/workspace/Phenex/lib/bbop.jar"/>
+	<classpathentry kind="lib" path="/home/cartik/workspace/Phenex/lib/obo.jar"/>
+	<classpathentry kind="lib" path="/home/cartik/workspace/Phenex/lib/oboedit.jar"/>
+	<classpathentry kind="lib" path="/home/cartik/workspace/Phenex/lib/obo-vocab.jar"/>
+	<classpathentry kind="lib" path="/home/cartik/workspace/Phenex/lib/phenote.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OBDAPI"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

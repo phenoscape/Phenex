@@ -1,6 +1,8 @@
 package org.phenoscape.bridge;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -22,6 +24,7 @@ import org.obd.query.LinkQueryTerm;
 import org.obd.query.QueryTerm;
 import org.obd.query.Shard;
 import org.obd.query.BooleanQueryTerm.BooleanOperator;
+import org.obd.query.impl.AbstractSQLShard;
 import org.obd.query.impl.OBDSQLShard;
 import org.phenoscape.io.NeXMLReader;
 import org.phenoscape.model.DataSet;
@@ -37,13 +40,22 @@ public class OBDModelBridgeTest {
 		NeXMLReader reader;
 		DataSet ds;
 		Graph g;
-		String basePath = "?";
+		String basePath = "/home/cartik/Desktop/PerlScripts/trunk/data";
 		File baseDataDir = new File(basePath);
 		int i = 0;
-		//OBOSessionShard s = new OBOSessionShard();
-		OBDSQLShard obdsql = new OBDSQLShard();
-		obdsql.connect("?", "?",
-				"?");
+		File connParamFile = new File("testfiles/connectionParameters");
+		BufferedReader br = new BufferedReader(new FileReader(connParamFile));
+		String[] connParams = new String[3];
+		String param;
+		int j = 0;
+		while ((param = br.readLine()) != null) {
+			connParams[j++] = param;
+		}
+
+		Shard obdsql = new OBDSQLShard();
+		((AbstractSQLShard) obdsql).connect(connParams[0], connParams[1],
+				connParams[2]);
+		// OBOSessionShard s = new OBOSessionShard();
 		List<File> baseDirs = Arrays.asList(baseDataDir.listFiles());
 		Collections.sort(baseDirs);
 		for (File baseDir : baseDirs) {
@@ -54,18 +66,20 @@ public class OBDModelBridgeTest {
 				for (File dataFile : files) {
 					// another check to avoid directories
 					if (dataFile.isFile()) {
-						System.out.println(++i + ". Started work with " + dataFile.getAbsolutePath());
+						System.out.println(++i + ". Started work with "
+								+ dataFile.getAbsolutePath());
 						reader = new NeXMLReader(dataFile, oc.getOBOSession());
 						ds = reader.getDataSet();
 						bridge.translate(ds, dataFile);
 						g = bridge.getGraph();
 						obdsql.putGraph(g);
-						//s.putGraph(g);
-						System.out.println(i + ". Finished loading " + dataFile.getAbsolutePath());
+						// s.putGraph(g);
+						System.out.println(i + ". Finished loading "
+								+ dataFile.getAbsolutePath());
 					}
 				}
 			}
-		}  
+		}
 		System.out.println(i + " files loaded. Done!");
 	}
 
@@ -75,17 +89,14 @@ public class OBDModelBridgeTest {
 	public void testOBDSave() throws XmlException, IOException, SQLException,
 			ClassNotFoundException {
 		OntologyController oc = new OntologyController();
-		NeXMLReader reader = new NeXMLReader(new File(
-				"?"), oc
-				.getOBOSession());
+		NeXMLReader reader = new NeXMLReader(new File("?"), oc.getOBOSession());
 		DataSet ds = reader.getDataSet();
 		OBDModelBridge bridge = new OBDModelBridge();
 		bridge.translate(ds, new File("?"));
 		Graph g = bridge.getGraph();
 
 		Shard shard = new OBDSQLShard();
-		((OBDSQLShard) shard)
-				.connect("?");
+		((OBDSQLShard) shard).connect("?");
 		shard.putGraph(g);
 		/*
 		 * <phen:bearer> <phen:typeref about="TAO:0000622"> <phen:qualifier

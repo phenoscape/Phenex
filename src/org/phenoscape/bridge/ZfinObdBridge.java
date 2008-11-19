@@ -5,30 +5,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.obd.model.CompositionalDescription;
 import org.obd.model.Graph;
 import org.obd.model.LinkStatement;
 import org.obd.model.Node;
-import org.obd.model.Statement;
 import org.obd.model.CompositionalDescription.Predicate;
 import org.obd.model.Node.Metatype;
 import org.obd.query.Shard;
 import org.obd.query.impl.AbstractSQLShard;
 import org.obd.query.impl.OBDSQLShard;
-import org.obo.datamodel.Link;
-import org.obo.datamodel.OBOClass;
-import org.obo.datamodel.impl.OBOClassImpl;
-import org.obo.util.ReasonerUtil;
-import org.obo.util.TermUtil;
 import org.purl.obo.vocab.RelationVocabulary;
 
 public class ZfinObdBridge {
@@ -79,66 +65,74 @@ public class ZfinObdBridge {
 					Node genotypeNode = createInstanceNode(genotypeId,
 							GENOTYPE_TYPE_ID);
 					genotypeNode.setLabel(genotypeName);
-					//System.err.println("Adding node " + genotypeNode.getId()
-					//		+ "of type " + GENOTYPE_TYPE_ID);
+					// System.err.println("Adding node " + genotypeNode.getId()
+					// + "of type " + GENOTYPE_TYPE_ID);
 					graph.addNode(genotypeNode);
 
 					Node publicationNode = createInstanceNode(pub,
 							PUBLICATION_TYPE_ID);
-					
+
 					graph.addNode(publicationNode);
 
 					if (entity1ID != null && entity1ID.trim().length() > 0) {
-					//	Collection<Statement> stmts = obdsql
-					//			.getStatementsForTarget(entity1ID);
-					//	Iterator<Statement> it = stmts.iterator();
-						
-					//	if (it.hasNext()) {
-					//		while (it.hasNext()) {
-					//			Statement stmt = it.next();
-					//			if (stmt.getRelationId().contains("DbXref")) {
-					//				String equivEntityID = stmt.getNodeId();
-					//				e1 = new OBOClassImpl(equivEntityID);
-					//			} 
-					//		}
-					//	}
-						 if(qualID != null &&
-								 qualID.trim().length() > 0){ 
-							 CompositionalDescription cd = new CompositionalDescription( Predicate.INTERSECTION);
-							 cd.addArgument(qualID);
-							 cd.addArgument(relationVocabulary.inheres_in(), entity1ID);
-							 genotypeAnnotLink.setNodeId(genotypeId);
-							 genotypeAnnotLink.setRelationId(GENOTYPE_PHENOTYPE_REL_ID);
-							 genotypeAnnotLink.setTargetId(cd.toString());
-//							 genotypeAnnotLink.addSubLinkStatement(HAS_PUB_REL_ID, pub); 
-							 System.err.println("Adding genotype statement " + genotypeAnnotLink.toString());
-							 graph.addStatement(genotypeAnnotLink); }
-						 
+						// Collection<Statement> stmts = obdsql
+						// .getStatementsForTarget(entity1ID);
+						// Iterator<Statement> it = stmts.iterator();
+
+						// if (it.hasNext()) {
+						// while (it.hasNext()) {
+						// Statement stmt = it.next();
+						// if (stmt.getRelationId().contains("DbXref")) {
+						// String equivEntityID = stmt.getNodeId();
+						// e1 = new OBOClassImpl(equivEntityID);
+						// }
+						// }
+						// }
+						if (qualID != null && qualID.trim().length() > 0) {
+							CompositionalDescription cd = new CompositionalDescription(
+									Predicate.INTERSECTION);
+							cd.addArgument(qualID);
+							cd.addArgument(relationVocabulary.inheres_in(),
+									entity1ID);
+							genotypeAnnotLink.setNodeId(genotypeId);
+							genotypeAnnotLink
+									.setRelationId(GENOTYPE_PHENOTYPE_REL_ID);
+							genotypeAnnotLink.setTargetId(cd.toString());
+							// genotypeAnnotLink.addSubLinkStatement(
+							// HAS_PUB_REL_ID, pub);
+							System.err.println("Adding genotype statement "
+									+ genotypeAnnotLink.toString());
+							graph.addStatement(genotypeAnnotLink);
+						}
+
 					}
 				}
 			} else {
 				System.err.println("Uninitialized URL for phenotypic data");
 			}
-			
-			if (genotypeURL != null) { 
-				BufferedReader br2 = new BufferedReader(new InputStreamReader( genotypeURL.openStream()));
-				while ((genoFileLine = br2.readLine()) != null) { 
-					String[] gComps = genoFileLine.split("\\t"); 
-					String geneID = gComps[4]; 
-					String genotypeID = gComps[0]; 
-					if(geneID != null && geneID.trim().length() > 0){ 
+
+			if (genotypeURL != null) {
+				BufferedReader br2 = new BufferedReader(new InputStreamReader(
+						genotypeURL.openStream()));
+				while ((genoFileLine = br2.readLine()) != null) {
+					String[] gComps = genoFileLine.split("\\t");
+					String geneID = gComps[4];
+					String genotypeID = gComps[0];
+					if (geneID != null && geneID.trim().length() > 0) {
 						Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
-						//System.err.println("Adding node " + geneNode.getId() + " of type " + GENE_TYPE_ID); 
+						// System.err.println("Adding node " + geneNode.getId()
+						// + " of type " + GENE_TYPE_ID);
 						graph.addNode(geneNode);
 						geneAnnotLink.setNodeId(geneID);
 						geneAnnotLink.setRelationId(GENE_GENOTYPE_REL_ID);
 						geneAnnotLink.setTargetId(genotypeID);
-						//System.err.println("Adding gene statement " + geneAnnotLink);
+						// System.err.println("Adding gene statement " +
+						// geneAnnotLink);
 						graph.addStatement(geneAnnotLink);
-			 		} 
-				} 
+					}
+				}
 			} else {
-				System.err.println("Uninitialized URL for genotypic data"); 
+				System.err.println("Uninitialized URL for genotypic data");
 			}
 			// System.err.println(i + " phenotypes and " + j +
 			// " genotypes found");
@@ -147,7 +141,6 @@ public class ZfinObdBridge {
 		}
 		obdsql.putGraph(graph);
 	}
-
 
 	protected Node createInstanceNode(String id, String typeId) {
 		Node n = new Node(id);

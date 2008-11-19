@@ -60,7 +60,7 @@ public class OBDModelBridge {
 	// TODO
 	public static String HAS_CHARACTER_REL_ID = "cdao:has_Character"; // 
 	public static String HAS_PHENOTYPE_REL_ID = "cdao:has_Phenotype"; // TODO
-	public static String TAXON_PHENOTYPE_REL_ID = "exhibits"; // TODO
+	public static String TAXON_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits"; // TODO
 	public static String CELL_TO_STATE_REL_ID = "cdao:has_State"; // TODO
 	public static String ANNOT_TO_CELL_REL_ID = "has_source"; // TODO
 	private static TermVocabulary vocab = new TermVocabulary();

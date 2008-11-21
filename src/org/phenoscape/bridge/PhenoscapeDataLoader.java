@@ -81,6 +81,8 @@ public class PhenoscapeDataLoader {
 				}
 			}
 		}
+		bridge.problemLog.flush();
+		bridge.problemLog.close();
 		System.out.println(i + " files loaded. Done!");
 	}
 }

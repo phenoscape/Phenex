@@ -11,6 +11,7 @@ import java.util.Set;
 import org.obd.model.CompositionalDescription;
 import org.obd.model.Graph;
 import org.obd.model.LinkStatement;
+import org.obd.model.LiteralStatement;
 import org.obd.model.Node;
 import org.obd.model.CompositionalDescription.Predicate;
 import org.obd.model.Node.Metatype;
@@ -68,8 +69,14 @@ public class ZfinObdBridge {
 					String genotypeId = pComps[0];
 					String genotypeName = pComps[1];
 
-					genotypeSet.add(genotypeId + "\t" + genotypeName);
-					pubSet.add(pub);
+					Node genotypeNode = createInstanceNode(genotypeId,
+							GENOTYPE_TYPE_ID);
+					genotypeNode.setLabel(genotypeName);
+					graph.addNode(genotypeNode);
+
+					Node publicationNode = createInstanceNode(pub,
+							PUBLICATION_TYPE_ID);
+					graph.addNode(publicationNode);
 
 					if (entity1ID != null && entity1ID.trim().length() > 0) {
 						// Collection<Statement> stmts = obdsql
@@ -98,25 +105,10 @@ public class ZfinObdBridge {
 							// genotypeAnnotLink.addSubLinkStatement(
 							// HAS_PUB_REL_ID, pub);
 							// System.err.println("Adding genotype statement "
-							// + genotypeAnnotLink.toString());
-							graph.addStatement(genotypeAnnotLink);
+							 //+ genotypeAnnotLink.toString());
+							graph.addLinkStatement(genotypeNode, GENOTYPE_PHENOTYPE_REL_ID, cd.toString());
 						}
-
 					}
-				}
-				for (String gID : genotypeSet) {
-					String[] comps = gID.split("\\t");
-					Node genotypeNode = createInstanceNode(comps[0],
-							GENOTYPE_TYPE_ID);
-					genotypeNode.setLabel(comps[1]);
-					// System.err.println("Adding node " + genotypeNode.getId()
-					// + "of type " + GENOTYPE_TYPE_ID);
-					graph.addNode(genotypeNode);
-				}
-				for (String pub : pubSet) {
-					Node publicationNode = createInstanceNode(pub,
-							PUBLICATION_TYPE_ID);
-					graph.addNode(publicationNode);
 				}
 			} else {
 				System.err.println("Uninitialized URL for phenotypic data");
@@ -129,6 +121,9 @@ public class ZfinObdBridge {
 					String[] gComps = genoFileLine.split("\\t");
 					String geneID = gComps[4];
 					String genotypeID = gComps[0];
+					
+					Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
+					graph.addNode(geneNode);
 					if (geneID != null && geneID.trim().length() > 0) {
 						geneSet.add(geneID);
 						geneAnnotLink.setNodeId(geneID);
@@ -136,19 +131,19 @@ public class ZfinObdBridge {
 						geneAnnotLink.setTargetId(genotypeID);
 						// System.err.println("Adding gene statement " +
 						// geneAnnotLink);
-						graph.addStatement(geneAnnotLink);
+						graph.addLinkStatement(geneNode, GENE_GENOTYPE_REL_ID, genotypeID);
 					}
 				}
 			} else {
 				System.err.println("Uninitialized URL for genotypic data");
 			}
-			for(String gene : geneSet){
-				Node geneNode = createInstanceNode(gene, GENE_TYPE_ID);
-				graph.addNode(geneNode);
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		//int j = 0;
+		//for(LiteralStatement s : graph.getLiteralStatements()){
+		//	System.out.println(++j + ". " + s.getTargetId());
+		//}
 		obdsql.putGraph(graph);
 	}
 

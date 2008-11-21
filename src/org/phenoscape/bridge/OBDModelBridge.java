@@ -221,6 +221,7 @@ public class OBDModelBridge {
 				problemLog.write(s + "\n");
 			}
 			problemLog.write("\n");
+			fileSpecificProblemSet.clear();
 		}
 		catch(Exception e){
 			e.printStackTrace();

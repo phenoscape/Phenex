@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.obd.model.CompositionalDescription;
 import org.obd.model.Graph;
@@ -27,6 +29,10 @@ public class ZfinObdBridge {
 	public static String HAS_PUB_REL_ID = "cdao:hasPub";
 	public static String GENOTYPE_TYPE_ID = "SO:0001027";
 	public static String GENE_TYPE_ID = "SO:0000704";
+
+	Set<String> geneSet = new HashSet<String>();
+	Set<String> genotypeSet = new HashSet<String>();
+	Set<String> pubSet = new HashSet<String>();
 
 	private static RelationVocabulary relationVocabulary = new RelationVocabulary();
 
@@ -62,17 +68,8 @@ public class ZfinObdBridge {
 					String genotypeId = pComps[0];
 					String genotypeName = pComps[1];
 
-					Node genotypeNode = createInstanceNode(genotypeId,
-							GENOTYPE_TYPE_ID);
-					genotypeNode.setLabel(genotypeName);
-					// System.err.println("Adding node " + genotypeNode.getId()
-					// + "of type " + GENOTYPE_TYPE_ID);
-					graph.addNode(genotypeNode);
-
-					Node publicationNode = createInstanceNode(pub,
-							PUBLICATION_TYPE_ID);
-
-					graph.addNode(publicationNode);
+					genotypeSet.add(genotypeId + "\t" + genotypeName);
+					pubSet.add(pub);
 
 					if (entity1ID != null && entity1ID.trim().length() > 0) {
 						// Collection<Statement> stmts = obdsql
@@ -100,12 +97,26 @@ public class ZfinObdBridge {
 							genotypeAnnotLink.setTargetId(cd.toString());
 							// genotypeAnnotLink.addSubLinkStatement(
 							// HAS_PUB_REL_ID, pub);
-							System.err.println("Adding genotype statement "
-									+ genotypeAnnotLink.toString());
+							// System.err.println("Adding genotype statement "
+							// + genotypeAnnotLink.toString());
 							graph.addStatement(genotypeAnnotLink);
 						}
 
 					}
+				}
+				for (String gID : genotypeSet) {
+					String[] comps = gID.split("\\t");
+					Node genotypeNode = createInstanceNode(comps[0],
+							GENOTYPE_TYPE_ID);
+					genotypeNode.setLabel(comps[1]);
+					// System.err.println("Adding node " + genotypeNode.getId()
+					// + "of type " + GENOTYPE_TYPE_ID);
+					graph.addNode(genotypeNode);
+				}
+				for (String pub : pubSet) {
+					Node publicationNode = createInstanceNode(pub,
+							PUBLICATION_TYPE_ID);
+					graph.addNode(publicationNode);
 				}
 			} else {
 				System.err.println("Uninitialized URL for phenotypic data");
@@ -119,10 +130,7 @@ public class ZfinObdBridge {
 					String geneID = gComps[4];
 					String genotypeID = gComps[0];
 					if (geneID != null && geneID.trim().length() > 0) {
-						Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
-						// System.err.println("Adding node " + geneNode.getId()
-						// + " of type " + GENE_TYPE_ID);
-						graph.addNode(geneNode);
+						geneSet.add(geneID);
 						geneAnnotLink.setNodeId(geneID);
 						geneAnnotLink.setRelationId(GENE_GENOTYPE_REL_ID);
 						geneAnnotLink.setTargetId(genotypeID);
@@ -134,8 +142,10 @@ public class ZfinObdBridge {
 			} else {
 				System.err.println("Uninitialized URL for genotypic data");
 			}
-			// System.err.println(i + " phenotypes and " + j +
-			// " genotypes found");
+			for(String gene : geneSet){
+				Node geneNode = createInstanceNode(gene, GENE_TYPE_ID);
+				graph.addNode(geneNode);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

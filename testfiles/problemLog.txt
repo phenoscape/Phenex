@@ -738,4 +738,264 @@ Taxon: TTO:1052155 exhibits null phenotype
 Taxon: TTO:1005677 exhibits null phenotype
 Taxon: TTO:1005466 exhibits null phenotype
 Taxon: TTO:1005509 exhibits null phenotype
-Taxon: TTO
+Taxon: TTO:1005623 exhibits null phenotype
+Taxon: TTO:1056370 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality convex inhering in anterior margin^part_of(mesethmoid bone)
+Taxon: TTO:1051722 exhibits null phenotype
+Taxon: TTO:1048749 exhibits null phenotype
+Taxon: TTO:1005482 exhibits null phenotype
+Taxon: TTO:1005561 exhibits null phenotype
+Taxon: TTO:1006021 exhibits null phenotype
+Taxon: TTO:1025387 exhibits null phenotype
+Taxon: TTO:1056053 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality increased thickness inhering in anterior margin^part_of(mesethmoid bone)
+Taxon: TTO:1005797 exhibits null phenotype
+Taxon: TTO:1006244 exhibits null phenotype
+Taxon: TTO:1024102 exhibits null phenotype
+Taxon: TTO:1005758 exhibits null phenotype
+Taxon: TTO:1051728 exhibits null phenotype
+Taxon: TTO:1048743 exhibits null phenotype
+Taxon: TTO:1046276 exhibits null phenotype
+Taxon: TTO:1005683 exhibits null phenotype
+Taxon: TTO:1005508 exhibits null phenotype
+Taxon: TTO:1052153 exhibits null phenotype
+Taxon: TTO:1056055 exhibits null phenotype
+Taxon: TTO:1005567 exhibits null phenotype
+Taxon: TTO:1048630 exhibits null phenotype
+Taxon: TTO:1055971 exhibits null phenotype
+Taxon: TTO:1005580 exhibits null phenotype
+Taxon: TTO:1005638 exhibits null phenotype
+Taxon: TTO:1054099 exhibits null phenotype
+Taxon: TTO:1005426 exhibits null phenotype
+Taxon: TTO:1005744 exhibits null phenotype
+Taxon: TTO:1005483 exhibits null phenotype
+Taxon: TTO:1005778 exhibits null phenotype
+Taxon: TTO:1005600 exhibits null phenotype
+Taxon: TTO:1005787 exhibits null phenotype
+Taxon: TTO:1049960 exhibits null phenotype
+Taxon: TTO:1051712 exhibits null phenotype
+Taxon: TTO:1005575 exhibits null phenotype
+Taxon: TTO:1050985 exhibits null phenotype
+Taxon: TTO:1004594 exhibits null phenotype
+Taxon: TTO:1048861 exhibits null phenotype
+Taxon: TTO:1044078 exhibits null phenotype
+Taxon: TTO:1004580 exhibits null phenotype
+Taxon: TTO:1005907 exhibits null phenotype
+Taxon: TTO:1046010 exhibits null phenotype
+Taxon: TTO:1048049 exhibits null phenotype
+Taxon: TTO:1005577 exhibits null phenotype
+Taxon: TTO:1005405 exhibits null phenotype
+Taxon: TTO:1004731 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality posterior to inhering in posterior margin^part_of(swim bladder)
+Taxon: TTO:1046996 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality in contact with inhering in quadrate
+Taxon: TTO:1055036 exhibits null phenotype
+Taxon: TTO:1008785 exhibits null phenotype
+Taxon: TTO:1052582 exhibits null phenotype
+Taxon: TTO:1005619 exhibits null phenotype
+Taxon: TTO:1005779 exhibits null phenotype
+Taxon: TTO:1049207 exhibits null phenotype
+Taxon: TTO:1053572 exhibits null phenotype
+Taxon: TTO:1005806 exhibits null phenotype
+Taxon: TTO:1054267 exhibits null phenotype
+Taxon: TTO:1005667 exhibits null phenotype
+Taxon: TTO:1047923 exhibits null phenotype
+Taxon: TTO:1049091 exhibits null phenotype
+Taxon: TTO:1047722 exhibits null phenotype
+Taxon: TTO:1045233 exhibits null phenotype
+Taxon: TTO:1048714 exhibits null phenotype
+Taxon: TTO:1005467 exhibits null phenotype
+Taxon: TTO:1049792 exhibits null phenotype
+Taxon: TTO:1025072 exhibits null phenotype
+Taxon: TTO:1054601 exhibits null phenotype
+Taxon: TTO:1005629 exhibits null phenotype
+Taxon: TTO:1047707 exhibits null phenotype
+Taxon: TTO:1005576 exhibits null phenotype
+Taxon: TTO:1025068 exhibits null phenotype
+Taxon: TTO:1008045 exhibits null phenotype
+Taxon: TTO:1054654 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality present inhering in entopterygoid
+Taxon: TTO:1052584 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting null phenotype
+Taxon: TTO:1054684 exhibits null phenotype
+Taxon: TTO:1004590 exhibits null phenotype
+Taxon: TTO:1002747 exhibits null phenotype
+Taxon: TTO:1005496 exhibits null phenotype
+Taxon: TTO:1044801 exhibits null phenotype
+Taxon: TTO:1004586 exhibits null phenotype
+Taxon: TTO:1054206 exhibits null phenotype
+Taxon: TTO:1048846 exhibits null phenotype
+Taxon: TTO:1054638 exhibits null phenotype
+Taxon: TTO:1052152 exhibits null phenotype
+Taxon: TTO:1005727 exhibits null phenotype
+Taxon: TTO:1048345 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality arrow-shaped inhering in vomer
+Taxon: TTO:1046925 exhibits null phenotype
+Taxon: TTO:1050373 exhibits null phenotype
+Taxon: TTO:1004576 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality absent inhering in extrascapular
+Taxon: TTO:1005901 exhibits null phenotype
+Taxon: TTO:1047153 exhibits null phenotype
+Taxon: TTO:1049796 exhibits null phenotype
+Taxon: TTO:1054679 exhibits null phenotype
+Taxon: TTO:1005790 exhibits null phenotype
+Taxon: TTO:1004596 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality present inhering in extrascapular
+Taxon: TTO:1004641 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality T-shaped inhering in vomer
+Null identifier for taxon: untitled exhibiting quality absent inhering in adipose fin
+Taxon: TTO:1045238 exhibits null phenotype
+Taxon: TTO:1005910 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality present inhering in adipose fin
+Null identifier for taxon: untitled exhibiting quality decreased circumference inhering in autopalatine
+Taxon: TTO:1045442 exhibits null phenotype
+Taxon: TTO:1054653 exhibits null phenotype
+Taxon: TTO:1047063 exhibits null phenotype
+Taxon: TTO:1005588 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality separated from inhering in quadrate
+Taxon: TTO:1005665 exhibits null phenotype
+Taxon: TTO:1004981 exhibits null phenotype
+Taxon: TTO:1049401 exhibits null phenotype
+Taxon: TTO:1005537 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality cylindrical inhering in autopalatine
+Taxon: TTO:1047294 exhibits null phenotype
+Taxon: TTO:1047953 exhibits null phenotype
+Taxon: TTO:1005089 exhibits null phenotype
+Taxon: TTO:1006036 exhibits null phenotype
+Taxon: TTO:1005988 exhibits null phenotype
+Taxon: TTO:1006171 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality present inhering in ectopterygoid
+Taxon: TTO:1046915 exhibits null phenotype
+Taxon: TTO:1005947 exhibits null phenotype
+Taxon: TTO:1049089 exhibits null phenotype
+Taxon: TTO:1005686 exhibits null phenotype
+Taxon: TTO:1005967 exhibits null phenotype
+Taxon: TTO:1005481 exhibits null phenotype
+Taxon: TTO:1005641 exhibits null phenotype
+Taxon: TTO:1042779 exhibits null phenotype
+Taxon: TTO:1054843 exhibits null phenotype
+Taxon: TTO:1005682 exhibits null phenotype
+Taxon: TTO:1005684 exhibits null phenotype
+Taxon: TTO:1008043 exhibits null phenotype
+Taxon: TTO:1051844 exhibits null phenotype
+Taxon: TTO:1044880 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality decreased volume inhering in swim bladder
+Taxon: TTO:1005630 exhibits null phenotype
+Taxon: TTO:1045220 exhibits null phenotype
+Taxon: TTO:1059763 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality increased size inhering in anterior region^part_of(autopalatine)
+Taxon: TTO:1054590 exhibits null phenotype
+Taxon: TTO:1005554 exhibits null phenotype
+Taxon: TTO:1048668 exhibits null phenotype
+Taxon: TTO:1004676 exhibits null phenotype
+Taxon: TTO:1051784 exhibits null phenotype
+Taxon: TTO:1005584 exhibits null phenotype
+Taxon: TTO:1045898 exhibits null phenotype
+Taxon: TTO:1050711 exhibits null phenotype
+Taxon: TTO:1050070 exhibits null phenotype
+Taxon: TTO:1051401 exhibits null phenotype
+Taxon: TTO:1005697 exhibits null phenotype
+Taxon: TTO:1053662 exhibits null phenotype
+Taxon: TTO:1048906 exhibits null phenotype
+Taxon: TTO:1047073 exhibits null phenotype
+Taxon: TTO:1005714 exhibits null phenotype
+Taxon: TTO:1048725 exhibits null phenotype
+Taxon: TTO:1005552 exhibits null phenotype
+Taxon: TTO:1006047 exhibits null phenotype
+Taxon: TTO:1054594 exhibits null phenotype
+Taxon: TTO:1059762 exhibits null phenotype
+Taxon: TTO:1007565 exhibits null phenotype
+Taxon: TTO:1054849 exhibits null phenotype
+Taxon: TTO:1005872 exhibits null phenotype
+Taxon: TTO:1045960 exhibits null phenotype
+Taxon: TTO:1048733 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality present inhering in bony projection^part_of(antero-ventral margin^part_of(mesethmoid bone))
+Taxon: TTO:1049329 exhibits null phenotype
+Taxon: TTO:1052000 exhibits null phenotype
+
+Ng_2003.xml
+
+
+Rapp_Py_Daniel_1997.xml
+
+Taxon: TTO:1009601 exhibits null phenotype
+Taxon: TTO:1009375 exhibits null phenotype
+Taxon: TTO:1005432 exhibits null phenotype
+Taxon: TTO:1005829 exhibits null phenotype
+Taxon: TTO:1005384 exhibits null phenotype
+Taxon: TTO:1005660 exhibits null phenotype
+Taxon: TTO:1005964 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality absent inhering in basibranchial 2
+Taxon: TTO:1005969 exhibits null phenotype
+Taxon: TTO:1053567 exhibits null phenotype
+Taxon: TTO:1005063 exhibits null phenotype
+Taxon: TTO:1005164 exhibits null phenotype
+Taxon: TTO:1005898 exhibits null phenotype
+Taxon: TTO:1005721 exhibits null phenotype
+Taxon: TTO:1044792 exhibits null phenotype
+Taxon: TTO:1005408 exhibits null phenotype
+Taxon: TTO:1006058 exhibits null phenotype
+Taxon: TTO:1006000 exhibits null phenotype
+Taxon: TTO:1035774 exhibits null phenotype
+Taxon: TTO:1005744 exhibits null phenotype
+Taxon: TTO:1005659 exhibits null phenotype
+Taxon: TTO:1005370 exhibits null phenotype
+Taxon: TTO:1005263 exhibits null phenotype
+Taxon: TTO:1005460 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality absent inhering in interhyal bone
+Taxon: TTO:1005398 exhibits null phenotype
+Taxon: TTO:1041365 exhibits null phenotype
+Taxon: TTO:1005958 exhibits null phenotype
+Taxon: TTO:1009376 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting null phenotype
+Null identifier for taxon: untitled exhibiting quality count inhering in branchiostegal ray
+Taxon: TTO:1005656 exhibits null phenotype
+Taxon: TTO:1005819 exhibits null phenotype
+Taxon: TTO:1005404 exhibits null phenotype
+Taxon: TTO:1005381 exhibits null phenotype
+Taxon: TTO:1005080 exhibits null phenotype
+Null identifier for taxon: untitled exhibiting quality present inhering in basibranchial 2
+Null identifier for taxon: untitled exhibiting quality present inhering in basibranchial 1
+Null identifier for taxon: untitled exhibiting quality shape inhering in basibranchial 1
+Null identifier for taxon: untitled exhibiting quality shape inhering in basibranchial 2
+Taxon: TTO:1005387 exhibits null phenotype
+
+Reis_1998.xml
+
+
+Royero_1999.xml
+
+
+Schaefer_1987.xml
+
+
+Schaefer_1990.xml
+
+
+Schaefer_1991.xml
+
+
+Shibatta_1998.xml
+
+
+Soares-Porto_1998.xml
+
+
+Sullivan_etal_2006.xml
+
+
+Vigliotta_2008.xml
+
+
+dePinna_1993.xml
+
+
+dePinna_1996.xml
+
+
+dePinna_etal_2007.xml
+
+
+de_Pinna_1998.xml
+
+

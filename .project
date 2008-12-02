@@ -14,11 +14,5 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>OBO-Edit2</name>
-			<type>2</type>
-			<location>/home/cartik/workspace/OBO-Edit2</location>
-		</link>
-	</linkedResources>
+	
 </projectDescription>

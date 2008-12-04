@@ -25,7 +25,7 @@ public class ZfinObdBridge {
 	protected Graph graph;
 
 	public static String GENOTYPE_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits";
-	public static String GENE_GENOTYPE_REL_ID = "PHENOSCAPE:hasAllele";
+	public static String GENE_GENOTYPE_REL_ID = "PHENOSCAPE:has_allele";
 	public static String PUBLICATION_TYPE_ID = "cdao:Pub";
 	public static String HAS_PUB_REL_ID = "cdao:hasPub";
 	public static String GENOTYPE_TYPE_ID = "SO:0001027";

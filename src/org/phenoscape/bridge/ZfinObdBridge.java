@@ -47,15 +47,18 @@ public class ZfinObdBridge {
 			File connParamFile = new File("testfiles/zfinLocations");
 			BufferedReader br = new BufferedReader(
 					new FileReader(connParamFile));
-			URL phenotypeURL = null, genotypeURL = null;
-			String param, phenoFileLine, genoFileLine;
+			URL phenotypeURL = null, genotypeURL = null, missingMarkersURL = null;
+			String param, phenoFileLine, genoFileLine, missingMarkersFileLine;
 			LinkStatement genotypeAnnotLink = new LinkStatement();
 			LinkStatement geneAnnotLink = new LinkStatement();
 			while ((param = br.readLine()) != null) {
 				if (param.contains("pheno"))
 					phenotypeURL = new URL(param);
-				else
+				else if(param.contains("missing_markers"))
+					missingMarkersURL = new URL(param);
+				else{
 					genotypeURL = new URL(param);
+				}
 			}
 
 			if (phenotypeURL != null) {
@@ -114,17 +117,22 @@ public class ZfinObdBridge {
 				System.err.println("Uninitialized URL for phenotypic data");
 			}
 
-			if (genotypeURL != null) {
+			if (genotypeURL != null && missingMarkersURL != null) {
 				BufferedReader br2 = new BufferedReader(new InputStreamReader(
 						genotypeURL.openStream()));
+				BufferedReader br3 = new BufferedReader(new InputStreamReader(missingMarkersURL.openStream()));
+				
 				while ((genoFileLine = br2.readLine()) != null) {
+					String geneID = "";
 					String[] gComps = genoFileLine.split("\\t");
-					String geneID = gComps[4];
 					String genotypeID = gComps[0];
+					if(gComps.length > 9){
+						geneID = gComps[9];
+					}
 					
-					Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
-					graph.addNode(geneNode);
 					if (geneID != null && geneID.trim().length() > 0) {
+						Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
+						graph.addNode(geneNode);
 						geneSet.add(geneID);
 						geneAnnotLink.setNodeId(geneID);
 						geneAnnotLink.setRelationId(GENE_GENOTYPE_REL_ID);
@@ -132,6 +140,22 @@ public class ZfinObdBridge {
 						// System.err.println("Adding gene statement " +
 						// geneAnnotLink);
 						graph.addLinkStatement(geneNode, GENE_GENOTYPE_REL_ID, genotypeID);
+					}
+					else{
+						while((missingMarkersFileLine = br3.readLine()) != null){
+							String[] mmComps = missingMarkersFileLine.split("\\t");
+							if(mmComps[0].equals(genotypeID)){
+								if(mmComps[4] != null && mmComps[4].trim().length() > 0){
+									Node geneNode = createInstanceNode(mmComps[4], GENE_TYPE_ID);
+									graph.addNode(geneNode);
+									geneSet.add(mmComps[4]);
+									geneAnnotLink.setNodeId(geneID);
+									geneAnnotLink.setRelationId(GENE_GENOTYPE_REL_ID);
+									geneAnnotLink.setTargetId(genotypeID);
+									graph.addLinkStatement(geneNode, GENE_GENOTYPE_REL_ID, genotypeID);
+								}
+							}
+						}
 					}
 				}
 			} else {

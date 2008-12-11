@@ -11,7 +11,6 @@ import java.util.Set;
 import org.obd.model.CompositionalDescription;
 import org.obd.model.Graph;
 import org.obd.model.LinkStatement;
-import org.obd.model.LiteralStatement;
 import org.obd.model.Node;
 import org.obd.model.CompositionalDescription.Predicate;
 import org.obd.model.Node.Metatype;
@@ -125,9 +124,9 @@ public class ZfinObdBridge {
 				while ((genoFileLine = br2.readLine()) != null) {
 					String geneID = "";
 					String[] gComps = genoFileLine.split("\\t");
-					String genotypeID = gComps[0];
+					String genotypeID = normalizetoZfin(gComps[0]);
 					if(gComps.length > 9){
-						geneID = gComps[9];
+						geneID = normalizetoZfin(gComps[9]);
 					}
 					
 					if (geneID != null && geneID.trim().length() > 0) {
@@ -144,11 +143,12 @@ public class ZfinObdBridge {
 					else{
 						while((missingMarkersFileLine = br3.readLine()) != null){
 							String[] mmComps = missingMarkersFileLine.split("\\t");
-							if(mmComps[0].equals(genotypeID)){
+							if(mmComps[0].equals(gComps[0])){
 								if(mmComps[4] != null && mmComps[4].trim().length() > 0){
-									Node geneNode = createInstanceNode(mmComps[4], GENE_TYPE_ID);
+									geneID = normalizetoZfin(mmComps[4]);
+									Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
 									graph.addNode(geneNode);
-									geneSet.add(mmComps[4]);
+									geneSet.add(geneID);
 									geneAnnotLink.setNodeId(geneID);
 									geneAnnotLink.setRelationId(GENE_GENOTYPE_REL_ID);
 									geneAnnotLink.setTargetId(genotypeID);
@@ -169,6 +169,17 @@ public class ZfinObdBridge {
 		//	System.out.println(++j + ". " + s.getTargetId());
 		//}
 		obdsql.putGraph(graph);
+	}
+
+	/**
+	 * Another helper method to deal with the prefix inconsistencies in ZFIN
+	 * Gene to Genotype files lack the ZFIN prefix
+	 * Genotype to Phenotype files have the prefix
+	 * @param string
+	 * @return
+	 */
+	private String normalizetoZfin(String string) {
+		return "ZFIN:" + string;
 	}
 
 	protected Node createInstanceNode(String id, String typeId) {

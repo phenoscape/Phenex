@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.obd.model.CompositionalDescription;
 import org.obd.model.Graph;
@@ -30,10 +28,6 @@ public class ZfinObdBridge {
 	public static String GENOTYPE_TYPE_ID = "SO:0001027";
 	public static String GENE_TYPE_ID = "SO:0000704";
 
-	Set<String> geneSet = new HashSet<String>();
-	Set<String> genotypeSet = new HashSet<String>();
-	Set<String> pubSet = new HashSet<String>();
-
 	private static RelationVocabulary relationVocabulary = new RelationVocabulary();
 
 	public ZfinObdBridge() {
@@ -48,14 +42,14 @@ public class ZfinObdBridge {
 					new FileReader(connParamFile));
 			URL phenotypeURL = null, genotypeURL = null, missingMarkersURL = null;
 			String param, phenoFileLine, genoFileLine, missingMarkersFileLine;
-			LinkStatement genotypeAnnotLink = new LinkStatement();
-			LinkStatement geneAnnotLink = new LinkStatement();
+			LinkStatement genotypeAnnotLink;
+			LinkStatement geneAnnotLink;
 			while ((param = br.readLine()) != null) {
 				if (param.contains("pheno"))
 					phenotypeURL = new URL(param);
-				else if(param.contains("missing_markers"))
+				else if (param.contains("missing_markers"))
 					missingMarkersURL = new URL(param);
-				else{
+				else {
 					genotypeURL = new URL(param);
 				}
 			}
@@ -81,34 +75,19 @@ public class ZfinObdBridge {
 					graph.addNode(publicationNode);
 
 					if (entity1ID != null && entity1ID.trim().length() > 0) {
-						// Collection<Statement> stmts = obdsql
-						// .getStatementsForTarget(entity1ID);
-						// Iterator<Statement> it = stmts.iterator();
-
-						// if (it.hasNext()) {
-						// while (it.hasNext()) {
-						// Statement stmt = it.next();
-						// if (stmt.getRelationId().contains("DbXref")) {
-						// String equivEntityID = stmt.getNodeId();
-						// e1 = new OBOClassImpl(equivEntityID);
-						// }
-						// }
-						// }
 						if (qualID != null && qualID.trim().length() > 0) {
 							CompositionalDescription cd = new CompositionalDescription(
 									Predicate.INTERSECTION);
 							cd.addArgument(qualID);
 							cd.addArgument(relationVocabulary.inheres_in(),
 									entity1ID);
+							genotypeAnnotLink = new LinkStatement();
 							genotypeAnnotLink.setNodeId(genotypeId);
 							genotypeAnnotLink
 									.setRelationId(GENOTYPE_PHENOTYPE_REL_ID);
 							genotypeAnnotLink.setTargetId(cd.toString());
-							// genotypeAnnotLink.addSubLinkStatement(
-							// HAS_PUB_REL_ID, pub);
-							// System.err.println("Adding genotype statement "
-							 //+ genotypeAnnotLink.toString());
-							graph.addLinkStatement(genotypeNode, GENOTYPE_PHENOTYPE_REL_ID, cd.toString());
+							genotypeAnnotLink.addSubLinkStatement(HAS_PUB_REL_ID, pub);
+							graph.addStatement(genotypeAnnotLink);
 						}
 					}
 				}
@@ -119,40 +98,43 @@ public class ZfinObdBridge {
 			if (genotypeURL != null && missingMarkersURL != null) {
 				BufferedReader br2 = new BufferedReader(new InputStreamReader(
 						genotypeURL.openStream()));
-				BufferedReader br3 = new BufferedReader(new InputStreamReader(missingMarkersURL.openStream()));
-				
+				BufferedReader br3 = new BufferedReader(new InputStreamReader(
+						missingMarkersURL.openStream()));
+
 				while ((genoFileLine = br2.readLine()) != null) {
 					String geneID = "";
 					String[] gComps = genoFileLine.split("\\t");
 					String genotypeID = normalizetoZfin(gComps[0]);
-					if(gComps.length > 9){
+					if (gComps.length > 9) {
 						geneID = normalizetoZfin(gComps[9]);
 					}
-					
+
 					if (geneID != null && geneID.trim().length() > 0) {
 						Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
 						graph.addNode(geneNode);
-						geneSet.add(geneID);
+						geneAnnotLink = new LinkStatement();
 						geneAnnotLink.setNodeId(geneID);
 						geneAnnotLink.setRelationId(GENE_GENOTYPE_REL_ID);
 						geneAnnotLink.setTargetId(genotypeID);
-						// System.err.println("Adding gene statement " +
-						// geneAnnotLink);
-						graph.addLinkStatement(geneNode, GENE_GENOTYPE_REL_ID, genotypeID);
-					}
-					else{
-						while((missingMarkersFileLine = br3.readLine()) != null){
-							String[] mmComps = missingMarkersFileLine.split("\\t");
-							if(mmComps[0].equals(gComps[0])){
-								if(mmComps[4] != null && mmComps[4].trim().length() > 0){
+						graph.addStatement(geneAnnotLink);
+					} else {
+						while ((missingMarkersFileLine = br3.readLine()) != null) {
+							String[] mmComps = missingMarkersFileLine
+									.split("\\t");
+							if (mmComps[0].equals(gComps[0])) {
+								if (mmComps[4] != null
+										&& mmComps[4].trim().length() > 0) {
 									geneID = normalizetoZfin(mmComps[4]);
-									Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
+									Node geneNode = createInstanceNode(geneID,
+											GENE_TYPE_ID);
 									graph.addNode(geneNode);
-									geneSet.add(geneID);
+									geneAnnotLink = new LinkStatement();
 									geneAnnotLink.setNodeId(geneID);
-									geneAnnotLink.setRelationId(GENE_GENOTYPE_REL_ID);
+									geneAnnotLink
+											.setRelationId(GENE_GENOTYPE_REL_ID);
 									geneAnnotLink.setTargetId(genotypeID);
-									graph.addLinkStatement(geneNode, GENE_GENOTYPE_REL_ID, genotypeID);
+									graph.addLinkStatement(geneNode,
+											GENE_GENOTYPE_REL_ID, genotypeID);
 								}
 							}
 						}
@@ -164,17 +146,14 @@ public class ZfinObdBridge {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		//int j = 0;
-		//for(LiteralStatement s : graph.getLiteralStatements()){
-		//	System.out.println(++j + ". " + s.getTargetId());
-		//}
 		obdsql.putGraph(graph);
 	}
 
 	/**
 	 * Another helper method to deal with the prefix inconsistencies in ZFIN
-	 * Gene to Genotype files lack the ZFIN prefix
-	 * Genotype to Phenotype files have the prefix
+	 * Gene to Genotype files lack the ZFIN prefix Genotype to Phenotype files
+	 * have the prefix
+	 * 
 	 * @param string
 	 * @return
 	 */

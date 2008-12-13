@@ -70,10 +70,6 @@ public class OBDModelBridge {
 	private Map<Taxon, String> taxonIdMap = new HashMap<Taxon, String>();
 	private Map<Phenotype, String> phenotypeIdMap = new HashMap<Phenotype, String>();
 	protected BufferedWriter problemLog;
-	// added to avoid null IDs associated with Phenotype instances: Cartik1.0
-	// private static int phenotype_id = 1;
-	// private static int taxon_id = 1;
-	
 
 	private Set<String> fileSpecificProblemSet = new HashSet<String>();
 

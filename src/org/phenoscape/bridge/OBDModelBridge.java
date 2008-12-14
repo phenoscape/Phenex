@@ -14,6 +14,7 @@ import org.obd.model.CompositionalDescription;
 import org.obd.model.Graph;
 import org.obd.model.LinkStatement;
 import org.obd.model.Node;
+import org.obd.model.Statement;
 import org.obd.model.CompositionalDescription.Predicate;
 import org.obd.model.Node.Metatype;
 import org.obd.model.vocabulary.TermVocabulary;
@@ -73,6 +74,8 @@ public class OBDModelBridge {
 
 	private Set<String> fileSpecificProblemSet = new HashSet<String>();
 
+	protected Set<LinkStatement> phenotypes;
+	
 	// an instantiation block
 	{
 		try {
@@ -82,11 +85,6 @@ public class OBDModelBridge {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public OBDModelBridge() {
-		super();
-		graph = new Graph();
 	}
 
 	public Graph getGraph() {
@@ -99,7 +97,8 @@ public class OBDModelBridge {
 
 	public Graph translate(DataSet ds, File dataFile) {
 		String dsId = UUID.randomUUID().toString();
-
+		graph = new Graph();
+		phenotypes = new HashSet<LinkStatement>();
 		// Dataset metadata
 		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
 
@@ -170,8 +169,6 @@ public class OBDModelBridge {
 				for (Phenotype p : state.getPhenotypes()) {
 					// taxon to phenotype
 					LinkStatement annotLink = new LinkStatement();
-					// to avoid insertion of null Ids: Cartik1.0
-					annotLink.setNodeId(taxonIdMap.get(t));
 					String problem = "";
 					if (phenotypeIdMap.get(p) != null
 							&& taxonIdMap.get(t) != null) {
@@ -179,7 +176,17 @@ public class OBDModelBridge {
 						annotLink.setTargetId(phenotypeIdMap.get(p));
 						annotLink.setRelationId(TAXON_PHENOTYPE_REL_ID);
 						annotLink.addSubLinkStatement("posited_by", dsId);
-						graph.addStatement(annotLink);
+						
+						// link description of biology back to data
+						Node cellNode = createInstanceNode(UUID.randomUUID()
+								.toString(), CELL_TYPE_ID);
+						annotLink.addSubLinkStatement(CELL_TO_STATE_REL_ID,
+								cellNode.getId());
+						phenotypes.add(annotLink);
+						// cell to state
+						LinkStatement cell2s = new LinkStatement(cellNode.getId(),
+								CELL_TO_STATE_REL_ID, stateIdMap.get(state)); // TODO
+						graph.addStatement(cell2s);
 					}
 					else if(taxonIdMap.get(t) == null){
 							problem = "Null identifier for taxon: " + t;
@@ -196,16 +203,6 @@ public class OBDModelBridge {
 					if(problem.length() > 0){
 						fileSpecificProblemSet.add(problem);
 					}
-					// link description of biology back to data
-					Node cellNode = createInstanceNode(UUID.randomUUID()
-							.toString(), CELL_TYPE_ID);
-					annotLink.addSubLinkStatement(CELL_TO_STATE_REL_ID,
-							cellNode.getId());
-
-					// cell to state
-					LinkStatement cell2s = new LinkStatement(cellNode.getId(),
-							CELL_TO_STATE_REL_ID, stateIdMap.get(state)); // TODO
-					graph.addStatement(cell2s);
 				}
 			}
 		}
@@ -218,6 +215,9 @@ public class OBDModelBridge {
 			}
 			problemLog.write("\n");
 			fileSpecificProblemSet.clear();
+			for(Statement stmt : phenotypes){
+				graph.addStatement(stmt);
+			}
 		}
 		catch(Exception e){
 			e.printStackTrace();

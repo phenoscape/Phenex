@@ -49,7 +49,7 @@ public class PhenoscapeDataLoader {
 		BufferedReader br = new BufferedReader(new FileReader(connParamFile));
 		String[] connParams = new String[3];
 		String param;
-		int j = 0;
+		int j = 0, t = 0;
 		while ((param = br.readLine()) != null) {
 			connParams[j++] = param;
 		}
@@ -75,6 +75,8 @@ public class PhenoscapeDataLoader {
 						g = bridge.getGraph();
 						obdsql.putGraph(g);
 						// s.putGraph(g);
+						t += g.getStatements().size();
+						System.out.println(g.getStatements().size() + " records added");
 						System.out.println(i + ". Finished loading "
 								+ dataFile.getAbsolutePath());
 					}
@@ -83,6 +85,6 @@ public class PhenoscapeDataLoader {
 		}
 		bridge.problemLog.flush();
 		bridge.problemLog.close();
-		System.out.println(i + " files loaded. Done!");
+		System.out.println(t + " total statements from " + i + " files loaded. Done!");
 	}
 }

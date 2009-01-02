@@ -102,15 +102,17 @@ public class ZfinObdBridge {
 						missingMarkersURL.openStream()));
 
 				while ((genoFileLine = br2.readLine()) != null) {
-					String geneID = "";
+					String geneID = "", geneName = "";
 					String[] gComps = genoFileLine.split("\\t");
 					String genotypeID = normalizetoZfin(gComps[0]);
 					if (gComps.length > 9) {
 						geneID = normalizetoZfin(gComps[9]);
+						geneName = gComps[8];
 					}
 
 					if (geneID != null && geneID.trim().length() > 0) {
 						Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
+						geneNode.setLabel(geneName);
 						graph.addNode(geneNode);
 						geneAnnotLink = new LinkStatement();
 						geneAnnotLink.setNodeId(geneID);
@@ -127,6 +129,7 @@ public class ZfinObdBridge {
 									geneID = normalizetoZfin(mmComps[4]);
 									Node geneNode = createInstanceNode(geneID,
 											GENE_TYPE_ID);
+									geneNode.setLabel(mmComps[3]);
 									graph.addNode(geneNode);
 									geneAnnotLink = new LinkStatement();
 									geneAnnotLink.setNodeId(geneID);

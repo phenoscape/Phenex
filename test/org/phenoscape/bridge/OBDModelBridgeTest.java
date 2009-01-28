@@ -33,6 +33,7 @@ import org.phenoscape.model.OntologyController;
 public class OBDModelBridgeTest {
 
 	@Test
+	@Ignore
 	public void testLoad() throws XmlException, IOException, SQLException,
 			ClassNotFoundException {
 		OntologyController oc = new OntologyController();

@@ -117,6 +117,9 @@ public class DataSet extends AbstractPropertyChangeObject {
 
     public void setStateForTaxon(Taxon taxon, Character character, State state) {
         if (taxon == null || character == null) { return; }
+        if (ObjectUtils.equals(this.getStateForTaxon(taxon, character), state)) {
+            return;
+        }
         final MatrixCellValue oldValue = new MatrixCellValue(taxon, character, this.getStateForTaxon(taxon, character));
         final Map<String, String> states;
         if (this.matrix.containsKey(taxon.getNexmlID())) {

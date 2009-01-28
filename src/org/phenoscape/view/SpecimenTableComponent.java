@@ -109,9 +109,9 @@ public class SpecimenTableComponent extends PhenoscapeGUIComponent {
     }
 
     private void updateButtonStates() {
-        this.addSpecimenButton.setEnabled(this.getSelectedTaxon() != null);
-        this.duplicateSpecimenButton.setEnabled(this.getSelectedSpecimen() != null);
-        this.deleteSpecimenButton.setEnabled(this.getSelectedSpecimen() != null);
+        this.addSpecimenButton.setEnabled((this.getSelectedTaxon() != null));
+        this.duplicateSpecimenButton.setEnabled((this.getSelectedSpecimen() != null) && (this.getSelectedTaxon() != null));
+        this.deleteSpecimenButton.setEnabled((this.getSelectedSpecimen() != null) && (this.getSelectedTaxon() != null));
     }
 
     private void initializeInterface() {

@@ -60,7 +60,7 @@ public class PhenoscapeController extends DocumentController {
         this.sortedTaxa = new SortedList<Taxon>(this.dataSet.getTaxa(), new EverythingEqualComparator<Taxon>());
         this.taxaSelectionModel = new EventSelectionModel<Taxon>(this.sortedTaxa);
         new ListSelectionMaintainer<Taxon>(this.sortedTaxa, this.taxaSelectionModel);
-        this.taxaSelectionModel.setSelectionMode(EventSelectionModel.SINGLE_SELECTION);
+        this.taxaSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         this.currentSpecimens = new SortedList<Specimen>(new CollectionList<Taxon, Specimen>(this.taxaSelectionModel.getSelected(),
                 new CollectionList.Model<Taxon, Specimen>(){
             public List<Specimen> getChildren(Taxon parent) {

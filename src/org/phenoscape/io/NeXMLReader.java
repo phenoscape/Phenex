@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -249,12 +250,31 @@ public class NeXMLReader {
         if (term instanceof OBOClass) {
             return (OBOClass)term;
         } else {
-            log().warn("Term not found; creating dangler for " + id);
-            this.danglers.add(id);
-            final OBOClass dangler = new DanglingClassImpl(id.trim());
-            return dangler;
+            final OBOClass altTerm = this.findTermByAltID(id);
+            if (altTerm != null) {
+                return altTerm;
+            } else {
+                log().warn("Term not found; creating dangler for " + id);
+                this.danglers.add(id);
+                final OBOClass dangler = new DanglingClassImpl(id.trim());
+                return dangler;
+            }
         }
-    }  
+    }
+    
+    private OBOClass findTermByAltID(String id) {
+        log().debug("Called alt_id search");
+        final Collection<IdentifiedObject> terms = this.session.getObjects();
+        for (IdentifiedObject object : terms) {
+            if (object instanceof OBOClass) {
+                final OBOClass term = (OBOClass)object;
+                if (term.getSecondaryIDs().contains(id)) {
+                    return term;
+                }
+            }
+        }
+        return null;
+    }
 
     private Logger log() {
         return Logger.getLogger(this.getClass());

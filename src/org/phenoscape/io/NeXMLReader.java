@@ -3,11 +3,12 @@ package org.phenoscape.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -52,7 +53,8 @@ public class NeXMLReader {
     private final DataSet data = new DataSet();
     private final NexmlDocument xmlDoc;
     private final OBOSession session;
-    private final List<String> danglers = new ArrayList<String>();
+    private final Set<String> danglers = new HashSet<String>();
+    private final Set<String> secondaryIDs = new HashSet<String>();
     private String charactersBlockID = UUID.randomUUID().toString();
 
     public NeXMLReader(File aFile, OBOSession session) throws XmlException, IOException {
@@ -89,8 +91,22 @@ public class NeXMLReader {
     /**
      * Returns the list of IDs referenced in the file that were not found in the OBOSession.
      */
-    public List<String> getDanglersList() {
+    public Collection<String> getDanglersList() {
         return this.danglers;
+    }
+    
+    /**
+     * Returns true if the reader had to find any referenced terms via a secondary ID.
+     */
+    public boolean didMigrateSecondaryIDs() {
+        return !this.secondaryIDs.isEmpty();
+    }
+    
+    /**
+     * Returns the list of IDs referenced in the file that were found to be secondary IDs.
+     */
+    public Collection<String> getMigratedSecondaryIDsList() {
+        return this.secondaryIDs;
     }
 
     private void parseNeXML() {
@@ -145,6 +161,7 @@ public class NeXMLReader {
                                 newState.addPhenotype(((PhenoXMLPhenotypeWrapper)phenotype).getPhenotype());
                             }
                             this.danglers.addAll(adapter.getDanglersList());
+                            this.secondaryIDs.addAll(adapter.getMigratedSecondaryIDsList());
                         } catch (XmlException e) {
                             log().error("Failed to parse OBO phenotype", e);
                         }
@@ -269,6 +286,7 @@ public class NeXMLReader {
             if (object instanceof OBOClass) {
                 final OBOClass term = (OBOClass)object;
                 if (term.getSecondaryIDs().contains(id)) {
+                    this.secondaryIDs.add(id);
                     return term;
                 }
             }

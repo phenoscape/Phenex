@@ -3,6 +3,7 @@ package org.phenoscape.model;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ import org.apache.xmlbeans.XmlException;
 import org.bbop.framework.GUIManager;
 import org.biojava.bio.seq.io.ParseException;
 import org.nexml.x10.NexmlDocument;
+import org.phenoscape.app.UserCancelledReadException;
 import org.phenoscape.app.DocumentController;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
@@ -152,7 +154,15 @@ public class PhenoscapeController extends DocumentController {
             final NeXMLReader reader = new NeXMLReader(aFile, this.getOntologyController().getOBOSession());
             if (reader.didCreateDanglers()) {
                 final boolean result = this.runDanglerAlert(aFile, reader.getDanglersList());
-                if (!result) { return; }
+                if (!result) {
+                    throw new UserCancelledReadException();
+                }
+            }
+            if (reader.didMigrateSecondaryIDs()) {
+                final boolean result = this.runSecondaryIDAlert(aFile, reader.getMigratedSecondaryIDsList());
+                if (!result) {
+                    throw new UserCancelledReadException();
+                }
             }
             this.xmlDoc = reader.getXMLDoc();
             this.charactersBlockID = reader.getCharactersBlockID();
@@ -298,13 +308,19 @@ public class PhenoscapeController extends DocumentController {
         }
     }
     
-    private boolean runDanglerAlert(File file, List<String> danglerIDs) {
+    private boolean runDanglerAlert(File file, Collection<String> danglerIDs) {
         final String[] options = {"Continue Opening", "Cancel"};
         final String message = "The file \"" + file.getName() + "\" contains references to ontology term IDs which could not be found. You can safely edit other values in the file, but fields referring to \"dangling\" terms should not be edited. Proceed with caution.";
         final int result = JOptionPane.showOptionDialog(null, message, "Missing Terms", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         return result == JOptionPane.YES_OPTION;
     }
 
+    private boolean runSecondaryIDAlert(File file, Collection<String> secondaryIDs) {
+        final String[] options = {"Continue Opening", "Cancel"};
+        final String message = "The file \"" + file.getName() + "\" contains references to some ontology terms by secondary IDs. When you save this file, these term references will be migrated to each term's primary ID.";
+        final int result = JOptionPane.showOptionDialog(null, message, "Secondary Identifiers", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        return result == JOptionPane.YES_OPTION;
+    }
 
     private Logger log() {
         return Logger.getLogger(this.getClass());

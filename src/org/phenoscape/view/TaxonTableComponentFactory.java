@@ -1,13 +1,13 @@
 package org.phenoscape.view;
 
 import org.bbop.framework.AbstractComponentFactory;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 
 public class TaxonTableComponentFactory extends AbstractComponentFactory<TaxonTableComponent> {
 
-  private final PhenoscapeController controller;
+  private final PhenexController controller;
   
-  public TaxonTableComponentFactory(PhenoscapeController controller) {
+  public TaxonTableComponentFactory(PhenexController controller) {
     this.controller = controller;
   }
 

@@ -17,16 +17,16 @@ import org.bbop.framework.AbstractGUIComponent;
 import org.bbop.framework.ComponentManager;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 import org.phenoscape.swing.AutoCompleteSupport;
 
 import ca.odell.glazedlists.GlazedLists;
 
 public class PhenoscapeGUIComponent extends AbstractGUIComponent {
   
-  private final PhenoscapeController controller;
+  private final PhenexController controller;
 
-  public PhenoscapeGUIComponent(String id, PhenoscapeController controller) {
+  public PhenoscapeGUIComponent(String id, PhenexController controller) {
     super(id);
     this.controller = controller;
   }
@@ -35,7 +35,7 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
    * Most interface components will need access to data.  The controller is the gatekeeper
    * to the data model.
    */
-  public PhenoscapeController getController() {
+  public PhenexController getController() {
     return this.controller;
   }
 

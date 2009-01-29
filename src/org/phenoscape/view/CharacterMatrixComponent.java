@@ -22,7 +22,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import org.apache.log4j.Logger;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 import org.phenoscape.swing.PlaceholderRenderer;
@@ -58,7 +58,7 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
     private CharacterDisplay characterOption = CharacterDisplay.CHARACTER_NUMBER;
     private StateDisplay stateOption = StateDisplay.STATE_SYMBOL;
 
-    public CharacterMatrixComponent(String id, PhenoscapeController controller) {
+    public CharacterMatrixComponent(String id, PhenexController controller) {
         super(id, controller);
         this.allStates = new CollectionList<Character, State>(this.getController().getDataSet().getCharacters(),
                 new CollectionList.Model<Character, State>() {

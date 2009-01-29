@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import org.bbop.framework.GUIManager;
 import org.bbop.framework.ViewMenu;
 import org.phenoscape.app.CrossPlatform;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 
 import phenote.gui.actions.ResponderChainAction;
 import edu.stanford.ejalbert.BrowserLauncher;
@@ -26,9 +26,9 @@ import edu.stanford.ejalbert.exception.UnsupportedOperatingSystemException;
 
 public class MenuFactory {
 
-    private final PhenoscapeController controller;
+    private final PhenexController controller;
 
-    public MenuFactory(PhenoscapeController controller) {
+    public MenuFactory(PhenexController controller) {
         this.controller = controller;
     }
 

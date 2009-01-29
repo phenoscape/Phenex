@@ -21,7 +21,7 @@ import javax.swing.table.TableCellEditor;
 import org.apache.log4j.Logger;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.State;
 import org.phenoscape.model.TermSet;
@@ -48,7 +48,7 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
     private PhenotypesTableFormat tableFormat;
     private JTable phenotypesTable;
 
-    public PhenotypeTableComponent(String id, PhenoscapeController controller) {
+    public PhenotypeTableComponent(String id, PhenexController controller) {
         super(id, controller);
     }
 

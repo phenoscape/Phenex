@@ -20,7 +20,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.Taxon;
 import org.phenoscape.swing.PlaceholderRenderer;
 
@@ -42,7 +42,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
     private JButton deleteTaxonButton;
     private EventTableModel<Taxon> taxaTableModel;
 
-    public TaxonTableComponent(String id, PhenoscapeController controller) {
+    public TaxonTableComponent(String id, PhenexController controller) {
         super(id, controller);
     }
 

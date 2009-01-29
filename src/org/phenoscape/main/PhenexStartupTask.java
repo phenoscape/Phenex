@@ -26,7 +26,7 @@ import org.jdesktop.swingworker.SwingWorker;
 import org.oboedit.gui.tasks.DefaultGUIStartupTask;
 import org.phenoscape.app.CrossPlatform;
 import org.phenoscape.model.OntologyController;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 import org.phenoscape.swing.BlockingProgressDialog;
 import org.phenoscape.swing.WindowSizePrefsSaver;
 import org.phenoscape.view.CharacterMatrixComponentFactory;
@@ -51,7 +51,7 @@ import phenote.gui.selection.SelectionBridge;
  */
 public class PhenexStartupTask extends DefaultGUIStartupTask {
   
-  private PhenoscapeController controller;
+  private PhenexController controller;
   
   @Override
   protected Collection<GUIComponentFactory<?>> getDefaultComponentFactories() {
@@ -118,7 +118,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
     dialog.setLocationRelativeTo(null);
     dialog.run();
     try {
-        this.controller = new PhenoscapeController(ontologyLoader.get());
+        this.controller = new PhenexController(ontologyLoader.get());
     } catch (InterruptedException e) {
         log().fatal("Failed to create ontology controller", e);
         GUIManager.exit(1);

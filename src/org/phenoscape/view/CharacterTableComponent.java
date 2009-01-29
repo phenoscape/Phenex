@@ -16,7 +16,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.apache.log4j.Logger;
 import org.phenoscape.model.Character;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 import org.phenoscape.swing.PlaceholderRenderer;
 
 import phenote.gui.BugWorkaroundTable;
@@ -36,7 +36,7 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
   private JButton addCharacterButton;
   private JButton deleteCharacterButton;
 
-  public CharacterTableComponent(String id, PhenoscapeController controller) {
+  public CharacterTableComponent(String id, PhenexController controller) {
     super(id, controller);
   }
   

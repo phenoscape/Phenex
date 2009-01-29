@@ -51,11 +51,11 @@ public abstract class DocumentController {
                 this.getUndoController().discardAllEdits();
                 this.getUndoController().markChangesSaved();
             } catch (IOException e) {
-                log().error("Failed to load file data", e);
                 if (e instanceof UserCancelledReadException) {
                     // user cancelled file load, don't show an error message
                     return;
                 } else {
+                    log().error("Failed to load file data", e);
                     this.runFileReadErrorMessage(file, e.getLocalizedMessage());
                 }
             }

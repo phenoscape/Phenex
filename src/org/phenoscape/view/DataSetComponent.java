@@ -19,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.xswingx.PromptSupport;
 import org.phenoscape.model.DataSet;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 import org.phenoscape.swing.TabActionTextField;
 
 public class DataSetComponent extends PhenoscapeGUIComponent {
@@ -28,7 +28,7 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
   private JTextField publicationField;
   private JTextArea pubNotesField;
 
-  public DataSetComponent(String id, PhenoscapeController controller) {
+  public DataSetComponent(String id, PhenexController controller) {
     super(id, controller);
   }
   

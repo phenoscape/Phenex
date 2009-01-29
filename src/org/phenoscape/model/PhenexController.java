@@ -1,5 +1,7 @@
 package org.phenoscape.model;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,15 +11,21 @@ import java.util.UUID;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.bbop.framework.GUIManager;
 import org.biojava.bio.seq.io.ParseException;
 import org.nexml.x10.NexmlDocument;
-import org.phenoscape.app.UserCancelledReadException;
 import org.phenoscape.app.DocumentController;
+import org.phenoscape.app.UserCancelledReadException;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
 import org.phenoscape.io.NeXMLReader;
@@ -32,7 +40,7 @@ import ca.odell.glazedlists.CollectionList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 
-public class PhenoscapeController extends DocumentController {
+public class PhenexController extends DocumentController {
 
     private final OntologyController ontologyController;
     private final DataSet dataSet = new DataSet();
@@ -52,7 +60,7 @@ public class PhenoscapeController extends DocumentController {
     private final List<NewDataListener> newDataListeners = new ArrayList<NewDataListener>();
     private final UndoObserver undoObserver;
 
-    public PhenoscapeController(OntologyController ontologyController) {
+    public PhenexController(OntologyController ontologyController) {
         super();
         this.ontologyController = ontologyController;
         this.sortedCharacters = new SortedList<Character>(this.dataSet.getCharacters(), new EverythingEqualComparator<Character>());
@@ -318,7 +326,31 @@ public class PhenoscapeController extends DocumentController {
     private boolean runSecondaryIDAlert(File file, Collection<String> secondaryIDs) {
         final String[] options = {"Continue Opening", "Cancel"};
         final String message = "The file \"" + file.getName() + "\" contains references to some ontology terms by secondary IDs. When you save this file, these term references will be migrated to each term's primary ID.";
-        final int result = JOptionPane.showOptionDialog(null, message, "Secondary Identifiers", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        final JPanel panel = new JPanel(new BorderLayout());
+        final List<String> ids = new ArrayList<String>(secondaryIDs);
+        final TableModel model = new AbstractTableModel() {
+
+            public int getColumnCount() {
+                return 1;
+            }
+
+            public int getRowCount() {
+                return ids.size();
+            }
+
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                return ids.get(rowIndex);
+            }
+
+            public String getColumnName(int column) {
+                return "Referenced ID";
+            }
+            
+        };
+        panel.setPreferredSize(new Dimension(400, 200));
+        panel.add(new JLabel("<HTML>" + message + "</HTML"), BorderLayout.NORTH);
+        panel.add(new JScrollPane(new JTable(model)), BorderLayout.CENTER);
+        final int result = JOptionPane.showOptionDialog(null, panel, "Secondary Identifiers", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         return result == JOptionPane.YES_OPTION;
     }
 

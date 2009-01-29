@@ -1,13 +1,13 @@
 package org.phenoscape.view;
 
 import org.bbop.framework.AbstractComponentFactory;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 
 public class CharacterTableComponentFactory extends AbstractComponentFactory<CharacterTableComponent> {
   
-  private final PhenoscapeController controller;
+  private final PhenexController controller;
 
-  public CharacterTableComponentFactory(PhenoscapeController controller) {
+  public CharacterTableComponentFactory(PhenexController controller) {
     this.controller = controller;
   }
   

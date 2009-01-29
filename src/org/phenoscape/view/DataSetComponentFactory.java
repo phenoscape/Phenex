@@ -1,13 +1,13 @@
 package org.phenoscape.view;
 
 import org.bbop.framework.AbstractComponentFactory;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 
 public class DataSetComponentFactory extends AbstractComponentFactory<DataSetComponent> {
   
-  private final PhenoscapeController controller;
+  private final PhenexController controller;
 
-  public DataSetComponentFactory(PhenoscapeController controller) {
+  public DataSetComponentFactory(PhenexController controller) {
     this.controller = controller;
   }
 

@@ -26,7 +26,7 @@ import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOProperty;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.TermSet;
 import org.phenoscape.swing.TablePopupListener;
 
@@ -53,12 +53,12 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
     private DifferentiaTableFormat tableFormat;
     private TablePopupListener popupListener;
 
-    public PostCompositionEditor(String id, PhenoscapeController controller, TermSet terms) {
+    public PostCompositionEditor(String id, PhenexController controller, TermSet terms) {
         super(id, controller);
         this.termSet = terms;
     }
 
-    public PostCompositionEditor(PhenoscapeController controller, TermSet terms) {
+    public PostCompositionEditor(PhenexController controller, TermSet terms) {
         this("", controller, terms);
         this.initializeInterface();
     }

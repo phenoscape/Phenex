@@ -17,7 +17,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.apache.log4j.Logger;
 import org.phenoscape.model.Character;
-import org.phenoscape.model.PhenoscapeController;
+import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.State;
 import org.phenoscape.swing.PlaceholderRenderer;
 
@@ -37,7 +37,7 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
   private JButton addStateButton;
   private JButton deleteStateButton;
 
-  public StateTableComponent(String id, PhenoscapeController controller) {
+  public StateTableComponent(String id, PhenexController controller) {
     super(id, controller);
   }
 

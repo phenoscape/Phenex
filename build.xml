@@ -15,7 +15,7 @@
 	<tstamp>
 		<format property="NOW" pattern="yyyy-MM-dd_HH:mm:ss"/>
 	</tstamp>
-	<property name="phenex.version" value="1.0-beta14"/>
+	<property name="phenex.version" value="1.0-beta15"/>
 	<property name="phenex.build" value="${NOW}"/>
 	
 <!-- The init target makes sure that the prerequisite directories exist. -->

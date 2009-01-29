@@ -45,7 +45,7 @@ public class PhenoscapeDataLoader {
 		File baseDataDir = new File(dataDir);
 		int i = 0;
 		// OBOSessionShard s = new OBOSessionShard();
-		File connParamFile = new File("testfiles/connectionParameters");
+		File connParamFile = new File("connectionParameters/connectionParameters");
 		BufferedReader br = new BufferedReader(new FileReader(connParamFile));
 		String[] connParams = new String[3];
 		String param;

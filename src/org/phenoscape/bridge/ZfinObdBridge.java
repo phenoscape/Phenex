@@ -44,6 +44,7 @@ public class ZfinObdBridge {
 			String param, phenoFileLine, genoFileLine, missingMarkersFileLine;
 			LinkStatement genotypeAnnotLink;
 			LinkStatement geneAnnotLink;
+			LinkStatement phenotypeToAnatomyLink, phenotypeToQualityLink;
 			while ((param = br.readLine()) != null) {
 				if (param.contains("pheno"))
 					phenotypeURL = new URL(param);
@@ -82,12 +83,27 @@ public class ZfinObdBridge {
 							cd.addArgument(relationVocabulary.inheres_in(),
 									entity1ID);
 							genotypeAnnotLink = new LinkStatement();
+							phenotypeToAnatomyLink = new LinkStatement();
+							phenotypeToQualityLink = new LinkStatement();
 							genotypeAnnotLink.setNodeId(genotypeId);
 							genotypeAnnotLink
 									.setRelationId(GENOTYPE_PHENOTYPE_REL_ID);
 							genotypeAnnotLink.setTargetId(cd.toString());
 							genotypeAnnotLink.addSubLinkStatement(HAS_PUB_REL_ID, pub);
+							
 							graph.addStatement(genotypeAnnotLink);
+							
+							phenotypeToAnatomyLink.setNodeId(cd.toString());
+							phenotypeToAnatomyLink.setRelationId(relationVocabulary.inheres_in());
+							phenotypeToAnatomyLink.setTargetId(entity1ID);
+							
+							graph.addStatement(phenotypeToAnatomyLink);
+							
+							phenotypeToQualityLink.setNodeId(cd.toString());
+							phenotypeToQualityLink.setRelationId(relationVocabulary.is_a());
+							phenotypeToQualityLink.setTargetId(qualID);
+							
+							graph.addStatement(phenotypeToQualityLink);
 						}
 					}
 				}
@@ -174,7 +190,7 @@ public class ZfinObdBridge {
 	}
 
 	public static void main(String[] args) {
-		File connParamFile = new File("testfiles/connectionParameters");
+		File connParamFile = new File("connectionParameters/connectionParameters");
 		try {
 			BufferedReader br = new BufferedReader(
 					new FileReader(connParamFile));

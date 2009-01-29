@@ -17,7 +17,7 @@ public class ZfinXrefModifier {
 	private final String IS_A = "OBO_REL:is_a";
 	
 	public ZfinXrefModifier(){
-		File connParamFile = new File("testfiles/connectionParameters");
+		File connParamFile = new File("connectionParameters/connectionParameters");
 		try {
 			BufferedReader br = new BufferedReader(
 					new FileReader(connParamFile));

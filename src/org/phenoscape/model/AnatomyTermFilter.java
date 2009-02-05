@@ -68,7 +68,8 @@ public class AnatomyTermFilter implements TermFilter {
     "PATO:0000017", //color saturation
     "PATO:0000016", //color brightness
     "PATO:0001301", //opacity
-    "PATO:0000020" //relative color
+    "PATO:0000020", //relative color
+    "PATO:0000070" //count in organism
   };
   
   private static final String[] EXCLUDES = {

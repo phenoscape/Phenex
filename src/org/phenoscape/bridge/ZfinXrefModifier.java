@@ -16,8 +16,8 @@ public class ZfinXrefModifier {
 	private final String HAS_DBXREF = "oboInOwl:hasDbXref"; 
 	private final String IS_A = "OBO_REL:is_a";
 	
-	public ZfinXrefModifier(){
-		File connParamFile = new File("connectionParameters/connectionParameters");
+	public ZfinXrefModifier(String path){
+		File connParamFile = new File(path);
 		try {
 			BufferedReader br = new BufferedReader(
 					new FileReader(connParamFile));
@@ -60,7 +60,7 @@ public class ZfinXrefModifier {
 	}
 	
 	public static void main(String[] args) {
-		ZfinXrefModifier zxm = new ZfinXrefModifier();
+		ZfinXrefModifier zxm = new ZfinXrefModifier(args[0]);
 		zxm.addIsALinks(zxm.obdsql);
 	}
 

@@ -35,9 +35,9 @@ public class ZfinObdBridge {
 		graph = new Graph();
 	}
 
-	public void loadZfinData(Shard obdsql) {
+	public void loadZfinData(Shard obdsql, String path) {
 		try {
-			File connParamFile = new File("testfiles/zfinLocations");
+			File connParamFile = new File(path);
 			BufferedReader br = new BufferedReader(
 					new FileReader(connParamFile));
 			URL phenotypeURL = null, genotypeURL = null, missingMarkersURL = null;
@@ -190,7 +190,7 @@ public class ZfinObdBridge {
 	}
 
 	public static void main(String[] args) {
-		File connParamFile = new File("connectionParameters/connectionParameters");
+		File connParamFile = new File(args[0]);
 		try {
 			BufferedReader br = new BufferedReader(
 					new FileReader(connParamFile));
@@ -205,7 +205,7 @@ public class ZfinObdBridge {
 			((AbstractSQLShard) obdsql).connect(connParams[0], connParams[1],
 					connParams[2]);
 			ZfinObdBridge zob = new ZfinObdBridge();
-			zob.loadZfinData(obdsql);
+			zob.loadZfinData(obdsql, args[1]);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

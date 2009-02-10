@@ -28,13 +28,13 @@ public class PhenoscapeDataLoader {
 		// String dataDir = args[0];
 		PhenoscapeDataLoader pdl = new PhenoscapeDataLoader();
 		try {
-			pdl.loadData(args[0]);
+			pdl.loadData(args[0], args[1]);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void loadData(String dataDir) throws XmlException, IOException,
+	public void loadData(String dataDir, String dbConn) throws XmlException, IOException,
 			SQLException, ClassNotFoundException {
 		OntologyController oc = new OntologyController();
 		OBDModelBridge bridge = new OBDModelBridge();
@@ -45,7 +45,7 @@ public class PhenoscapeDataLoader {
 		File baseDataDir = new File(dataDir);
 		int i = 0;
 		// OBOSessionShard s = new OBOSessionShard();
-		File connParamFile = new File("connectionParameters/connectionParameters");
+		File connParamFile = new File(dbConn);
 		BufferedReader br = new BufferedReader(new FileReader(connParamFile));
 		String[] connParams = new String[3];
 		String param;

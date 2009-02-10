@@ -80,7 +80,7 @@ public class OBDModelBridge {
 	{
 		try {
 			problemLog = new BufferedWriter(
-					new FileWriter(new File("testfiles/problemLog.txt")));
+					new FileWriter(new File("../problems/problemLog.txt")));
 			problemLog.write("PROBLEM LOG\n___________\n\n");
 		} catch (Exception e) {
 			e.printStackTrace();

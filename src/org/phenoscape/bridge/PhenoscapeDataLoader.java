@@ -9,11 +9,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
+import org.bbop.dataadapter.DataAdapterException;
 import org.obd.model.Graph;
 import org.obd.query.Shard;
 import org.obd.query.impl.AbstractSQLShard;
 import org.obd.query.impl.OBDSQLShard;
+import org.obo.dataadapter.OBOAdapter;
+import org.obo.dataadapter.OBOFileAdapter;
+import org.obo.datamodel.OBOSession;
+import org.oboedit.controller.SessionManager;
 import org.phenoscape.io.NeXMLReader;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.OntologyController;
@@ -36,7 +42,6 @@ public class PhenoscapeDataLoader {
 
 	public void loadData(String dataDir, String dbConn) throws XmlException, IOException,
 			SQLException, ClassNotFoundException {
-		OntologyController oc = new OntologyController();
 		OBDModelBridge bridge = new OBDModelBridge();
 		NeXMLReader reader;
 		DataSet ds;
@@ -57,6 +62,7 @@ public class PhenoscapeDataLoader {
 		Shard obdsql = new OBDSQLShard();
 		((AbstractSQLShard) obdsql).connect(connParams[0], connParams[1],
 				connParams[2]);
+		final OBOSession oboSession = this.loadOBOSession();
 		List<File> baseDirs = Arrays.asList(baseDataDir.listFiles());
 		Collections.sort(baseDirs);
 		for (File baseDir : baseDirs) {
@@ -69,7 +75,7 @@ public class PhenoscapeDataLoader {
 					if (dataFile.isFile()) {
 						System.out.println(++i + ". Started work with "
 								+ dataFile.getAbsolutePath());
-						reader = new NeXMLReader(dataFile, oc.getOBOSession());
+						reader = new NeXMLReader(dataFile, oboSession);
 						ds = reader.getDataSet();
 						bridge.translate(ds, dataFile);
 						g = bridge.getGraph();
@@ -87,4 +93,30 @@ public class PhenoscapeDataLoader {
 		bridge.problemLog.close();
 		System.out.println(t + " total statements from " + i + " files loaded. Done!");
 	}
+	
+	private OBOSession loadOBOSession() {
+	    final OBOFileAdapter fileAdapter = new OBOFileAdapter();
+        OBOFileAdapter.OBOAdapterConfiguration config = new OBOFileAdapter.OBOAdapterConfiguration();
+        config.setReadPaths(Arrays.asList(this.getPaths()));
+        config.setBasicSave(false);
+        config.setAllowDangling(true);
+        config.setFollowImports(false);
+        try {
+            return fileAdapter.doOperation(OBOAdapter.READ_ONTOLOGY, config, null);
+        } catch (DataAdapterException e) {
+            log().fatal("Failed to load ontologies", e);
+            return null;
+        }
+	}
+
+    private String[] getPaths() {
+        // TODO Auto-generated method stub
+        // return an array of paths to OBO files, as strings
+        return null;
+    }
+    
+    private Logger log() {
+        return Logger.getLogger(this.getClass());
+    }
+    
 }

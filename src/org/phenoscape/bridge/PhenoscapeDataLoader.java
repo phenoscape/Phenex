@@ -20,10 +20,8 @@ import org.obd.query.impl.OBDSQLShard;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.OBOSession;
-import org.oboedit.controller.SessionManager;
 import org.phenoscape.io.NeXMLReader;
 import org.phenoscape.model.DataSet;
-import org.phenoscape.model.OntologyController;
 
 public class PhenoscapeDataLoader {
 

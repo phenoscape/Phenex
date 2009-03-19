@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +98,7 @@ public class PhenoscapeDataLoader {
 	private OBOSession loadOBOSession() {
 	    final OBOFileAdapter fileAdapter = new OBOFileAdapter();
         OBOFileAdapter.OBOAdapterConfiguration config = new OBOFileAdapter.OBOAdapterConfiguration();
-        config.setReadPaths(Arrays.asList(this.getPaths()));
+        config.setReadPaths(this.getPaths());
         config.setBasicSave(false);
         config.setAllowDangling(true);
         config.setFollowImports(false);
@@ -109,10 +110,15 @@ public class PhenoscapeDataLoader {
         }
 	}
 
-    private String[] getPaths() {
+    private List<String> getPaths() {
         // TODO Auto-generated method stub
         // return an array of paths to OBO files, as strings
-        return null;
+    	List<String> paths = new ArrayList<String>();
+    	File ontCache = new File("Ontology-Cache");
+    	for(File f : ontCache.listFiles()){
+    		paths.add(f.getAbsolutePath());
+    	}
+        return paths;
     }
     
     private Logger log() {

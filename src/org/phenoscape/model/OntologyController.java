@@ -38,6 +38,7 @@ public class OntologyController {
     private String REL_PROPOSED = "";
 
     private TermSet entityTermSet = null;
+    private TermSet qualityTermSet = null;
     private TermSet taxonTermSet = null;
     private TermSet collectionTermSet = null;
     private TermSet unitTermSet = null;
@@ -112,7 +113,12 @@ public class OntologyController {
     }
 
     public TermSet getQualityTermSet() {
-        return this.getEntityTermSet();
+        if (this.qualityTermSet == null) {
+            final TermSet terms = this.getTermSet(PATO);
+            terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
+            this.qualityTermSet = terms;
+        }
+        return this.qualityTermSet;
     }
 
     public TermSet getRelatedEntityTermSet() {

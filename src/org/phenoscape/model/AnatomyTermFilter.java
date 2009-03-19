@@ -1,5 +1,7 @@
 package org.phenoscape.model;
 
+import java.util.Arrays;
+
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOSession;
@@ -9,6 +11,7 @@ public class AnatomyTermFilter implements TermFilter {
 
   private final OBOSession session;
   private static final String[] INCLUDES = {
+    "TAO:0001094", //whole organism
     "TAO:0001668", //anatomical space
     "TAO:0001478", //anatomical cluster
     "TAO:0000548", //musculature system
@@ -36,40 +39,17 @@ public class AnatomyTermFilter implements TermFilter {
     "PATO:0000467", //present
     "PATO:0000052", //shape
     "PATO:0000117", //size
-    "PATO:0001447", //calcified
-    "PATO:0001449", //cartilaginous
-    "PATO:0001840", //compressed
-    "PATO:0001847", //constricted
-    "PATO:0001821", //imperforate
-    "PATO:0001448", //ossified
-    "PATO:0000649", //perforated
-    "PATO:0001987", //saccular
-    "PATO:0001480", //spongy
-    "PATO:0001851", //swollen
     "PATO:0000150", //texture
-    "PATO:0000133", //angle
-    "PATO:0000610", //open
-    "PATO:0000608", //closed
-    "PATO:0000137", //orientation
-    "PATO:0001608", //patchy
     "PATO:0000140", //placement
-    "PATO:0001032", //position
-    "PATO:0001512", //punctate
-    "PATO:0000965", //symmetry
-    "PATO:0000040", //distance
-    "PATO:0001645", //protruding into
-    "PATO:0001646", //protruding out of
     "PATO:0001631", //relational spatial quality
     "PATO:0001452", //relational structural quality
     "PATO:0000053", //count
     "PATO:0001647", //relational shape quality
     "PATO:0000014", //color
-    "PATO:0000019", //color pattern
-    "PATO:0000017", //color saturation
-    "PATO:0000016", //color brightness
-    "PATO:0001301", //opacity
-    "PATO:0000020", //relative color
-    "PATO:0000070" //count in organism
+    "PATO:0000070", //count in organism
+    "PATO:0000025", //composition
+    "PATO:0001449", //cartilaginous
+    "PATO:0001448" //ossified
   };
   
   private static final String[] EXCLUDES = {
@@ -136,15 +116,19 @@ public class AnatomyTermFilter implements TermFilter {
     if (!term.equals(teleostAnatomicalEntity) && !TermUtil.hasAncestor(term, teleostAnatomicalEntity) && !term.equals(quality) && !TermUtil.hasAncestor(term, quality)) {
       return true;
     }
-    for (String includeID : INCLUDES) {
-      if (this.equalsOrHasAncestor(term, includeID)) {
-        for (String excludeID : EXCLUDES) {
-          if (this.equalsOrHasAncestor(term, excludeID)) {
-            return false;
+    if (TermUtil.hasAncestor(term, teleostAnatomicalEntity)) {
+        for (String includeID : INCLUDES) {
+            if (this.equalsOrHasAncestor(term, includeID)) {
+              for (String excludeID : EXCLUDES) {
+                if (this.equalsOrHasAncestor(term, excludeID)) {
+                  return false;
+                }
+              }
+              return true;
+            }
           }
-        }
-        return true;
-      }
+    } else if (TermUtil.hasAncestor(term, quality)) {
+        return Arrays.asList(INCLUDES).contains(term.getID());
     }
     return false;
   }

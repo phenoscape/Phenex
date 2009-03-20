@@ -49,7 +49,8 @@ public class AnatomyTermFilter implements TermFilter {
     "PATO:0000070", //count in organism
     "PATO:0000025", //composition
     "PATO:0001449", //cartilaginous
-    "PATO:0001448" //ossified
+    "PATO:0001448", //ossified
+    "PATO:0000141" //structure
   };
   
   private static final String[] EXCLUDES = {

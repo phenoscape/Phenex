@@ -25,6 +25,7 @@ import org.obo.util.TermUtil;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.Phenotype;
+import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 import org.purl.obo.vocab.RelationVocabulary;
@@ -53,17 +54,24 @@ public class OBDModelBridge {
 	public static String STATE_TYPE_ID = "cdao:CharacterStateDomain";
 	public static String CELL_TYPE_ID = "cdao:CharacterStateDatum";
 	public static String CHARACTER_TYPE_ID = "cdao:Character";
-	public static String PUBLICATION_TYPE_ID = "cdao:Pub"; // TODO
+	public static String PUBLICATION_TYPE_ID = "PHENOSCAPE:Publication"; // TODO
+	public static String OTU_TYPE_ID = "cdao:TU";
+	public static String SPECIMEN_TYPE_ID = "PHENOSCAPE:Specimen";
 
-	public static String HAS_PUB_REL_ID = "cdao:hasPub";
+	public static String HAS_PUB_REL_ID = "PHENOSCAPE:has_publication";
+	public static String HAS_SPECIMEN_REL_ID = "PHENOSCAPE:has_specimen";
 	public static String HAS_STATE_REL_ID = "cdao:has_Datum";
-	public static String REFERS_TO_TAXON_REL_ID = "cdao:hasTaxon"; // has_TU?
+	public static String REFERS_TO_TAXON_REL_ID = "PHENOSCAPE:has_taxon"; // has_TU?
+	public static String HAS_TU_REL_ID = "cdao:has_TU";
 	// TODO
 	public static String HAS_CHARACTER_REL_ID = "cdao:has_Character"; // 
 	public static String HAS_PHENOTYPE_REL_ID = "cdao:has_Phenotype"; // TODO
 	public static String TAXON_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits"; // TODO
-	public static String CELL_TO_STATE_REL_ID = "cdao:has_State"; // TODO
-	public static String ANNOT_TO_CELL_REL_ID = "has_source"; // TODO
+	public static String CELL_TO_STATE_REL_ID = "cdao:has_State"; 
+	public static String ANNOT_TO_CELL_REL_ID = "PHENOSCAPE:has_source"; // TODO
+	public static String SPECIMEN_TO_COLLECTION_REL_ID = "PHENOSCAPE:belongs_to_collection";
+	public static String SPECIMEN_TO_CATALOG_ID_REL_ID = "PHENOSCAPE:has_catalog_id";
+	
 	private static TermVocabulary vocab = new TermVocabulary();
 	private static RelationVocabulary relationVocabulary = new RelationVocabulary();
 	private Map<Character, String> characterIdMap = new HashMap<Character, String>();
@@ -102,14 +110,6 @@ public class OBDModelBridge {
 		// Dataset metadata
 		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
 
-		// link publication to dataset
-		Node pubNode = createInstanceNode(ds.getPublication(),
-				PUBLICATION_TYPE_ID);
-		LinkStatement ds2p = new LinkStatement(dsId, HAS_PUB_REL_ID, pubNode
-				.getId());
-		graph.addStatement(ds2p);
-
-		// link dataset to taxa
 		for (Taxon t : ds.getTaxa()) {
 			// avoid uploading taxa without names; Cartik1.0
 			if (t.getValidName() != null
@@ -117,9 +117,38 @@ public class OBDModelBridge {
 				Node tn = translate(t);
 				if (tn.getId() != null) {
 					taxonIdMap.put(t, tn.getId());
-					LinkStatement ds2t = new LinkStatement(dsId,
+					String otuId = UUID.randomUUID().toString();
+					Node otuNode = createInstanceNode(otuId, OTU_TYPE_ID);
+					otuNode.setLabel(t.getValidName().getName());
+					// link dataset to taxa
+					LinkStatement ds2otu = new LinkStatement(dsId, HAS_TU_REL_ID, otuNode.getId());
+					graph.addStatement(ds2otu);
+					//link otu to taxon
+					LinkStatement ds2t = new LinkStatement(otuId,
 							REFERS_TO_TAXON_REL_ID, tn.getId());
 					graph.addStatement(ds2t);
+					//link otu to specimens
+					for(Specimen s : t.getSpecimens()){
+						//System.out.println(s.toString());
+						if(s.getCollectionCode() != null){
+							Node specimenNode = createInstanceNode(s.toString(), SPECIMEN_TYPE_ID);
+							LinkStatement otu2specimen = new LinkStatement(otuId, HAS_SPECIMEN_REL_ID, specimenNode.getId());
+							graph.addStatement(otu2specimen);
+						//link speciment to collection 
+							LinkStatement specimen2collection = new LinkStatement(s.toString(), SPECIMEN_TO_COLLECTION_REL_ID, 
+									s.getCollectionCode().getID());
+							graph.addStatement(specimen2collection);
+						//link specimen to catalog id
+							LinkStatement specimen2catalogId = new LinkStatement(s.toString(), SPECIMEN_TO_CATALOG_ID_REL_ID, s.getCatalogID());
+							graph.addStatement(specimen2catalogId);
+						}
+					}
+					// link otu to publication
+					Node pubNode = createInstanceNode(ds.getPublication(),
+							PUBLICATION_TYPE_ID);
+					LinkStatement otu2p = new LinkStatement(otuId, HAS_PUB_REL_ID, pubNode
+							.getId());
+					graph.addStatement(otu2p);
 				}
 			}
 		}
@@ -210,7 +239,7 @@ public class OBDModelBridge {
 		try{
 			problemLog.write(dataFile.getName() + "\n\n");
 			for(String s : fileSpecificProblemSet){
-				System.err.println(s);
+				//System.err.println(s);
 				problemLog.write(s + "\n");
 			}
 			problemLog.write("\n");

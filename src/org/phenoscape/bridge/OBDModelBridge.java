@@ -109,6 +109,10 @@ public class OBDModelBridge {
 		phenotypes = new HashSet<LinkStatement>();
 		// Dataset metadata
 		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
+		Node pubNode = createInstanceNode(ds.getPublication(),
+				PUBLICATION_TYPE_ID);
+		LinkStatement ds2p = new LinkStatement(dsId, HAS_PUB_REL_ID, pubNode.getId());
+		graph.addStatement(ds2p);
 
 		for (Taxon t : ds.getTaxa()) {
 			// avoid uploading taxa without names; Cartik1.0
@@ -143,12 +147,6 @@ public class OBDModelBridge {
 							graph.addStatement(specimen2catalogId);
 						}
 					}
-					// link otu to publication
-					Node pubNode = createInstanceNode(ds.getPublication(),
-							PUBLICATION_TYPE_ID);
-					LinkStatement otu2p = new LinkStatement(otuId, HAS_PUB_REL_ID, pubNode
-							.getId());
-					graph.addStatement(otu2p);
 				}
 			}
 		}

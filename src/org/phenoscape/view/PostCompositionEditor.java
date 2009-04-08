@@ -11,7 +11,6 @@ import java.util.Comparator;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -28,6 +27,7 @@ import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOProperty;
 import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.TermSet;
+import org.phenoscape.swing.AutocompleteField;
 import org.phenoscape.swing.TablePopupListener;
 
 import phenote.datamodel.OboUtil;
@@ -46,7 +46,7 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
     private EventList<Differentium> diffs = new BasicEventList<Differentium>();
     private EventSelectionModel<Differentium> selectionModel = new EventSelectionModel<Differentium>(diffs);
     private final TermSet termSet;
-    private JComboBox genusBox;
+    private AutocompleteField<OBOObject> genusBox;
     private JButton addDifferentiaButton;
     private JButton deleteDifferentiaButton;
     private JTable diffTable;
@@ -78,7 +78,7 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
     }
 
     private void updateGenus() {
-        this.genus = (OBOClass)(this.genusBox.getSelectedItem());
+        this.genus = (OBOClass)(this.genusBox.getValue());
     }
 
     public OBOClass getTerm() {
@@ -116,7 +116,7 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
         } else {
             this.genus = aTerm;
         }
-        this.genusBox.setSelectedItem((OBOObject)this.genus);
+        this.genusBox.setValue((OBOObject)this.genus);
         if (this.diffs.isEmpty()) {
             this.diffs.add(new Differentium());
         }
@@ -135,7 +135,7 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
         pce.setTerm(this.genus);
         final int result = pce.runPostCompositionDialog();
         if (result == JOptionPane.OK_OPTION) {
-            this.genusBox.setSelectedItem(pce.getTerm());
+            this.genusBox.setValue(pce.getTerm());
         }
     }
 

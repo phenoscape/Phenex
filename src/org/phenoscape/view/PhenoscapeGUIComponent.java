@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import javax.accessibility.Accessible;
 import javax.accessibility.AccessibleContext;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
@@ -18,9 +17,10 @@ import org.bbop.framework.ComponentManager;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.phenoscape.model.PhenexController;
-import org.phenoscape.swing.AutoCompleteSupport;
-
-import ca.odell.glazedlists.GlazedLists;
+import org.phenoscape.swing.AutocompleteCellEditor;
+import org.phenoscape.swing.AutocompleteField;
+import org.phenoscape.swing.SearchHit;
+import org.phenoscape.swing.TermSearcher;
 
 public class PhenoscapeGUIComponent extends AbstractGUIComponent {
   
@@ -43,8 +43,8 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
    * Update SelectionManager with current term selection.  This allows components
    * like the Term Info panel to display information about the term.
    */
-  protected void updateGlobalTermSelection(OBOClass term) {
-    this.getController().getPhenoteSelectionManager().selectTerm(this, term, false);
+  protected void updateGlobalTermSelection(OBOObject term) {
+    this.getController().getPhenoteSelectionManager().selectTerm(this, (OBOClass)term, false); //TODO this cast may not always be right
   }
   
   /**
@@ -54,26 +54,37 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
     ComponentManager.getManager().setLabel(this, title);
   }
   
-  protected JComboBox createAutocompleteBox(Collection<OBOObject> terms) {
-    return this.createAutocompleteBox(terms, false);
-  }
+//  protected JComboBox createAutocompleteBox(Collection<OBOObject> terms) {
+//    return this.createAutocompleteBox(terms, false);
+//  }
   
-  private JComboBox createAutocompleteBox(Collection<OBOObject> terms, boolean cellEditor) {
-    final JComboBox comboBox = new JComboBox();
-    comboBox.putClientProperty("JComboBox.isTableCellEditor", cellEditor);
-    final AutoCompleteSupport<OBOObject> acs = AutoCompleteSupport.install(comboBox, GlazedLists.eventList(terms), new TermFilterator());
-    acs.setValidItemClass(OBOObject.class);
-    final ComboPopup popup = this.getComboPopup(comboBox);
-    if (popup != null) { popup.getList().addListSelectionListener(new CompletionListListener()); }
-    return comboBox;
+  protected AutocompleteField<OBOObject> createAutocompleteBox(Collection<OBOObject> terms) {
+      final AutocompleteField<OBOObject> ac =  new AutocompleteField<OBOObject>(new TermSearcher(terms));
+      ac.getListComponent().addListSelectionListener(new CompletionListListener());
+      return ac;
   }
   
   protected TableCellEditor createAutocompleteEditor(Collection<OBOObject> terms) {
-    final JComboBox comboBox = this.createAutocompleteBox(terms, true);
-    final DefaultCellEditor editor = new DefaultCellEditor(comboBox);
-    editor.setClickCountToStart(2);
-    return editor;
+      return new AutocompleteCellEditor<OBOObject>(this.createAutocompleteBox(terms));
   }
+  
+//  private JComboBox createAutocompleteBox(Collection<OBOObject> terms, boolean cellEditor) {
+//    final JComboBox comboBox = new JComboBox();
+//    comboBox.putClientProperty("JComboBox.isTableCellEditor", cellEditor);
+//    final AutoCompleteSupport<OBOObject> acs = AutoCompleteSupport.install(comboBox, GlazedLists.eventList(terms), new TermFilterator());
+//    acs.setValidItemClass(OBOObject.class);
+//    final ComboPopup popup = this.getComboPopup(comboBox);
+//    if (popup != null) { popup.getList().addListSelectionListener(new CompletionListListener()); }
+//    return comboBox;
+//  }
+  
+  
+//  protected TableCellEditor createAutocompleteEditor(Collection<OBOObject> terms) {
+//    final JComboBox comboBox = this.createAutocompleteBox(terms, true);
+//    final DefaultCellEditor editor = new DefaultCellEditor(comboBox);
+//    editor.setClickCountToStart(2);
+//    return editor;
+//  }
   
   protected ComboPopup getComboPopup(JComboBox comboBox) {
     final AccessibleContext ac = comboBox.getAccessibleContext();
@@ -87,25 +98,25 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
   
   protected class CompletionListListener implements ListSelectionListener {
 
-    public void valueChanged(ListSelectionEvent event) {
-      final Object source = event.getSource();
-      if (source instanceof JList) {
-        final JList menu = (JList)source;
-        try {
-          final Object value = menu.getSelectedValue();
-          if (value instanceof OBOClass) {
-            updateGlobalTermSelection((OBOClass)value);
+      public void valueChanged(ListSelectionEvent event) {
+          final Object source = event.getSource();
+          if (source instanceof JList) {
+              final JList menu = (JList)source;
+              try {
+                  final Object value = menu.getSelectedValue();
+                  if (value instanceof SearchHit) {
+                      updateGlobalTermSelection(((SearchHit<OBOObject>)value).getHit());
+                  } else {
+                      // sometimes the selection is a String instead
+                  }
+              } catch (IndexOutOfBoundsException e) {
+                  // for some reason sometimes the menu selection is not valid
+              }
           } else {
-            // sometimes the selection is a String instead
+              log().error("Source of combobox mouse over event is not JList");
           }
-        } catch (IndexOutOfBoundsException e) {
-          // for some reason sometimes the menu selection is not valid
-        }
-      } else {
-        log().error("Source of combobox mouse over event is not JList");
       }
-    }
-    
+
   }
   
   private Logger log() {

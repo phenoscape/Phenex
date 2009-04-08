@@ -43,8 +43,8 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
    * Update SelectionManager with current term selection.  This allows components
    * like the Term Info panel to display information about the term.
    */
-  protected void updateGlobalTermSelection(OBOObject term) {
-    this.getController().getPhenoteSelectionManager().selectTerm(this, (OBOClass)term, false); //TODO this cast may not always be right
+  protected void updateGlobalTermSelection(OBOClass term) {
+    this.getController().getPhenoteSelectionManager().selectTerm(this, term, false);
   }
   
   /**
@@ -104,8 +104,8 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
               final JList menu = (JList)source;
               try {
                   final Object value = menu.getSelectedValue();
-                  if (value instanceof SearchHit) {
-                      updateGlobalTermSelection(((SearchHit<OBOObject>)value).getHit());
+                  if ((value instanceof SearchHit) && (((SearchHit<OBOObject>)value).getHit() instanceof OBOClass)) {
+                      updateGlobalTermSelection((OBOClass)((SearchHit<OBOObject>)value).getHit());
                   } else {
                       // sometimes the selection is a String instead
                   }

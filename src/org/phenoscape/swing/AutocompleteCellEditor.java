@@ -32,7 +32,6 @@ public class AutocompleteCellEditor<T> implements TableCellEditor {
 
     @SuppressWarnings("unchecked")
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        log().debug("Get tablecelleditorcomponent: " + value);
         this.originalValue = value;
         this.value = value;
         this.acField.setValue((T)value);
@@ -108,6 +107,7 @@ public class AutocompleteCellEditor<T> implements TableCellEditor {
         }
     }
     
+    @SuppressWarnings("unused")
     private Logger log() {
         return Logger.getLogger(this.getClass());
     }

@@ -82,8 +82,6 @@ public class PhenoscapeDataLoader {
 						// s.putGraph(g);
 						t += g.getStatements().size();
 						System.out.println(g.getStatements().size() + " records added");
-						System.out.println(i + ". Finished loading "
-								+ dataFile.getAbsolutePath());
 					}
 				}
 			}

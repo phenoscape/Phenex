@@ -318,7 +318,7 @@ public class AutocompleteField<T> extends JComponent {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             final SearchHit<?> hit = (SearchHit<?>)value;
-            final String displayValue = "<html>" + hit.getMatchText() + " <i><font color=\"gray\" size=\"small\">" + hit.getMatchType().getName() + "</font></i>" + "</html>";
+            final String displayValue = "<html>" + hit.getMatchText() + " <i><font color=\"gray\" size=\"small\">" + hit.getMatchType().getName() + "</font></i></html>";
             return super.getListCellRendererComponent(list, displayValue, index, isSelected,cellHasFocus);
         }
         

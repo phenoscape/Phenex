@@ -74,10 +74,10 @@ public class OBDModelBridge {
 	
 	private static TermVocabulary vocab = new TermVocabulary();
 	private static RelationVocabulary relationVocabulary = new RelationVocabulary();
-	private Map<Character, String> characterIdMap = new HashMap<Character, String>();
-	private Map<State, String> stateIdMap = new HashMap<State, String>();
-	private Map<Taxon, String> taxonIdMap = new HashMap<Taxon, String>();
-	private Map<Phenotype, String> phenotypeIdMap = new HashMap<Phenotype, String>();
+	private Map<Character, String> characterIdMap;
+	private Map<State, String> stateIdMap;
+	private Map<Taxon, String> taxonIdMap;
+	private Map<Phenotype, String> phenotypeIdMap;
 	protected BufferedWriter problemLog;
 
 	private Set<String> fileSpecificProblemSet = new HashSet<String>();
@@ -107,6 +107,10 @@ public class OBDModelBridge {
 		String dsId = UUID.randomUUID().toString();
 		graph = new Graph();
 		phenotypes = new HashSet<LinkStatement>();
+		characterIdMap = new HashMap<Character, String>();
+		stateIdMap = new HashMap<State, String>();
+		taxonIdMap = new HashMap<Taxon, String>();
+		phenotypeIdMap = new HashMap<Phenotype, String>();
 		// Dataset metadata
 		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
 		Node pubNode = createInstanceNode(ds.getPublication(),
@@ -195,6 +199,11 @@ public class OBDModelBridge {
 				}
 				for (Phenotype p : state.getPhenotypes()) {
 					// taxon to phenotype
+					if(p.getEntity() != null && p.getEntity().getName().equals("anal fin lepidotrichium") &&
+							t.toString().contains("Leucaspius"))
+						System.out.println(p.getEntity() + " is " + p.getQuality() + " in " + t + 
+							" as per \'" + ds.getPublication() + "\'") ;
+					//TODO CHECK: We link phenotypes to the taxon straightaway...need input from JB for this
 					LinkStatement annotLink = new LinkStatement();
 					String problem = "";
 					if (phenotypeIdMap.get(p) != null

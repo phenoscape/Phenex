@@ -1,6 +1,8 @@
-package org.phenoscape.swing;
+package org.phenoscape.util;
 
 import org.obo.datamodel.OBOObject;
+import org.phenoscape.swing.MatchType;
+import org.phenoscape.swing.SearchHit;
 
 public class TermHit implements SearchHit<OBOObject> {
     

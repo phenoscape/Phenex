@@ -1,4 +1,4 @@
-package org.phenoscape.swing;
+package org.phenoscape.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +11,9 @@ import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.Synonym;
 import org.obo.util.TermUtil;
 import org.oboedit.controller.SessionManager;
+import org.phenoscape.swing.AutocompleteSearcher;
+import org.phenoscape.swing.MatchType;
+import org.phenoscape.swing.SearchHit;
 
 public class TermSearcher implements AutocompleteSearcher<OBOObject> {
 

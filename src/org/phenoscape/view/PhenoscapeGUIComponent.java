@@ -20,7 +20,7 @@ import org.phenoscape.model.PhenexController;
 import org.phenoscape.swing.AutocompleteCellEditor;
 import org.phenoscape.swing.AutocompleteField;
 import org.phenoscape.swing.SearchHit;
-import org.phenoscape.swing.TermSearcher;
+import org.phenoscape.util.TermSearcher;
 
 public class PhenoscapeGUIComponent extends AbstractGUIComponent {
   

@@ -27,6 +27,7 @@ public class AutocompleteCellEditor<T> implements TableCellEditor {
     public AutocompleteCellEditor(AutocompleteField<T> autocompleteField) {
         this.acField = autocompleteField;
         this.acField.getComboBox().putClientProperty("JComboBox.isTableCellEditor", true);
+        this.acField.getComboBox().setBorder(null); //this corrects the editor height on Windows
         this.acField.addActionListener(new AutocompleteBoxActionListener());
     }
 

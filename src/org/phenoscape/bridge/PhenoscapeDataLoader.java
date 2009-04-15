@@ -29,7 +29,6 @@ public class PhenoscapeDataLoader {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		// String dataDir = args[0];
 		PhenoscapeDataLoader pdl = new PhenoscapeDataLoader();
 		try {
@@ -41,7 +40,7 @@ public class PhenoscapeDataLoader {
 
 	public void loadData(String dataDir, String dbConn) throws XmlException, IOException,
 			SQLException, ClassNotFoundException {
-		OBDModelBridge bridge = new OBDModelBridge();
+		OBDModelBridge bridge;
 		NeXMLReader reader;
 		DataSet ds;
 		Graph g;
@@ -76,18 +75,15 @@ public class PhenoscapeDataLoader {
 								+ dataFile.getAbsolutePath());
 						reader = new NeXMLReader(dataFile, oboSession);
 						ds = reader.getDataSet();
-						bridge.translate(ds, dataFile);
-						g = bridge.getGraph();
+						bridge = new OBDModelBridge();
+						g = bridge.translate(ds, dataFile);
 						obdsql.putGraph(g);
-						// s.putGraph(g);
 						t += g.getStatements().size();
 						System.out.println(g.getStatements().size() + " records added");
 					}
 				}
 			}
 		}
-		bridge.problemLog.flush();
-		bridge.problemLog.close();
 		System.out.println(t + " total statements from " + i + " files loaded. Done!");
 	}
 	
@@ -107,7 +103,6 @@ public class PhenoscapeDataLoader {
 	}
 
     private List<String> getPaths() {
-        // TODO Auto-generated method stub
         // return an array of paths to OBO files, as strings
     	List<String> paths = new ArrayList<String>();
     	File ontCache = new File("Ontology-Cache");

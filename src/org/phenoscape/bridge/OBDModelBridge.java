@@ -49,26 +49,26 @@ import org.purl.obo.vocab.RelationVocabulary;
 public class OBDModelBridge {
 
 	protected Graph graph;
-	// CDAO vacab : TODO
+	
 	public static String DATASET_TYPE_ID = "cdao:CharacterStateDataMatrix";
 	public static String STATE_TYPE_ID = "cdao:CharacterStateDomain";
 	public static String CELL_TYPE_ID = "cdao:CharacterStateDatum";
 	public static String CHARACTER_TYPE_ID = "cdao:Character";
-	public static String PUBLICATION_TYPE_ID = "PHENOSCAPE:Publication"; // TODO
+	public static String PUBLICATION_TYPE_ID = "PHENOSCAPE:Publication"; 
 	public static String OTU_TYPE_ID = "cdao:TU";
 	public static String SPECIMEN_TYPE_ID = "PHENOSCAPE:Specimen";
 
 	public static String HAS_PUB_REL_ID = "PHENOSCAPE:has_publication";
 	public static String HAS_SPECIMEN_REL_ID = "PHENOSCAPE:has_specimen";
 	public static String HAS_STATE_REL_ID = "cdao:has_Datum";
-	public static String REFERS_TO_TAXON_REL_ID = "PHENOSCAPE:has_taxon"; // has_TU?
+	public static String REFERS_TO_TAXON_REL_ID = "PHENOSCAPE:has_taxon"; 
 	public static String HAS_TU_REL_ID = "cdao:has_TU";
-	// TODO
-	public static String HAS_CHARACTER_REL_ID = "cdao:has_Character"; // 
-	public static String HAS_PHENOTYPE_REL_ID = "cdao:has_Phenotype"; // TODO
-	public static String TAXON_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits"; // TODO
+	
+	public static String HAS_CHARACTER_REL_ID = "cdao:has_Character"; 
+	public static String HAS_PHENOTYPE_REL_ID = "cdao:has_Phenotype"; 
+	public static String TAXON_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits"; 
 	public static String CELL_TO_STATE_REL_ID = "cdao:has_State"; 
-	public static String ANNOT_TO_CELL_REL_ID = "PHENOSCAPE:has_source"; // TODO
+	public static String ANNOT_TO_CELL_REL_ID = "PHENOSCAPE:has_source"; 
 	public static String SPECIMEN_TO_COLLECTION_REL_ID = "PHENOSCAPE:belongs_to_collection";
 	public static String SPECIMEN_TO_CATALOG_ID_REL_ID = "PHENOSCAPE:has_catalog_id";
 	
@@ -79,22 +79,9 @@ public class OBDModelBridge {
 	private Map<Taxon, String> taxonIdMap;
 	private Map<Phenotype, String> phenotypeIdMap;
 	protected BufferedWriter problemLog;
-
-	private Set<String> fileSpecificProblemSet = new HashSet<String>();
-
+	
 	protected Set<LinkStatement> phenotypes;
 	
-	// an instantiation block
-	{
-		try {
-			problemLog = new BufferedWriter(
-					new FileWriter(new File("../problems/problemLog.txt")));
-			problemLog.write("PROBLEM LOG\n___________\n\n");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	public Graph getGraph() {
 		return graph;
 	}
@@ -132,9 +119,9 @@ public class OBDModelBridge {
 					LinkStatement ds2otu = new LinkStatement(dsId, HAS_TU_REL_ID, otuNode.getId());
 					graph.addStatement(ds2otu);
 					//link otu to taxon
-					LinkStatement ds2t = new LinkStatement(otuId,
+					LinkStatement otu2t = new LinkStatement(otuId,
 							REFERS_TO_TAXON_REL_ID, tn.getId());
-					graph.addStatement(ds2t);
+					graph.addStatement(otu2t);
 					//link otu to specimens
 					for(Specimen s : t.getSpecimens()){
 						//System.out.println(s.toString());
@@ -199,13 +186,7 @@ public class OBDModelBridge {
 				}
 				for (Phenotype p : state.getPhenotypes()) {
 					// taxon to phenotype
-					if(p.getEntity() != null && p.getEntity().getName().equals("anal fin lepidotrichium") &&
-							t.toString().contains("Leucaspius"))
-						System.out.println(p.getEntity() + " is " + p.getQuality() + " in " + t + 
-							" as per \'" + ds.getPublication() + "\'") ;
-					//TODO CHECK: We link phenotypes to the taxon straightaway...need input from JB for this
 					LinkStatement annotLink = new LinkStatement();
-					String problem = "";
 					if (phenotypeIdMap.get(p) != null
 							&& taxonIdMap.get(t) != null) {
 						annotLink.setNodeId(taxonIdMap.get(t));
@@ -221,42 +202,14 @@ public class OBDModelBridge {
 						phenotypes.add(annotLink);
 						// cell to state
 						LinkStatement cell2s = new LinkStatement(cellNode.getId(),
-								CELL_TO_STATE_REL_ID, stateIdMap.get(state)); // TODO
+								CELL_TO_STATE_REL_ID, stateIdMap.get(state)); 
 						graph.addStatement(cell2s);
-					}
-					else if(taxonIdMap.get(t) == null){
-							problem = "Null identifier for taxon: " + t;
-							if(phenotypeIdMap.get(p) != null){
-								problem += " exhibiting quality " + p.getQuality() + " inhering in " + p.getEntity(); 
-							}
-							else{
-								problem += " exhibiting null phenotype";
-							}
-					}
-					else if(phenotypeIdMap.get(p) == null){
-							problem = "Taxon: " + taxonIdMap.get(t) + " exhibits null phenotype"; 
-					}
-					if(problem.length() > 0){
-						fileSpecificProblemSet.add(problem);
 					}
 				}
 			}
 		}
-//		problems.put(dataFile.getName(), fileSpecificProblemSet);
-		try{
-			problemLog.write(dataFile.getName() + "\n\n");
-			for(String s : fileSpecificProblemSet){
-				//System.err.println(s);
-				problemLog.write(s + "\n");
-			}
-			problemLog.write("\n");
-			fileSpecificProblemSet.clear();
-			for(Statement stmt : phenotypes){
-				graph.addStatement(stmt);
-			}
-		}
-		catch(Exception e){
-			e.printStackTrace();
+		for(Statement stmt : phenotypes){
+			graph.addStatement(stmt);
 		}
 		return graph;
 	}

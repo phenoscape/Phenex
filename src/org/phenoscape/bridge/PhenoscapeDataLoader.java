@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.bbop.dataadapter.DataAdapterException;
@@ -28,8 +29,10 @@ public class PhenoscapeDataLoader {
 	/**
 	 * @param args
 	 */
+
 	public static void main(String[] args) {
 		// String dataDir = args[0];
+		BasicConfigurator.configure();
 		PhenoscapeDataLoader pdl = new PhenoscapeDataLoader();
 		try {
 			pdl.loadData(args[0], args[1]);

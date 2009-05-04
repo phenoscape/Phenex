@@ -151,6 +151,9 @@ public class AutocompleteField<T> extends JComponent {
         if (hit != null) {
             comboBox.setSelectedItem(hit);
             this.setValueWithInput(hit);
+        } else if (text.trim().equals("")) { 
+            this.internallySetValue(null);
+            this.fireActionPerformed();
         } else {
             this.comboBox.setForeground(Color.RED);
             this.getEditorField().setForeground(Color.RED);

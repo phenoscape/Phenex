@@ -57,6 +57,7 @@ public class AutocompleteField<T> extends JComponent {
         this.comboBox.addActionListener(new AutocompleteActionListener());
         this.comboBox.setRenderer(new AutocompleteRenderer());
         this.getListComponent().addListSelectionListener(new CompletionListListener());
+        this.getListComponent().setVerifyInputWhenFocusTarget(false);
         this.setLayout(new BorderLayout());
         this.add(this.comboBox, BorderLayout.CENTER);
     }

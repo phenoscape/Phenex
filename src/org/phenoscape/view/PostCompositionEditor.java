@@ -28,10 +28,10 @@ import org.obo.datamodel.OBOProperty;
 import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.TermSet;
 import org.phenoscape.swing.AutocompleteField;
+import org.phenoscape.swing.BugWorkaroundTable;
 import org.phenoscape.swing.TablePopupListener;
 
 import phenote.datamodel.OboUtil;
-import phenote.gui.BugWorkaroundTable;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;

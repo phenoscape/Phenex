@@ -19,9 +19,9 @@ import org.apache.log4j.Logger;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.State;
+import org.phenoscape.swing.BugWorkaroundTable;
 import org.phenoscape.swing.PlaceholderRenderer;
 
-import phenote.gui.BugWorkaroundTable;
 import phenote.gui.SortDisabler;
 import phenote.gui.TableColumnPrefsSaver;
 import ca.odell.glazedlists.EventList;

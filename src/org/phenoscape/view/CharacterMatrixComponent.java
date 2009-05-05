@@ -25,9 +25,9 @@ import org.phenoscape.model.DataSet;
 import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
+import org.phenoscape.swing.BugWorkaroundTable;
 import org.phenoscape.swing.PlaceholderRenderer;
 
-import phenote.gui.BugWorkaroundTable;
 import ca.odell.glazedlists.CollectionList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;

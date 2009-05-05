@@ -13,6 +13,7 @@ import javax.accessibility.AccessibleContext;
 import javax.swing.Action;
 import javax.swing.ComboBoxModel;
 import javax.swing.InputMap;
+import javax.swing.InputVerifier;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -112,6 +113,11 @@ public class AutocompleteField<T> extends JComponent {
         }
     }
     
+    @Override
+    public void setInputVerifier(InputVerifier inputVerifier) {
+        this.getEditorField().setInputVerifier(inputVerifier);
+    }
+
     protected JComboBox getComboBox() {
         return this.comboBox;
     }
@@ -233,8 +239,13 @@ public class AutocompleteField<T> extends JComponent {
         public void firePopupMenuWillBecomeVisible() {
             hasBeenEdited = true;
             super.firePopupMenuWillBecomeVisible();
-        } 
+        }
         
+        @Override
+        public void setInputVerifier(InputVerifier inputVerifier) {
+            getEditorField().setInputVerifier(inputVerifier);
+        }
+
     }
 
     private class AutocompleteEditor extends BasicComboBoxEditor {

@@ -4,22 +4,17 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.EventObject;
-import java.util.List;
 
+import javax.swing.AbstractCellEditor;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
 
-public class AutocompleteCellEditor<T> implements TableCellEditor {
+public class AutocompleteCellEditor<T> extends AbstractCellEditor implements TableCellEditor {
 
     private final AutocompleteField<T> acField;
-    private final List<CellEditorListener> listeners = new ArrayList<CellEditorListener>();
     private Object originalValue = null;
     private Object value = null;
     private int clickCountToStart = 2;
@@ -39,19 +34,9 @@ public class AutocompleteCellEditor<T> implements TableCellEditor {
         return this.acField.getComboBox();
     }
 
-    public void addCellEditorListener(CellEditorListener l) {
-        this.listeners.add(l);
-    }
-
     public void cancelCellEditing() {
         this.value = this.originalValue;
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                for (CellEditorListener listener : listeners) {
-                    listener.editingCanceled(new ChangeEvent(this));
-                }
-            }
-        });
+        super.cancelCellEditing();
     }
 
     public Object getCellEditorValue() {
@@ -65,23 +50,7 @@ public class AutocompleteCellEditor<T> implements TableCellEditor {
         return true;
     }
 
-    public void removeCellEditorListener(CellEditorListener l) {
-        this.listeners.remove(l);
-    }
-
     public boolean shouldSelectCell(EventObject anEvent) {
-        return true;
-    }
-
-    public boolean stopCellEditing() {
-        for (CellEditorListener listener : listeners) {
-            final CellEditorListener cel = listener;
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    cel.editingStopped(new ChangeEvent(this));
-                }
-            });
-        }
         return true;
     }
     
@@ -97,14 +66,7 @@ public class AutocompleteCellEditor<T> implements TableCellEditor {
 
         public void actionPerformed(ActionEvent e) {
             value = acField.getValue();
-            for (CellEditorListener listener : listeners) {
-                final CellEditorListener cel = listener;
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        cel.editingStopped(new ChangeEvent(this));
-                    }
-                });
-            }
+            stopCellEditing();
         }
     }
     

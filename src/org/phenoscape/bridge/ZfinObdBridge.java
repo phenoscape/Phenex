@@ -50,14 +50,14 @@ public class ZfinObdBridge {
     /** The genotype-url system property should contain the URL of the ZFIN genotypes file. */
     public static final String GENOTYPE_URL = "genotype-url";
 
-    public static String GENOTYPE_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits";
-    public static String GENE_GENOTYPE_REL_ID = "PHENOSCAPE:has_allele";
-    public static String PUBLICATION_TYPE_ID = "cdao:Pub";
-    public static String HAS_PUB_REL_ID = "cdao:hasPub";
-    public static String GENOTYPE_TYPE_ID = "SO:0001027";
-    public static String GENE_TYPE_ID = "SO:0000704";
-    private String TELEOST_ANATOMY = "teleost_anatomy";
-    private static RelationVocabulary relationVocabulary = new RelationVocabulary();
+    public static final String GENOTYPE_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits";
+    public static final String GENE_GENOTYPE_REL_ID = "PHENOSCAPE:has_allele";
+    public static final String PUBLICATION_TYPE_ID = "cdao:Pub";
+    public static final String HAS_PUB_REL_ID = "cdao:hasPub";
+    public static final String GENOTYPE_TYPE_ID = "SO:0001027";
+    public static final String GENE_TYPE_ID = "SO:0000704";
+    private static final String TELEOST_ANATOMY = "teleost_anatomy";
+    private static final RelationVocabulary relationVocabulary = new RelationVocabulary();
 
     private Shard shard;
     private Graph graph;

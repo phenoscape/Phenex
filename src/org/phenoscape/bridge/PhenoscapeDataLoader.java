@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.bbop.dataadapter.DataAdapterException;
@@ -41,7 +40,6 @@ public class PhenoscapeDataLoader {
     }
 
     public static void main(String[] args) throws XmlException, IOException, SQLException, ClassNotFoundException {
-        BasicConfigurator.configure();
         PhenoscapeDataLoader pdl = new PhenoscapeDataLoader();
         pdl.processDataFolder(new File(args[0]));
     }

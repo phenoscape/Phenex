@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
@@ -50,6 +51,7 @@ public class ZfinObdBridge {
     /** The genotype-url system property should contain the URL of the ZFIN genotypes file. */
     public static final String GENOTYPE_URL = "genotype-url";
 
+    public static final String DATASET_TYPE_ID = "cdao:CharacterStateDataMatrix";
     public static final String GENOTYPE_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits";
     public static final String GENE_GENOTYPE_REL_ID = "PHENOSCAPE:has_allele";
     public static final String PUBLICATION_TYPE_ID = "cdao:Pub";
@@ -82,92 +84,16 @@ public class ZfinObdBridge {
         String phenoFileLine, genoFileLine, missingMarkersFileLine;
         LinkStatement geneAnnotLink;
 
+        /*
+         * A set of genotypes that are associated with known genes
+         */
+        Set<String> allowableGenotypes = new HashSet<String>(); 
+        
         URL phenotypeURL = new URL(System.getProperty(PHENOTYPE_URL));
         URL missingMarkersURL = new URL(System.getProperty(MISSING_MARKERS_URL));
         URL genotypeURL = new URL(System.getProperty(GENOTYPE_URL));
 
         BufferedReader br1 = new BufferedReader(new InputStreamReader(phenotypeURL.openStream()));
-        while ((phenoFileLine = br1.readLine()) != null) {
-            String[] pComps = phenoFileLine.split("\\t");
-            String pub = pComps[8];
-            String qualID = pComps[5];
-            String ab = pComps[7];
-            String entity1Id = pComps[4];
-            String genotypeId = pComps[0];
-            String genotypeName = pComps[1];
-            String towardsId = pComps[6];
-
-            Node genotypeNode = createInstanceNode(genotypeId, GENOTYPE_TYPE_ID);
-            genotypeNode.setLabel(genotypeName);
-            graph.addNode(genotypeNode);
-
-            Node publicationNode = createInstanceNode(pub, PUBLICATION_TYPE_ID);
-            graph.addNode(publicationNode);
-
-            Set<LinkStatement> diffs = new HashSet<LinkStatement>();
-            if (entity1Id != null) {
-                String taoId = getEquivalentTAOID(entity1Id);
-                String target = taoId != null?taoId : entity1Id;
-                LinkStatement d = new LinkStatement();
-                d.setRelationId(relationVocabulary.inheres_in());
-                d.setTargetId(target);
-                diffs.add(d);
-            }
-            if (towardsId != null) {
-                String taoId = getEquivalentTAOID(towardsId);
-                String target = taoId != null?taoId : towardsId;
-                if(target != null && target.trim().length() > 0 && target.matches("[A-Z]+:[0-9]+")){
-                    LinkStatement d = new LinkStatement();
-                    d.setRelationId(relationVocabulary.towards());
-                    d.setTargetId(target);
-                    diffs.add(d);
-                }
-            }
-            String quality = qualID;
-            if(ab != null){
-                for (String qual : ab.split("/")) {
-                    String patoId;
-                    if(qualID.equals("PATO:0000001")){
-                        if (qual.equals("normal"))
-                            patoId = "PATO:0000461";
-                        else if (qual.equals("absent"))
-                            patoId = "PATO:0000462";
-                        else if (qual.equals("present"))
-                            patoId = "PATO:0000467";
-                        else
-                            patoId = "PATO:0000460"; // abnormal
-                        quality = patoId;
-                    }
-                }
-            }
-
-            CompositionalDescription desc = new CompositionalDescription(quality, diffs);
-            String phenoId = desc.generateId();
-            desc.setId(phenoId);
-            graph.addStatements(desc);
-
-            LinkStatement annot = new LinkStatement();
-            annot.setNodeId(genotypeId);
-            annot.setRelationId(GENOTYPE_PHENOTYPE_REL_ID);
-
-            if (!pub.equals("")) {
-                LinkStatement pubLink = new LinkStatement();
-                pubLink.setRelationId("posited_by");
-                pubLink.setTargetId(pub);
-                annot.addSubStatement(pubLink);
-            }
-
-            annot.setTargetId(phenoId);
-            graph.addStatement(annot);
-
-            LinkStatement ls = new LinkStatement();
-            ls.setNodeId(phenoId);
-            ls.setRelationId(relationVocabulary.is_a());
-            ls.setTargetId(quality);
-
-            graph.addStatement(ls);
-        }
-        
         BufferedReader br2 = new BufferedReader(new InputStreamReader(
                 genotypeURL.openStream()));
         BufferedReader br3 = new BufferedReader(new InputStreamReader(
@@ -186,11 +112,19 @@ public class ZfinObdBridge {
                 Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
                 geneNode.setLabel(geneName);
                 graph.addNode(geneNode);
+                
+                Node genotypeNode = createInstanceNode(genotypeID, GENOTYPE_TYPE_ID);
+                genotypeNode.setLabel(gComps[1]);
+                graph.addNode(genotypeNode);
+                
                 geneAnnotLink = new LinkStatement();
                 geneAnnotLink.setNodeId(geneID);
                 geneAnnotLink.setRelationId(GENE_GENOTYPE_REL_ID);
                 geneAnnotLink.setTargetId(genotypeID);
                 graph.addStatement(geneAnnotLink);
+                
+                allowableGenotypes.add(genotypeID);
+                
             } else {
                 while ((missingMarkersFileLine = br3.readLine()) != null) {
                     String[] mmComps = missingMarkersFileLine
@@ -203,17 +137,113 @@ public class ZfinObdBridge {
                                     GENE_TYPE_ID);
                             geneNode.setLabel(mmComps[3]);
                             graph.addNode(geneNode);
+                            
+                            Node genotypeNode = createInstanceNode(genotypeID, GENOTYPE_TYPE_ID);
+                            genotypeNode.setLabel(mmComps[1]);
+                            graph.addNode(genotypeNode);
                             geneAnnotLink = new LinkStatement();
                             geneAnnotLink.setNodeId(geneID);
                             geneAnnotLink
                             .setRelationId(GENE_GENOTYPE_REL_ID);
                             geneAnnotLink.setTargetId(genotypeID);
                             graph.addLinkStatement(geneNode, GENE_GENOTYPE_REL_ID, genotypeID);
+                            
+                            allowableGenotypes.add(genotypeID);
                         }
                     }
                 }
             }
         }
+        
+        while ((phenoFileLine = br1.readLine()) != null) {
+            String[] pComps = phenoFileLine.split("\\t");
+            String pub = pComps[8];
+            String qualID = pComps[5];
+            String ab = pComps[7];
+            String entity1Id = pComps[4];
+            String genotypeId = pComps[0];
+            String towardsId = pComps[6];
+
+            if(allowableGenotypes.contains(genotypeId)){ //check this genotype links to a gene
+            	Set<LinkStatement> diffs = new HashSet<LinkStatement>();
+            	if (entity1Id != null) {
+            		String taoId = getEquivalentTAOID(entity1Id);
+            		String target = taoId != null?taoId : entity1Id;
+            		LinkStatement d = new LinkStatement();
+            		d.setRelationId(relationVocabulary.inheres_in());
+            		d.setTargetId(target);
+            		diffs.add(d);
+            	}
+            	if (towardsId != null) {
+            		String taoId = getEquivalentTAOID(towardsId);
+            		String target = taoId != null?taoId : towardsId;
+            		if(target != null && target.trim().length() > 0 && target.matches("[A-Z]+:[0-9]+")){
+            			LinkStatement d = new LinkStatement();
+            			d.setRelationId(relationVocabulary.towards());
+            			d.setTargetId(target);
+            			diffs.add(d);
+            		}
+            	}
+            	String quality = qualID;
+            	if(ab != null){
+            		for (String qual : ab.split("/")) {
+            			String patoId;
+            			if(qualID.equals("PATO:0000001")){
+            				if (qual.equals("normal"))
+            					patoId = "PATO:0000461";
+            				else if (qual.equals("absent"))
+            					patoId = "PATO:0000462";
+            				else if (qual.equals("present"))
+            					patoId = "PATO:0000467";
+            				else
+            					patoId = "PATO:0000460"; // abnormal
+            				quality = patoId;
+            			}
+            		}
+            	}
+
+            	CompositionalDescription desc = new CompositionalDescription(quality, diffs);
+            	String phenoId = desc.generateId();
+            	desc.setId(phenoId);
+            	graph.addStatements(desc);
+
+            	LinkStatement annot = new LinkStatement();
+            	annot.setNodeId(genotypeId);
+            	annot.setRelationId(GENOTYPE_PHENOTYPE_REL_ID);
+
+            	if (!pub.equals("")) {
+            		Node publicationNode = createInstanceNode(pub, PUBLICATION_TYPE_ID);
+            		graph.addNode(publicationNode);
+
+            		String dsId = UUID.randomUUID().toString();
+            		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
+            		graph.addNode(dsNode);
+
+            		LinkStatement dsLink = new LinkStatement();
+            		dsLink.setRelationId("posited_by");
+            		dsLink.setTargetId(dsId);
+            		annot.addSubStatement(dsLink);
+            		
+            		LinkStatement pubLink = new LinkStatement();
+            		pubLink.setNodeId(dsId);
+            		pubLink.setRelationId("PHENOSCAPE:has_publication");
+            		pubLink.setTargetId(pub);
+            		graph.addStatement(pubLink);
+            	}
+
+            	annot.setTargetId(phenoId);
+
+            	graph.addStatement(annot);
+
+            	LinkStatement ls = new LinkStatement();
+            	ls.setNodeId(phenoId);
+            	ls.setRelationId(relationVocabulary.is_a());
+            	ls.setTargetId(quality);
+
+            	graph.addStatement(ls);
+            }
+        }
+        
         this.shard.putGraph(graph);
     }
 

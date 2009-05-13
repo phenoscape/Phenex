@@ -13,6 +13,7 @@ import java.util.UUID;
 import org.obd.model.CompositionalDescription;
 import org.obd.model.Graph;
 import org.obd.model.LinkStatement;
+import org.obd.model.LiteralStatement;
 import org.obd.model.Node;
 import org.obd.model.Statement;
 import org.obd.model.CompositionalDescription.Predicate;
@@ -72,6 +73,8 @@ public class OBDModelBridge {
 	public static String SPECIMEN_TO_COLLECTION_REL_ID = "PHENOSCAPE:belongs_to_collection";
 	public static String SPECIMEN_TO_CATALOG_ID_REL_ID = "PHENOSCAPE:has_catalog_id";
 	
+	public static String HAS_CURATORS_REL_ID = "PHENOSCAPE:has_curators";
+	
 	private static TermVocabulary vocab = new TermVocabulary();
 	private static RelationVocabulary relationVocabulary = new RelationVocabulary();
 	private Map<Character, String> characterIdMap;
@@ -100,11 +103,15 @@ public class OBDModelBridge {
 		phenotypeIdMap = new HashMap<Phenotype, String>();
 		// Dataset metadata
 		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
+		String curators = ds.getCurators();
 		Node pubNode = createInstanceNode(ds.getPublication(),
 				PUBLICATION_TYPE_ID);
 		LinkStatement ds2p = new LinkStatement(dsId, HAS_PUB_REL_ID, pubNode.getId());
 		graph.addStatement(ds2p);
-
+		
+		LiteralStatement ds2curators = new LiteralStatement(dsId, HAS_CURATORS_REL_ID, curators);
+		graph.addStatement(ds2curators);
+		
 		for (Taxon t : ds.getTaxa()) {
 			// avoid uploading taxa without names; Cartik1.0
 			if (t.getValidName() != null

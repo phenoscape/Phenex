@@ -8,8 +8,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -65,11 +68,18 @@ public class ZfinObdBridge {
     private Graph graph;
     private OBOSession oboSession;
     
+    /*
+     * This map has been created to keep track of main IDs and their mapping to alternate IDs
+     * These are stored in key=ALTERNATE-ID value=ID format 
+     */
+    private Map<String, String> id2AlternateIdMap;
+    
     public ZfinObdBridge() throws SQLException, ClassNotFoundException {
         super();
         this.shard = this.initializeShard();
         this.graph = new Graph();
         this.setOboSession(this.loadOBOSession());
+        this.id2AlternateIdMap = createAltIdMappings(this.getOboSession());
     }
 
     public OBOSession getOboSession() {
@@ -158,17 +168,27 @@ public class ZfinObdBridge {
         while ((phenoFileLine = br1.readLine()) != null) {
             String[] pComps = phenoFileLine.split("\\t");
             String pub = pComps[8];
-            String qualID = pComps[5];
+            String qualId = pComps[5];
             String ab = pComps[7];
             String entity1Id = pComps[4];
             String genotypeId = pComps[0];
             String towardsId = pComps[6];
-
+                       		
+            if(id2AlternateIdMap.containsKey(qualId)){
+            	log().info("Replacing alternate ID: " + qualId);
+            	qualId = id2AlternateIdMap.get(qualId);
+            }
+            
             if(allowableGenotypes.contains(genotypeId)){ //check this genotype links to a gene
             	Set<LinkStatement> diffs = new HashSet<LinkStatement>();
             	if (entity1Id != null) {
             		String taoId = getEquivalentTAOID(entity1Id);
             		String target = taoId != null?taoId : entity1Id;
+            		if(id2AlternateIdMap.containsKey(target)){
+                    	log().info("Replacing alternate ID: " + target);
+                    	target = id2AlternateIdMap.get(target);
+                    }
+
             		LinkStatement d = new LinkStatement();
             		d.setRelationId(relationVocabulary.inheres_in());
             		d.setTargetId(target);
@@ -178,17 +198,21 @@ public class ZfinObdBridge {
             		String taoId = getEquivalentTAOID(towardsId);
             		String target = taoId != null?taoId : towardsId;
             		if(target != null && target.trim().length() > 0 && target.matches("[A-Z]+:[0-9]+")){
+            			if(id2AlternateIdMap.containsKey(target)){
+                        	log().info("Replacing alternate ID: " + target);
+                        	target = id2AlternateIdMap.get(target);
+                        }
             			LinkStatement d = new LinkStatement();
             			d.setRelationId(relationVocabulary.towards());
             			d.setTargetId(target);
             			diffs.add(d);
             		}
             	}
-            	String quality = qualID;
+            	String quality = qualId;
             	if(ab != null){
             		for (String qual : ab.split("/")) {
             			String patoId;
-            			if(qualID.equals("PATO:0000001")){
+            			if(qualId.equals("PATO:0000001")){
             				if (qual.equals("normal"))
             					patoId = "PATO:0000461";
             				else if (qual.equals("absent"))
@@ -310,8 +334,8 @@ public class ZfinObdBridge {
         List<String> paths = new ArrayList<String>();
         File ontCache = new File(System.getProperty(ONTOLOGY_DIR));
         for (File f : ontCache.listFiles()) {
-            if (f.getAbsolutePath().contains("zebrafish_anatomy") || f.getName().contains("teleost_anatomy")) 
-                paths.add(f.getAbsolutePath());
+            paths.add(f.getAbsolutePath());
+            log().trace(paths.toString());
         }
         return paths;
     }
@@ -326,4 +350,24 @@ public class ZfinObdBridge {
         return Logger.getLogger(this.getClass());
     }
     
+    
+    /**
+     * This method populates the alternate id to id map
+     */
+    
+    private Map<String, String> createAltIdMappings(OBOSession session) {
+    	Map<String, String> altIDMappings = new HashMap<String, String>();
+        log().trace("Called alt_id search");
+        final Collection<IdentifiedObject> terms = session.getObjects();
+        for (IdentifiedObject object : terms) {
+            if (object instanceof OBOClass) {
+                final OBOClass term = (OBOClass)object;
+                if (term.getSecondaryIDs() != null && term.getSecondaryIDs().size() > 0) {
+                	for(String altID : term.getSecondaryIDs())
+                		altIDMappings.put(altID, term.getID());
+                }
+            }
+        }
+        return altIDMappings;
+    }
 }

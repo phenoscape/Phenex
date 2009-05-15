@@ -264,14 +264,6 @@ public class OBDModelBridge {
 			for (Link diff : diffs) {
 				cd.addArgument(diff.getType().getID(),
 						translateOBOClass((OBOClass) diff.getParent()));
-				/*
-				 * CompositionalDescription restr = new
-				 * CompositionalDescription(Predicate.RESTRICTION);
-				 * CompositionalDescription diffCD = ); LinkStatement ls = new
-				 * LinkStatement(null,diff.getType().getID(), diffCD.getId());
-				 * restr.setRestriction(ls);
-				 * restr.addArgument(ls.getTargetId()); cd.addArgument(restr);
-				 */
 			}
 			return cd;
 		} else {

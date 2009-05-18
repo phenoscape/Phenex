@@ -30,6 +30,7 @@ import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
 import org.phenoscape.io.NeXMLReader;
 import org.phenoscape.io.NeXMLWriter;
+import org.phenoscape.io.TabDelimitedWriter;
 import org.phenoscape.io.TaxonTabReader;
 import org.phenoscape.swing.ListSelectionMaintainer;
 import org.phenoscape.util.DataMerger;
@@ -233,6 +234,15 @@ public class PhenexController extends DocumentController {
             this.mergeNeXML(file);
         }
     }
+    
+    public void exportToExcel() {
+        final JFileChooser fileChooser = new JFileChooser();
+        final int result = fileChooser.showSaveDialog(GUIManager.getManager().getFrame());
+        if (result == JFileChooser.APPROVE_OPTION) {
+            final File file = fileChooser.getSelectedFile();
+            this.writeForExcel(file);
+        }
+    }
 
     public JFrame getWindow() {
         return GUIManager.getManager().getFrame();
@@ -313,6 +323,16 @@ public class PhenexController extends DocumentController {
             log().error("Error parsing NeXML file", e);
         } catch (IOException e) {
             log().error("Error reading NeXML file", e);
+        }
+    }
+    
+    private void writeForExcel(File aFile) {
+        final TabDelimitedWriter writer = new TabDelimitedWriter();
+        writer.setDataSet(this.getDataSet());
+        try {
+            writer.write(aFile);
+        } catch (IOException e) {
+            log().error("Error writing to tab-delimited file", e);
         }
     }
     

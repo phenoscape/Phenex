@@ -83,6 +83,10 @@ public class MenuFactory {
         };
         saveAsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK));
         menu.add(new JMenuItem(saveAsAction));
+        final Action exportExcelAction = new AbstractAction("Export for Excel...") {
+            public void actionPerformed(ActionEvent e) { controller.exportToExcel(); }
+        };
+        menu.add(new JMenuItem(exportExcelAction));
         if (CrossPlatform.shouldPutExitInFileMenu()) {
             menu.addSeparator();
             final Action exitAction = new AbstractAction("Exit") {

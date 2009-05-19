@@ -57,8 +57,8 @@ public class ZfinObdBridge {
     public static final String DATASET_TYPE_ID = "cdao:CharacterStateDataMatrix";
     public static final String GENOTYPE_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits";
     public static final String GENE_GENOTYPE_REL_ID = "PHENOSCAPE:has_allele";
-    public static final String PUBLICATION_TYPE_ID = "cdao:Pub";
-    public static final String HAS_PUB_REL_ID = "cdao:hasPub";
+    public static final String PUBLICATION_TYPE_ID = "PHENOSCAPE:Publication";
+    public static String HAS_PUB_REL_ID = "PHENOSCAPE:has_publication";
     public static final String GENOTYPE_TYPE_ID = "SO:0001027";
     public static final String GENE_TYPE_ID = "SO:0000704";
     private static final String TELEOST_ANATOMY = "teleost_anatomy";

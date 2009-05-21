@@ -158,12 +158,13 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
             case 2: taxon.setPublicationName(editedValue.toString()); break;
             case 3: taxon.setComment(editedValue.toString()); break;
             case 4: taxon.setMatrixTaxonName(editedValue.toString()); break;
+            case 5: taxon.setFigure(editedValue.toString()); break;
             }
             return taxon;
         }
 
         public int getColumnCount() {
-            return 5;
+            return 6;
         }
 
         public String getColumnName(int column) {
@@ -173,6 +174,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
             case 2: return "Publication Taxon";
             case 3: return "Comment";
             case 4: return "Matrix Taxon";
+            case 5: return "Figure";
             default: return null;
             }
         }
@@ -184,6 +186,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
             case 2: return taxon.getPublicationName();
             case 3: return taxon.getComment();
             case 4: return taxon.getMatrixTaxonName();
+            case 5: return taxon.getFigure();
             default: return null;
             }
         }
@@ -195,6 +198,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
             case 2: return String.class;
             case 3: return String.class;
             case 4: return String.class;
+            case 5: return String.class;
             default: return null;
             }
         }
@@ -206,6 +210,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
             case 2: return Strings.getNaturalComparator();
             case 3: return Strings.getNaturalComparator();
             case 4: return Strings.getNaturalComparator();
+            case 5: return Strings.getNaturalComparator();
             default: return null;
             }
         }

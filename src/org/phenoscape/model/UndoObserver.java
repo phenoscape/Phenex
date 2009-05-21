@@ -19,22 +19,22 @@ import org.phenoscape.app.PropertyChangeObject;
 import org.phenoscape.app.UndoController;
 
 public class UndoObserver {
-    
+
     private final UndoController undoController;
     private final DataSetObserver dataSetObserver = new DataSetObserver();
     // should this logic be in this class or UndoController?
     private boolean undoing = false;
-    
+
     public UndoObserver(UndoController controller) {
         this.undoController = controller;
     }
-    
+
     public void setDataSet(DataSet data) {
         this.dataSetObserver.startObserving(data);
     }
-    
+
     private class DataSetObserver implements Observer<DataSet> {
-        
+
         private final PropertyChangeListener publicationListener = new PropertyUndoer("Edit Publication");
         private final PropertyChangeListener pubNotesListener = new PropertyUndoer("Edit Publication Notes");
         private final PropertyChangeListener curatorsListener = new PropertyUndoer("Edit Curators");
@@ -43,7 +43,7 @@ public class UndoObserver {
         private final ListObserver<Taxon> taxaObserver = new ListObserver<Taxon>(this.taxonObserver, "Taxon");
         private final CharacterObserver characterObserver = new CharacterObserver();
         private final ListObserver<Character> charactersObserver = new ListObserver<Character>(this.characterObserver, "Character");
-        
+
         public void startObserving(DataSet data) {
             data.addPropertyChangeListener(DataSet.PUBLICATION, this.publicationListener);
             data.addPropertyChangeListener(DataSet.PUBLICATION_NOTES, this.pubNotesListener);
@@ -52,13 +52,13 @@ public class UndoObserver {
             this.taxaObserver.startObserving(data.getTaxa());
             this.charactersObserver.startObserving(data.getCharacters());
         }
-        
+
         public void startObserving(Collection<DataSet> objects) {
             for (DataSet data : objects) {
                 this.startObserving(data);
             }
         }
-        
+
         public void stopObserving(DataSet data) {
             data.removePropertyChangeListener(DataSet.PUBLICATION, this.publicationListener);
             data.removePropertyChangeListener(DataSet.PUBLICATION_NOTES, this.pubNotesListener);
@@ -67,13 +67,13 @@ public class UndoObserver {
             this.taxaObserver.stopObserving(data.getTaxa());
             this.charactersObserver.stopObserving(data.getCharacters());
         }
-        
+
         public void stopObserving(Collection<DataSet> objects) {
             for (DataSet data : objects) {
                 this.stopObserving(data);
             }
         }
-        
+
         private class MatrixCellUndoer implements PropertyChangeListener {
 
             public void propertyChange(final PropertyChangeEvent change) {
@@ -106,17 +106,18 @@ public class UndoObserver {
 
                 });
             }
-            
+
         }
-        
+
     }
-    
+
     private class TaxonObserver implements Observer<Taxon> {
 
         private final PropertyChangeListener validNameListener = new PropertyUndoer("Edit Valid Taxon");
         private final PropertyChangeListener pubNameListener = new PropertyUndoer("Edit Publication Taxon");
         private final PropertyChangeListener matrixTaxonListener = new PropertyUndoer("Edit Matrix Taxon");
         private final PropertyChangeListener commentListener = new PropertyUndoer("Edit Taxon Comment");
+        private final PropertyChangeListener figureListener = new PropertyUndoer("Edit Taxon Figure");
         private final SpecimenObserver specimenObserver = new SpecimenObserver();
         private final ListObserver<Specimen> specimensObserver = new ListObserver<Specimen>(this.specimenObserver, "Specimen");
 
@@ -125,9 +126,10 @@ public class UndoObserver {
             taxon.addPropertyChangeListener(Taxon.MATRIX_TAXON_NAME, this.matrixTaxonListener);
             taxon.addPropertyChangeListener(Taxon.PUBLICATION_NAME, this.pubNameListener);
             taxon.addPropertyChangeListener(Taxon.COMMENT, this.commentListener);
+            taxon.addPropertyChangeListener(Taxon.FIGURE, this.figureListener);
             this.specimensObserver.startObserving(taxon.getSpecimens());
         }
-        
+
         public void startObserving(Collection<Taxon> objects) {
             for (Taxon taxon : objects) {
                 this.startObserving(taxon);
@@ -139,9 +141,10 @@ public class UndoObserver {
             taxon.removePropertyChangeListener(Taxon.MATRIX_TAXON_NAME, this.matrixTaxonListener);
             taxon.removePropertyChangeListener(Taxon.PUBLICATION_NAME, this.pubNameListener);
             taxon.removePropertyChangeListener(Taxon.COMMENT, this.commentListener);
+            taxon.removePropertyChangeListener(Taxon.FIGURE, this.figureListener);
             this.specimensObserver.stopObserving(taxon.getSpecimens());
         }
-        
+
         public void stopObserving(Collection<Taxon> objects) {
             for (Taxon taxon : objects) {
                 this.stopObserving(taxon);
@@ -149,9 +152,9 @@ public class UndoObserver {
         }
 
     }
-    
+
     private class SpecimenObserver implements Observer<Specimen> {
-        
+
         private final PropertyChangeListener collectionCodeListener = new PropertyUndoer("Edit Collection Code");
         private final PropertyChangeListener catalogIDListener = new PropertyUndoer("Edit Catalog ID");
 
@@ -176,19 +179,21 @@ public class UndoObserver {
                 this.stopObserving(specimen);
             }
         }
-        
+
     }
-    
+
     private class CharacterObserver implements Observer<Character> {
-        
+
         private final PropertyChangeListener labelListener = new PropertyUndoer("Edit Character Description");
         private final PropertyChangeListener commentListener = new PropertyUndoer("Edit Character Comment");
+        private final PropertyChangeListener figureListener = new PropertyUndoer("Edit Character Figure");
         private final StateObserver stateObserver = new StateObserver();
         private final ListObserver<State> statesObserver = new ListObserver<State>(stateObserver, "State");
 
         public void startObserving(Character character) {
             character.addPropertyChangeListener(Character.LABEL, this.labelListener);
             character.addPropertyChangeListener(Character.COMMENT, this.commentListener);
+            character.addPropertyChangeListener(Character.FIGURE, this.figureListener);
             this.statesObserver.startObserving(character.getStates());
         }
 
@@ -201,6 +206,7 @@ public class UndoObserver {
         public void stopObserving(Character character) {
             character.removePropertyChangeListener(Character.LABEL, this.labelListener);
             character.removePropertyChangeListener(Character.COMMENT, this.commentListener);
+            character.removePropertyChangeListener(Character.FIGURE, this.figureListener);
             this.statesObserver.stopObserving(character.getStates());
         }
 
@@ -209,21 +215,23 @@ public class UndoObserver {
                 this.stopObserving(character);
             }
         }
-        
+
     }
-    
+
     private class StateObserver implements Observer<State> {
-        
+
         private final PropertyChangeListener labelListener = new PropertyUndoer("Edit State Description");
         private final PropertyChangeListener symbolListener = new PropertyUndoer("Edit State Symbol");
         private final PropertyChangeListener commentListener = new PropertyUndoer("Edit State Comment");
+        private final PropertyChangeListener figureListener = new PropertyUndoer("Edit State Figure");
         private final PhenotypeObserver phenotypeObserver = new PhenotypeObserver();
         private final ListObserver<Phenotype> phenotypesObserver = new ListObserver<Phenotype>(this.phenotypeObserver, "Phenotype");
-        
+
         public void startObserving(State state) {
             state.addPropertyChangeListener(State.LABEL, this.labelListener);
             state.addPropertyChangeListener(State.SYMBOL, this.symbolListener);
             state.addPropertyChangeListener(State.COMMENT, this.commentListener);
+            state.addPropertyChangeListener(State.FIGURE, this.figureListener);
             this.phenotypesObserver.startObserving(state.getPhenotypes());
         }
 
@@ -237,6 +245,7 @@ public class UndoObserver {
             state.removePropertyChangeListener(State.LABEL, this.labelListener);
             state.removePropertyChangeListener(State.SYMBOL, this.symbolListener);
             state.removePropertyChangeListener(State.COMMENT, this.commentListener);
+            state.removePropertyChangeListener(State.FIGURE, this.figureListener);
             this.phenotypesObserver.stopObserving(state.getPhenotypes());
         }
 
@@ -245,11 +254,11 @@ public class UndoObserver {
                 this.stopObserving(state);
             }
         }
-        
+
     }
-    
+
     private class PhenotypeObserver implements Observer<Phenotype> {
-        
+
         private final PropertyChangeListener entityListener = new PropertyUndoer("Edit Entity");
         private final PropertyChangeListener qualityListener = new PropertyUndoer("Edit Quality");
         private final PropertyChangeListener relatedEntityListener = new PropertyUndoer("Edit Related Entity");
@@ -257,7 +266,7 @@ public class UndoObserver {
         private final PropertyChangeListener measurementListener = new PropertyUndoer("Edit Measurement");
         private final PropertyChangeListener unitListener = new PropertyUndoer("Edit Unit");
         private final PropertyChangeListener commentListener = new PropertyUndoer("Edit Phenotype Comment");
-        
+
         public void startObserving(Phenotype phenotype) {
             phenotype.addPropertyChangeListener(Phenotype.ENTITY, this.entityListener);
             phenotype.addPropertyChangeListener(Phenotype.QUALITY, this.qualityListener);
@@ -289,30 +298,30 @@ public class UndoObserver {
                 this.stopObserving(phenotype);
             }
         }
-        
+
     }
-    
+
     private class ListObserver<Y extends PropertyChangeObject> {
-        
+
         private final Observer<Y> elementObserver;
         private final ListListener listListener = new ListListener();
         private final String elementUndoName;
-        
+
         public ListObserver(Observer<Y> elementObserver, String elementUndoName) {
             this.elementObserver = elementObserver;
             this.elementUndoName = elementUndoName;
         }
-        
+
         public void startObserving(ObservableList<Y> list) {
             list.addObservableListListener(listListener);
             elementObserver.startObserving(list);
         }
-        
+
         public void stopObserving(ObservableList<Y> list) {
             list.removeObservableListListener(listListener);
             elementObserver.stopObserving(list);
         }
-        
+
         @SuppressWarnings("unchecked")
         private class ListListener implements ObservableListListener {
 
@@ -332,7 +341,7 @@ public class UndoObserver {
                     return; 
                 }
                 postEdit(new AbstractUndoableEdit() {
-                    
+
                     private final List items = new ArrayList(added);
                     final int location = index;
 
@@ -365,7 +374,7 @@ public class UndoObserver {
                     return; 
                 }
                 postEdit(new AbstractUndoableEdit() {
-                    
+
                     final List items = new ArrayList(oldElements);
                     final int location = index;
 
@@ -390,15 +399,15 @@ public class UndoObserver {
 
                 });
             }
-            
+
         }
-        
+
     }
-    
+
     private class PropertyUndoer implements PropertyChangeListener {
-        
+
         private final String undoText;
-        
+
         public PropertyUndoer(String presentationName) {
             this.undoText = presentationName;
         }
@@ -432,11 +441,11 @@ public class UndoObserver {
             });
         }
     }
-    
+
     private void postEdit(UndoableEdit e) {
         this.undoController.postEdit(e);
     }
-    
+
     private Logger log() {
         return Logger.getLogger(this.getClass());
     }

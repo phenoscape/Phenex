@@ -19,11 +19,13 @@ public class State extends AbstractPropertyChangeObject {
     public static final String COMMENT = "comment";
     public static final String SYMBOL = "symbol";
     public static final String LABEL = "label";
+    public static final String FIGURE = "figure";
     private final String nexmlID;
     private final ObservableEventList<Phenotype> phenotypes = new ObservableEventList<Phenotype>(new BasicEventList<Phenotype>());
     private String label;
     private String symbol;
     private String comment;
+    private String figure;
 
     public State() {
         this(UUID.randomUUID().toString()); 
@@ -96,6 +98,17 @@ public class State extends AbstractPropertyChangeObject {
         this.firePropertyChange(COMMENT, oldValue, notes);
     }
 
+    public String getFigure() {
+        return this.figure;
+    }
+
+    public void setFigure(String aFigure) {
+        if (ObjectUtils.equals(this.figure, aFigure)) return;
+        final String oldValue = this.figure;
+        this.figure = aFigure;
+        this.firePropertyChange(FIGURE, oldValue, aFigure);
+    }
+
     public String toString() {
         final String prefix = this.getSymbol() != null ? this.getSymbol() + " - " : "";
         final String suffix = this.getLabel() != null ? this.getLabel() : "untitled";
@@ -109,6 +122,8 @@ public class State extends AbstractPropertyChangeObject {
         } else if (propertyKey.equals(SYMBOL)) {
             return String.class;
         } else if (propertyKey.equals(COMMENT)) {
+            return String.class;
+        } else if (propertyKey.equals(FIGURE)) {
             return String.class;
         } else {
             return super.getClass(propertyKey);

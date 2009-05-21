@@ -94,14 +94,14 @@ public class NeXMLReader {
     public Collection<String> getDanglersList() {
         return this.danglers;
     }
-    
+
     /**
      * Returns true if the reader had to find any referenced terms via a secondary ID.
      */
     public boolean didMigrateSecondaryIDs() {
         return !this.secondaryIDs.isEmpty();
     }
-    
+
     /**
      * Returns the list of IDs referenced in the file that were found to be secondary IDs.
      */
@@ -142,6 +142,7 @@ public class NeXMLReader {
             }
             newCharacter.setLabel(standardChar.getLabel());
             newCharacter.setComment(this.getComment(standardChar));
+            newCharacter.setFigure(this.getFigure(standardChar));
             final AbstractStates states = NeXMLUtil.findOrCreateStates(format, newCharacter.getStatesNexmlID());
             if (states instanceof StandardStates) {
                 for (AbstractState abstractState : states.getStateArray()) {
@@ -149,6 +150,7 @@ public class NeXMLReader {
                     newState.setSymbol(this.readSymbol(abstractState));
                     newState.setLabel(abstractState.getLabel());
                     newState.setComment(this.getComment(abstractState));
+                    newState.setFigure(this.getFigure(abstractState));
                     final Dict phenotypeDict = NeXMLUtil.findOrCreateDict(abstractState, "OBO_phenotype", abstractState.getDomNode().getOwnerDocument().createElement("any"));
                     final Element any = NeXMLUtil.getFirstChildWithTagName((Element)(phenotypeDict.getDomNode()), "any");
                     final Element phenoXML = NeXMLUtil.getFirstChildWithTagNameNS(any, "http://www.bioontologies.org/obd/schema/pheno", "phenotype");
@@ -197,6 +199,7 @@ public class NeXMLReader {
                 break; // there should only be one String element anyway
             }
             newTaxon.setComment(this.getComment(xmlTaxon));
+            newTaxon.setFigure(this.getFigure(xmlTaxon));
             newTaxon.setMatrixTaxonName(this.getMatrixTaxon(xmlTaxon));
             final Dict specimensDict = NeXMLUtil.findOrCreateDict(xmlTaxon, "OBO_specimens", xmlTaxon.getDomNode().getOwnerDocument().createElement("any"));
             for (XmlObject xmlObj : specimensDict.getAnyArray()) {
@@ -253,7 +256,15 @@ public class NeXMLReader {
         }
         return null;
     }
-    
+
+    private String getFigure(Annotated node) {
+        final Dict figureDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.FIGURE_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+        for (String figure : figureDict.getStringArray()) {
+            return figure;
+        }
+        return null;
+    }
+
     private String getMatrixTaxon(Annotated node) {
         final Dict matrixTaxonDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.MATRIX_TAXON_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
         for (String matrixTaxon : matrixTaxonDict.getStringArray()) {
@@ -278,7 +289,7 @@ public class NeXMLReader {
             }
         }
     }
-    
+
     private OBOClass findTermByAltID(String id) {
         log().debug("Called alt_id search");
         final Collection<IdentifiedObject> terms = this.session.getObjects();

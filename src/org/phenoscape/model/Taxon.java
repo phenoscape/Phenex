@@ -16,11 +16,13 @@ public class Taxon extends AbstractPropertyChangeObject {
     private String publicationName;
     private String matrixTaxonName;
     private String comment;
+    private String figure;
     private final ObservableEventList<Specimen> specimens = new ObservableEventList<Specimen>(new BasicEventList<Specimen>());
     public static String VALID_NAME = "validName";
     public static String PUBLICATION_NAME = "publicationName";
     public static String MATRIX_TAXON_NAME = "matrixTaxonName";
     public static String COMMENT = "comment";
+    public static final String FIGURE = "figure";
 
     public Taxon() {
         this(UUID.randomUUID().toString());
@@ -78,6 +80,17 @@ public class Taxon extends AbstractPropertyChangeObject {
         this.firePropertyChange(COMMENT, oldValue, comment);
     }
 
+    public String getFigure() {
+        return this.figure;
+    }
+
+    public void setFigure(String aFigure) {
+        if (ObjectUtils.equals(this.figure, aFigure)) return;
+        final String oldValue = this.figure;
+        this.figure = aFigure;
+        this.firePropertyChange(FIGURE, oldValue, aFigure);
+    }
+
     public Specimen newSpecimen() {
         final Specimen newSpecimen = new Specimen();
         this.addSpecimen(newSpecimen);
@@ -109,9 +122,11 @@ public class Taxon extends AbstractPropertyChangeObject {
             return String.class;
         } else if (propertyKey.equals(COMMENT)) {
             return String.class;
+        } else if (propertyKey.equals(FIGURE)) {
+            return String.class;
         } else {
             return super.getClass(propertyKey);
         }
     }
-    
+
 }

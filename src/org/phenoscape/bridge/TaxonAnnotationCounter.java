@@ -35,7 +35,7 @@ public class TaxonAnnotationCounter {
 
     /**
 	 * @INPUT - None
-     * This query retrieves the number of annotations for every GENE. 
+     * This query retrieves the number of annotations for every TAXON. 
      * These counts are returned in order from 
      * the highest to the lowest
      */
@@ -71,8 +71,8 @@ public class TaxonAnnotationCounter {
 	}
     
     /**
-     * @PURPOSE The purpose of this method is to get the count of taxon annotations
-     * for every anatomical entity and write these counts to a tab delimited text file
+     * @PURPOSE The purpose of this method is to get the count of phenotyper annotation
+     * for every taxon and write these counts to a tab delimited text file
      * @throws SQLException
      * @throws IOException
      */

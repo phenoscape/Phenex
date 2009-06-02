@@ -74,6 +74,7 @@ public class OBDModelBridge {
 	public static String SPECIMEN_TO_CATALOG_ID_REL_ID = "PHENOSCAPE:has_catalog_id";
 	
 	public static String HAS_CURATORS_REL_ID = "PHENOSCAPE:has_curators";
+	public static String HAS_COMMENT_REL_ID = "PHENOSCAPE:has_comment";
 	
 	private static TermVocabulary vocab = new TermVocabulary();
 	private static RelationVocabulary relationVocabulary = new RelationVocabulary();
@@ -155,6 +156,9 @@ public class OBDModelBridge {
 			String cid = UUID.randomUUID().toString();
 			Node characterNode = createInstanceNode(cid, CHARACTER_TYPE_ID);
 			characterNode.setLabel(character.getLabel());
+			String charComment = character.getComment();
+			LiteralStatement chCommentStmt = new LiteralStatement(characterNode.getId(), HAS_COMMENT_REL_ID, charComment);
+			characterNode.addStatement(chCommentStmt);
 			characterIdMap.put(character, cid);
 			LinkStatement ds2c = new LinkStatement(dsId, HAS_CHARACTER_REL_ID,
 					cid);
@@ -164,6 +168,9 @@ public class OBDModelBridge {
 				String sid = UUID.randomUUID().toString();
 				Node stateNode = createInstanceNode(sid, STATE_TYPE_ID);
 				stateNode.setLabel(state.getLabel());
+				String stateComment = state.getComment();
+				LiteralStatement stCommStmt = new LiteralStatement(stateNode.getId(), HAS_COMMENT_REL_ID, stateComment);
+				stateNode.addStatement(stCommStmt);
 				stateIdMap.put(state, sid);
 				LinkStatement c2s = new LinkStatement(cid, HAS_STATE_REL_ID,
 						sid);

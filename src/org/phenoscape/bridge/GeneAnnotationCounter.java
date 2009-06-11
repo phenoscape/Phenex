@@ -27,8 +27,8 @@ public class GeneAnnotationCounter {
     public static final String DB_USER = "db-user";
     /** The db-password system property should contain the database password. */
     public static final String DB_PASSWORD = "db-password";
-    
-    public static final String TEXT_FILE_LOC = "staging";
+    /** The file-loc system property should contain the location where this file will be stored */
+    public static final String TEXT_FILE_LOC = "file-loc";
 
     private Shard shard;
     private Connection conn;
@@ -59,7 +59,7 @@ public class GeneAnnotationCounter {
     	"GROUP BY gene_node.uid, gene_node.label " +
     	"ORDER BY annotation_count DESC";
     
-    private String textFileLocation = TEXT_FILE_LOC + "/annotationCountByGene.txt";
+    private String textFileLocation = System.getProperty(TEXT_FILE_LOC) + "/annotationCountByGene.txt";
     
     /**
      * Constructor initializes the shard and the connection to the database

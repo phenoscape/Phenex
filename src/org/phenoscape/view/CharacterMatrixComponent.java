@@ -28,18 +28,27 @@ import org.phenoscape.model.Taxon;
 import org.phenoscape.swing.BugWorkaroundTable;
 import org.phenoscape.swing.PlaceholderRenderer;
 
+import com.eekboom.utils.Strings;
+
+import phenote.gui.SortDisabler;
+import phenote.util.EverythingEqualComparator;
+
 import ca.odell.glazedlists.CollectionList;
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.GlazedLists;
+import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.gui.WritableTableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.TableComparatorChooser;
 
 public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 
     private EventTableModel<Taxon> headerModel;
     private EventTableModel<Taxon> matrixTableModel;
+    private final SortedList<Taxon> sortedTaxa = new SortedList<Taxon>(this.getController().getDataSet().getTaxa(), new EverythingEqualComparator<Taxon>());
     private final EventList<State> allStates;
     private static enum TaxonDisplay {
         PUBLICATION_NAME { public String toString() { return "Display Publication Name"; }},
@@ -77,12 +86,14 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 
     private void initializeInterface() {
         this.setLayout(new BorderLayout());
-        this.headerModel = new EventTableModel<Taxon>(this.getController().getDataSet().getTaxa(), new HeaderTableFormat());
+        this.headerModel = new EventTableModel<Taxon>(this.sortedTaxa, new HeaderTableFormat());
         final JTable headerTable = new BugWorkaroundTable(this.headerModel);
         headerTable.putClientProperty("Quaqua.Table.style", "striped");
         headerTable.setDefaultRenderer(Taxon.class, new TaxonRenderer());
         headerTable.getColumnModel().getColumn(0).setMaxWidth(40);
-        this.matrixTableModel = new EventTableModel<Taxon>(this.getController().getDataSet().getTaxa(), new MatrixTableFormat());
+        final TableComparatorChooser<Taxon> sortChooser = new TableComparatorChooser<Taxon>(headerTable, this.sortedTaxa, false);
+        sortChooser.addSortActionListener(new SortDisabler());
+        this.matrixTableModel = new EventTableModel<Taxon>(this.sortedTaxa, new MatrixTableFormat());
         final JTable matrixTable = new BugWorkaroundTable(this.matrixTableModel);
         matrixTable.setCellSelectionEnabled(true);
         matrixTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
@@ -166,7 +177,21 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
         }
 
         public Comparator<?> getColumnComparator(int column) {
-            return null;
+            switch (column) {
+            case 0: return GlazedLists.comparableComparator();
+            case 1: return new Comparator<Taxon>() {
+                public int compare(Taxon o1, Taxon o2) {
+                    if (taxonOption.equals(TaxonDisplay.VALID_NAME)) {
+                        return GlazedLists.comparableComparator().compare(o1.getValidName(), o2.getValidName());
+                    } else if (taxonOption.equals(TaxonDisplay.PUBLICATION_NAME)){
+                        return Strings.getNaturalComparator().compare(o1.getPublicationName(), o2.getPublicationName());
+                    } else { // MATRIX_NAME
+                        return Strings.getNaturalComparator().compare(o1.getMatrixTaxonName(), o2.getMatrixTaxonName());
+                    }
+                }
+            };
+            default: return null;
+            }
         }
 
         public int getColumnCount() {

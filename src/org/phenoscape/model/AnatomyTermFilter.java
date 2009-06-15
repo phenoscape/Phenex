@@ -53,7 +53,8 @@ public class AnatomyTermFilter implements TermFilter {
         "PATO:0000025", //composition
         "PATO:0001449", //cartilaginous
         "PATO:0001448", //ossified
-        "PATO:0000141" //structure
+        "PATO:0000141", //structure
+        "GO:0007610" //behavior
     };
 
     private static final String[] EXCLUDES = {
@@ -117,6 +118,16 @@ public class AnatomyTermFilter implements TermFilter {
         //only filter out stuff from anatomy ontology or PATO
         final OBOClass teleostAnatomicalEntity = (OBOClass)(this.session.getObject("TAO:0100000"));
         final OBOClass quality = (OBOClass)(this.session.getObject("PATO:0000001"));
+        final OBOClass biologicalProcess = (OBOClass)(this.session.getObject("GO:0008150"));
+        final OBOClass cellularComponent = (OBOClass)(this.session.getObject("GO:0005575"));
+        final OBOClass molecularFunction = (OBOClass)(this.session.getObject("GO:0003674"));
+        final OBOClass adultBehavior = (OBOClass)(this.session.getObject("GO:0030534"));
+        final OBOClass regeneration = (OBOClass)(this.session.getObject("GO:0031099"));
+        if ((term.equals(adultBehavior)) || (term.equals(regeneration))) { return true; };
+        //exclude all the rest of GO
+        if (term.equals(biologicalProcess) || TermUtil.hasAncestor(term, biologicalProcess) || term.equals(cellularComponent) || TermUtil.hasAncestor(term, cellularComponent) || term.equals(molecularFunction) || TermUtil.hasAncestor(term, molecularFunction)) {
+            return false;
+        }
         if (!term.equals(teleostAnatomicalEntity) && !TermUtil.hasAncestor(term, teleostAnatomicalEntity) && !term.equals(quality) && !TermUtil.hasAncestor(term, quality)) {
             return true;
         }

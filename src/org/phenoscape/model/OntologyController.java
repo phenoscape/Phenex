@@ -36,6 +36,7 @@ public class OntologyController {
     private String UNIT = "";
     private String REL = "";
     private String REL_PROPOSED = "";
+    private String GO = "";
 
     private TermSet entityTermSet = null;
     private TermSet qualityTermSet = null;
@@ -72,7 +73,8 @@ public class OntologyController {
             this.UNIT = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/unit.obo")).toURI().toString();
             this.REL = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro.obo")).toURI().toString();
             this.REL_PROPOSED = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro_proposed.obo")).toURI().toString();
-            String[] paths = { TTO, COLLECTION, TAO, PATO, SPATIAL, UNIT, REL, REL_PROPOSED };
+            this.GO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/genomic-proteomic/gene_ontology_edit.obo")).toURI().toString();
+            String[] paths = { TTO, COLLECTION, TAO, PATO, SPATIAL, UNIT, REL, REL_PROPOSED, GO };
             return paths;
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
@@ -104,7 +106,7 @@ public class OntologyController {
 
     public TermSet getEntityTermSet() {
         if (this.entityTermSet == null) {
-            final TermSet terms = this.getTermSet(TAO, SPATIAL, PATO);
+            final TermSet terms = this.getTermSet(TAO, SPATIAL, PATO, GO);
             terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
             this.entityTermSet = terms;
         }

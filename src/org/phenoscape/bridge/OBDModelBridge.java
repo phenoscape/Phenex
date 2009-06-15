@@ -75,6 +75,7 @@ public class OBDModelBridge {
 	
 	public static String HAS_CURATORS_REL_ID = "PHENOSCAPE:has_curators";
 	public static String HAS_COMMENT_REL_ID = "PHENOSCAPE:has_comment";
+	private static final String HAS_NUMBER_REL_ID = "PHENOSCAPE:has_number";
 	
 	private static TermVocabulary vocab = new TermVocabulary();
 	private static RelationVocabulary relationVocabulary = new RelationVocabulary();
@@ -153,12 +154,15 @@ public class OBDModelBridge {
 		// link dataset to characters used in that dataset
 		for (Character character : ds.getCharacters()) {
 			// if (character.toString().length() > 0) {
+			int charNumber = ds.getCharacters().indexOf(character) + 1;
 			String cid = UUID.randomUUID().toString();
 			Node characterNode = createInstanceNode(cid, CHARACTER_TYPE_ID);
 			characterNode.setLabel(character.getLabel());
 			String charComment = character.getComment();
 			LiteralStatement chCommentStmt = new LiteralStatement(characterNode.getId(), HAS_COMMENT_REL_ID, charComment);
 			characterNode.addStatement(chCommentStmt);
+			LiteralStatement chNumberStmt = new LiteralStatement(characterNode.getId(), HAS_NUMBER_REL_ID, charNumber + "");
+			characterNode.addStatement(chNumberStmt);
 			characterIdMap.put(character, cid);
 			LinkStatement ds2c = new LinkStatement(dsId, HAS_CHARACTER_REL_ID,
 					cid);

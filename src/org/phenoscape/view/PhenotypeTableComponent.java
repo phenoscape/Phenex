@@ -2,7 +2,12 @@ package org.phenoscape.view;
 
 import java.awt.BorderLayout;
 import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -19,8 +24,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
+import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
+import org.obo.util.TermUtil;
 import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.State;
@@ -28,7 +35,9 @@ import org.phenoscape.model.TermSet;
 import org.phenoscape.swing.BugWorkaroundTable;
 import org.phenoscape.swing.PlaceholderRenderer;
 import org.phenoscape.swing.PopupListener;
+import org.phenoscape.util.TermSelection;
 
+import phenote.datamodel.OboUtil;
 import phenote.gui.SortDisabler;
 import phenote.gui.TableColumnPrefsSaver;
 import ca.odell.glazedlists.EventList;
@@ -170,6 +179,43 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
             this.tableFormat.setColumnValue(phenotype, pce.getTerm(), column);
         }
     }
+    
+    private void copyTermAtPoint(Point p) {
+        final int column = this.phenotypesTable.getTableHeader().columnAtPoint(p);
+        final int row = this.phenotypesTable.rowAtPoint(p);
+        if (!this.tableFormat.getColumnClass(column).equals(OBOObject.class)) return;
+        final Phenotype phenotype = this.getController().getPhenotypesForCurrentStateSelection().get(row);
+        final OBOClass term = (OBOClass)(this.tableFormat.getColumnValue(phenotype, column));
+        final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        final TermSelection termSelection = new TermSelection(term);
+        log().debug("Putting term on clipboard: " + term);
+        clipboard.setContents(termSelection, null);
+    }
+    
+    
+    private void pasteTermAtPoint(Point p) {
+        final int column = this.phenotypesTable.getTableHeader().columnAtPoint(p);
+        final int row = this.phenotypesTable.rowAtPoint(p);
+        if (!this.tableFormat.getColumnClass(column).equals(OBOObject.class)) return;
+        final Phenotype phenotype = this.getController().getPhenotypesForCurrentStateSelection().get(row);
+        final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        if (Arrays.asList(clipboard.getAvailableDataFlavors()).contains(TermSelection.termFlavor)) {
+            try {
+                final Object data = clipboard.getData(TermSelection.termFlavor);
+                //final IdentifiedObject obj = this.getController().getOntologyController().getOBOSession().getObject(data.toString());
+                if (data instanceof OBOClass) {
+                    final OBOClass term = (OBOClass)data;
+                    this.tableFormat.setColumnValue(phenotype, term, column);
+                } else {
+                    log().error("The object on the clipboard was not an OBOClass");
+                }
+            } catch (UnsupportedFlavorException e) {
+                log().error("The clipboard didn't have the term flavor, although it said it did", e);
+            } catch (IOException e) {
+                log().error("Couldn't read from the clipboard", e);
+            }
+        }
+    }
 
     private JToolBar createToolBar() {
         final JToolBar toolBar = new JToolBar();
@@ -193,6 +239,16 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
 
     private JPopupMenu createTablePopupMenu() {
         final JPopupMenu menu = new JPopupMenu();
+        menu.add(new AbstractAction("Copy Term") {
+            public void actionPerformed(ActionEvent e) {
+                copyTermAtPoint(tablePopup.getLocation());
+            }
+        });
+        menu.add(new AbstractAction("Paste Term") {
+            public void actionPerformed(ActionEvent e) {
+                pasteTermAtPoint(tablePopup.getLocation());
+            }
+        });
         menu.add(new AbstractAction("Edit Post-composed Term") {
             public void actionPerformed(ActionEvent e) {
                 runPostCompositionForTermAtPoint(tablePopup.getLocation());
@@ -328,7 +384,6 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
 
     }
 
-    @SuppressWarnings("unused")
     private Logger log() {
         return Logger.getLogger(this.getClass());
     }

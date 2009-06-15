@@ -37,6 +37,7 @@ public class AnatomyTermFilter implements TermFilter {
         "TAO:0001738", //fontanel
         "TAO:0001920", //pseudotympanum
         "TAO:0005120", //peritoneum
+        "TAO:0001996", //maxillary canal
         "PATO:0000462", //absent
         "PATO:0000467", //present
         "PATO:0000052", //shape

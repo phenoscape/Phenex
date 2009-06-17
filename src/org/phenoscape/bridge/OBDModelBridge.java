@@ -116,7 +116,7 @@ public class OBDModelBridge {
 		
 		for (Taxon t : ds.getTaxa()) {
 			// avoid uploading taxa without names; Cartik1.0
-			if (t.getValidName() != null
+			if (t.getValidName() != null && t.getValidName().getName() != null
 					&& t.getValidName().getName().length() > 0) {
 				Node tn = translate(t);
 				if (tn.getId() != null) {

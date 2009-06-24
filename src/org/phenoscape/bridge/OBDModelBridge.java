@@ -199,10 +199,12 @@ public class OBDModelBridge {
 						graph.addStatement(s2p);
 					}
 					else{
-						bw.append("Invalid phenotype " + p + " for state " + state + "\n" );
-						bw.append("Entity of invalid phenotype is " + p.getEntity() + " Quality of invalid phenotype is " + p.getQuality());
+						bw.append("Invalid phenotype for state " + state + 
+								" and character " + character + "\n" );
+						bw.append("  Entity of invalid phenotype is " + p.getEntity() + 
+								" Quality of invalid phenotype is " + p.getQuality());
 						if(p.getMeasurement() != null && p.getUnit() == null){
-							bw.append(" Units not specified for measurement " + p.getMeasurement());
+							bw.append("  Units not specified for measurement " + p.getMeasurement());
 						}
 						bw.append("\n");
 					}

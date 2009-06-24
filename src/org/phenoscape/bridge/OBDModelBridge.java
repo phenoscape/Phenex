@@ -109,7 +109,8 @@ public class OBDModelBridge {
 		phenotypeIdMap = new HashMap<Phenotype, String>();
 		// Dataset metadata
 		
-		bw.append(dataFile.getName().toUpperCase() + "\n\n");
+		bw.append("\n\n" + dataFile.getName().toUpperCase() + 
+				"\n-----------------------------------------\n\n");
 		
 		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
 		String curators = ds.getCurators();
@@ -157,7 +158,7 @@ public class OBDModelBridge {
 				}
 			}
 			else{
-				bw.append("NULL value for taxon " + t + "\n");
+				bw.append("Usable name not specified for taxon with publication name: " + t.getPublicationName() + "\n");
 			}
 		}
 

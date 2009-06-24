@@ -1,8 +1,10 @@
 package org.phenoscape.bridge;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -41,6 +43,7 @@ public class OBDModelBridgeTest {
 		NeXMLReader reader;
 		DataSet ds;
 		Graph g;
+		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("problemLog.txt")));
 		String basePath = "/home/cartik/Desktop/PerlScripts/trunk/data";
 		File baseDataDir = new File(basePath);
 		int i = 0;
@@ -71,7 +74,7 @@ public class OBDModelBridgeTest {
 								+ dataFile.getAbsolutePath());
 						reader = new NeXMLReader(dataFile, oc.getOBOSession());
 						ds = reader.getDataSet();
-						bridge.translate(ds, dataFile);
+						bridge.translate(ds, dataFile, bw);
 						g = bridge.getGraph();
 						obdsql.putGraph(g);
 						// s.putGraph(g);
@@ -89,11 +92,12 @@ public class OBDModelBridgeTest {
 	// ignoring this test because it requires special setup
 	public void testOBDSave() throws XmlException, IOException, SQLException,
 			ClassNotFoundException {
+		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("problemLog.txt")));
 		OntologyController oc = new OntologyController();
 		NeXMLReader reader = new NeXMLReader(new File("?"), oc.getOBOSession());
 		DataSet ds = reader.getDataSet();
 		OBDModelBridge bridge = new OBDModelBridge();
-		bridge.translate(ds, new File("?"));
+		bridge.translate(ds, new File("?"), bw);
 		Graph g = bridge.getGraph();
 
 		Shard shard = new OBDSQLShard();

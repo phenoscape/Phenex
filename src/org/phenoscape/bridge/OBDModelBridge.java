@@ -157,9 +157,6 @@ public class OBDModelBridge {
 					}
 				}
 			}
-			else{
-				bw.append("Usable name not specified for taxon with publication name: " + t.getPublicationName() + "\n");
-			}
 		}
 
 		// link dataset to characters used in that dataset
@@ -198,16 +195,6 @@ public class OBDModelBridge {
 								HAS_PHENOTYPE_REL_ID, cd.getId());
 						graph.addStatement(s2p);
 					}
-					else{
-						bw.append("Invalid phenotype for state " + state + 
-								" and character " + character + "\n" );
-						bw.append("  Entity of invalid phenotype is " + p.getEntity() + 
-								" Quality of invalid phenotype is " + p.getQuality());
-						if(p.getMeasurement() != null && p.getUnit() == null){
-							bw.append("  Units not specified for measurement " + p.getMeasurement());
-						}
-						bw.append("\n");
-					}
 				}
 			}
 		}
@@ -218,6 +205,7 @@ public class OBDModelBridge {
 				State state = ds.getStateForTaxon(t, c);
 				if (state == null) {
 					// System.err.println("no state for t:"+t+" char:"+c);
+					bw.append("STATE not specified for TAXON '" + t.getPublicationName() + "' and CHARACTER '" + c + "'\n");
 					continue;
 				}
 				for (Phenotype p : state.getPhenotypes()) {
@@ -240,6 +228,21 @@ public class OBDModelBridge {
 						LinkStatement cell2s = new LinkStatement(cellNode.getId(),
 								CELL_TO_STATE_REL_ID, stateIdMap.get(state)); 
 						graph.addStatement(cell2s);
+					}
+					else{
+						bw.append("Invalid phenotype for STATE '" + state + 
+								"' and CHARACTER '" + c + "' in TAXON '");
+						if(t.getValidName() == null)
+							bw.append(t.getPublicationName() + "' [Valid name not specified for taxon. " +
+									"This is the publication name]\n");
+						else
+							bw.append(t + "'\n");
+						bw.append("  ENTITY of invalid phenotype is '" + p.getEntity() + 
+								"' QUALITY of invalid phenotype is " + p.getQuality());
+						if(p.getMeasurement() != null && p.getUnit() == null){
+							bw.append("'  Units not specified for MEASUREMENT '" + p.getMeasurement());
+						}
+						bw.append("'\n");
 					}
 				}
 			}

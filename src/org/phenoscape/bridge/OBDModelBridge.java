@@ -3,6 +3,7 @@ package org.phenoscape.bridge;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,6 +77,9 @@ public class OBDModelBridge {
 	public static String HAS_CURATORS_REL_ID = "PHENOSCAPE:has_curators";
 	public static String HAS_COMMENT_REL_ID = "PHENOSCAPE:has_comment";
 	private static final String HAS_NUMBER_REL_ID = "PHENOSCAPE:has_number";
+	private static final String HAS_COUNT_REL_ID = "PHENOSCAPE:has_count";
+	private static final String HAS_MSRMNT_REL_ID = "PHENOSCAPE:has_measurement";
+	private static final String HAS_UNIT_REL_ID = "PHENOSCAPE:has_unit";
 	
 	private static TermVocabulary vocab = new TermVocabulary();
 	private static RelationVocabulary relationVocabulary = new RelationVocabulary();
@@ -95,7 +99,7 @@ public class OBDModelBridge {
 		this.graph = graph;
 	}
 
-	public Graph translate(DataSet ds, File dataFile) {
+	public Graph translate(DataSet ds, File dataFile, BufferedWriter bw) throws IOException{
 		String dsId = UUID.randomUUID().toString();
 		graph = new Graph();
 		phenotypes = new HashSet<LinkStatement>();
@@ -104,6 +108,9 @@ public class OBDModelBridge {
 		taxonIdMap = new HashMap<Taxon, String>();
 		phenotypeIdMap = new HashMap<Phenotype, String>();
 		// Dataset metadata
+		
+		bw.append(dataFile.getName().toUpperCase() + "\n\n");
+		
 		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
 		String curators = ds.getCurators();
 		Node pubNode = createInstanceNode(ds.getPublication(),
@@ -149,6 +156,9 @@ public class OBDModelBridge {
 					}
 				}
 			}
+			else{
+				bw.append("NULL value for taxon " + t + "\n");
+			}
 		}
 
 		// link dataset to characters used in that dataset
@@ -180,15 +190,20 @@ public class OBDModelBridge {
 						sid);
 				graph.addStatement(c2s);
 				for (Phenotype p : state.getPhenotypes()) {
-					// a minimal check: Cartik1.0
-					if (p.getEntity() != null && p.getQuality() != null) {
-						CompositionalDescription cd = translate(p);
-						if (cd.getId() != null && cd.getId().length() > 0) {
-							phenotypeIdMap.put(p, cd.getId());
-							LinkStatement s2p = new LinkStatement(sid,
-									HAS_PHENOTYPE_REL_ID, cd.getId());
-							graph.addStatement(s2p);
+					CompositionalDescription cd = translate(p);
+					if (cd != null && cd.getId() != null && cd.getId().length() > 0) {
+						phenotypeIdMap.put(p, cd.getId());
+						LinkStatement s2p = new LinkStatement(sid,
+								HAS_PHENOTYPE_REL_ID, cd.getId());
+						graph.addStatement(s2p);
+					}
+					else{
+						bw.append("Invalid phenotype " + p + " for state " + state + "\n" );
+						bw.append("Entity of invalid phenotype is " + p.getEntity() + " Quality of invalid phenotype is " + p.getQuality());
+						if(p.getMeasurement() != null && p.getUnit() == null){
+							bw.append(" Units not specified for measurement " + p.getMeasurement());
 						}
+						bw.append("\n");
 					}
 				}
 			}
@@ -232,7 +247,7 @@ public class OBDModelBridge {
 		return graph;
 	}
 
-	public CompositionalDescription translate(Phenotype p) {
+	public CompositionalDescription translate(Phenotype p) throws IOException {
 		OBOClass e = p.getEntity();
 		OBOClass q = p.getQuality();
 		OBOClass e2 = p.getRelatedEntity();
@@ -240,6 +255,16 @@ public class OBDModelBridge {
 		Integer count = p.getCount();
 		Float m = p.getMeasurement();
 
+		if(e == null){
+			return null;
+		}
+		if(q == null){
+			return null;
+		}
+		if (m != null && u == null){
+			return null;
+		}
+			// cd.addArgument("has_measurement",m);
 		CompositionalDescription cd = new CompositionalDescription(
 				Predicate.INTERSECTION);
 		cd.addArgument(q.getID());
@@ -250,14 +275,12 @@ public class OBDModelBridge {
 		}
 		if (e2 != null)
 			cd.addArgument(relationVocabulary.towards(), translateOBOClass(e2));
-		if (false) {
-			if (u == null && m != null) {
-				// TODO : throw
-			}
-			if (m != null) {
-				cd.addArgument("has_unit", u.getID());
-				// cd.addArgument("has_measurement",m);
-			}
+		if(count != null){
+			cd.addArgument(HAS_COUNT_REL_ID, count + "");
+		}
+		if(m != null && u != null){
+			cd.addArgument(HAS_MSRMNT_REL_ID, m + "");
+			cd.addArgument(HAS_UNIT_REL_ID, u.getName());
 		}
 		cd.setId(cd.generateId());
 		getGraph().addStatements(cd);

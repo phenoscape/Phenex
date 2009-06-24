@@ -1,6 +1,8 @@
 package org.phenoscape.bridge;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,9 +32,13 @@ public class PhenoscapeDataLoader {
     public static final String DB_PASSWORD = "db-password";
     /** The ontology-dir system property should contain the path to a folder with ontologies to be loaded. */
     public static final String ONTOLOGY_DIR = "ontology-dir";
+    /** The file-loc system property should contain the path to where the error log will be stored. */
+    public static final String FILE_LOC = "file-loc";
     
     private Shard shard;
     private OBOSession session;
+    
+    private String file = System.getProperty(FILE_LOC) + "/problemLog.txt";
 
     public PhenoscapeDataLoader() throws SQLException, ClassNotFoundException {
         this.shard = this.initializeShard();
@@ -41,16 +47,20 @@ public class PhenoscapeDataLoader {
 
     public static void main(String[] args) throws XmlException, IOException, SQLException, ClassNotFoundException {
         PhenoscapeDataLoader pdl = new PhenoscapeDataLoader();
-        pdl.processDataFolder(new File(args[0]));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(pdl.file)));
+        bw.write("PROBLEM LOG" + "\n\n\n");
+        pdl.processDataFolder(new File(args[0]), bw);
+        bw.flush();
+        bw.close();
     }
 
-    private void processDataFolder(File folder) {
+    private void processDataFolder(File folder, BufferedWriter bw) {
         for (File file : folder.listFiles()) {
             if (file.isDirectory()) {
-                this.processDataFolder(file);
+                this.processDataFolder(file, bw);
             } else if (file.getName().endsWith(".xml")) {
                 try {
-                    this.processDataFile(file);
+                    this.processDataFile(file, bw);
                 } catch (XmlException e) {
                     log().error("Failed parsing " + file, e);
                 } catch (IOException e) {
@@ -63,12 +73,12 @@ public class PhenoscapeDataLoader {
         }
     }
 
-    private void processDataFile(File file) throws XmlException, IOException {
+    private void processDataFile(File file, BufferedWriter bw) throws XmlException, IOException {
         log().info("Started work with " + file.getAbsolutePath());
         NeXMLReader reader = new NeXMLReader(file, this.session);
         DataSet ds = reader.getDataSet();
         OBDModelBridge bridge = new OBDModelBridge();
-        Graph g = bridge.translate(ds, file);
+        Graph g = bridge.translate(ds, file, bw);
         this.shard.putGraph(g);
         log().info(g.getStatements().size() + " records added");
     }

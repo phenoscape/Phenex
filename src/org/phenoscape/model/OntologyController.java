@@ -107,7 +107,7 @@ public class OntologyController {
     public TermSet getEntityTermSet() {
         if (this.entityTermSet == null) {
             final TermSet terms = this.getTermSet(TAO, SPATIAL, PATO, GO);
-            terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
+            //terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
             this.entityTermSet = terms;
         }
         
@@ -117,7 +117,7 @@ public class OntologyController {
     public TermSet getQualityTermSet() {
         if (this.qualityTermSet == null) {
             final TermSet terms = this.getTermSet(PATO);
-            terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
+            //terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
             this.qualityTermSet = terms;
         }
         return this.qualityTermSet;

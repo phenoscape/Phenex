@@ -2,7 +2,6 @@ package org.phenoscape.bridge;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -258,7 +257,9 @@ public class OBDModelBridge {
 		OBOClass q = p.getQuality();
 		OBOClass e2 = p.getRelatedEntity();
 		OBOClass u = p.getUnit();
-		Integer count = p.getCount();
+		// we are temporarily using the comment field to store count information,
+		// which often contains non-integer characters such as > or <
+		String count = p.getComment();
 		Float m = p.getMeasurement();
 
 		if(e == null){

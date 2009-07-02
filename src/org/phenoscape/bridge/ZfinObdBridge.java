@@ -22,6 +22,7 @@ import org.obd.model.CompositionalDescription;
 import org.obd.model.Graph;
 import org.obd.model.LinkStatement;
 import org.obd.model.Node;
+import org.obd.model.NodeAlias;
 import org.obd.model.Node.Metatype;
 import org.obd.query.Shard;
 import org.obd.query.impl.OBDSQLShard;
@@ -53,6 +54,8 @@ public class ZfinObdBridge {
     public static final String MISSING_MARKERS_URL = "missing-markers-url";
     /** The genotype-url system property should contain the URL of the ZFIN genotypes file. */
     public static final String GENOTYPE_URL = "genotype-url";
+    /** The gene-name-url system property should contain the URL of the ZFIN genetic markers file. */
+    public static final String GENE_NAME_URL = "gene-name-url"; 
 
     public static final String DATASET_TYPE_ID = "cdao:CharacterStateDataMatrix";
     public static final String GENOTYPE_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits";
@@ -68,18 +71,21 @@ public class ZfinObdBridge {
     private Graph graph;
     private OBOSession oboSession;
     
+    private Map<String, String> zfinGeneIdToNameMap;
     /*
      * This map has been created to keep track of main IDs and their mapping to alternate IDs
      * These are stored in key=ALTERNATE-ID value=ID format 
      */
     private Map<String, String> id2AlternateIdMap;
     
-    public ZfinObdBridge() throws SQLException, ClassNotFoundException {
+    public ZfinObdBridge() throws SQLException, ClassNotFoundException, IOException {
         super();
         this.shard = this.initializeShard();
         this.graph = new Graph();
         this.setOboSession(this.loadOBOSession());
         this.id2AlternateIdMap = createAltIdMappings(this.getOboSession());
+        this.zfinGeneIdToNameMap = new HashMap<String, String>();
+        this.createZfinNameDirectory();
     }
 
     public OBOSession getOboSession() {
@@ -90,6 +96,20 @@ public class ZfinObdBridge {
         this.oboSession = oboSession;
     }
 
+    private void createZfinNameDirectory() throws IOException{
+    	URL geneticMarkersURL = new URL(System.getProperty(GENE_NAME_URL));
+    	BufferedReader reader = new BufferedReader(new InputStreamReader(geneticMarkersURL.openStream()));
+    	String line, zfinId, zfinName; 
+    	while((line = reader.readLine()) != null){
+    		if(line.startsWith("ZDB-GENE")){
+    			String[] lineComps = line.split("\\t");
+    			zfinId = lineComps[0];
+    			zfinName = lineComps[2];
+    			this.zfinGeneIdToNameMap.put(zfinId, zfinName);
+    		}
+    	}
+    }
+    
     public void loadZfinData() throws MalformedURLException, IOException {
         String phenoFileLine, genoFileLine, missingMarkersFileLine;
         LinkStatement geneAnnotLink;
@@ -110,19 +130,33 @@ public class ZfinObdBridge {
                 missingMarkersURL.openStream()));
 
         while ((genoFileLine = br2.readLine()) != null) {
-            String geneID = "", geneName = "";
+            String geneID = "", geneName = null, geneSymbol = "";
             String[] gComps = genoFileLine.split("\\t");
             String genotypeID = normalizetoZfin(gComps[0]);
+            NodeAlias na = null;
             if (gComps.length > 9) {
                 geneID = normalizetoZfin(gComps[9]);
-                geneName = gComps[8];
+                geneSymbol = gComps[8];
+                if(this.zfinGeneIdToNameMap.get(gComps[9]) != null){
+                	geneName = zfinGeneIdToNameMap.get(gComps[9]);
+                }
             }
 
             if (geneID != null && geneID.trim().length() > 0) {
                 Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
-                geneNode.setLabel(geneName);
-                graph.addNode(geneNode);
+                if(geneName == null){
+                	geneNode.setLabel(geneSymbol);
+                }
+                else{
+                	geneNode.setLabel(geneName);
+                	na = new NodeAlias();
+                	na.setNodeId(geneID);
+                	na.setTargetId(geneSymbol);
+                }
                 
+                graph.addNode(geneNode);
+                if(na != null)
+                	graph.addStatement(na);
                 Node genotypeNode = createInstanceNode(genotypeID, GENOTYPE_TYPE_ID);
                 genotypeNode.setLabel(gComps[1]);
                 graph.addNode(genotypeNode);

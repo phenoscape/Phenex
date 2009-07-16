@@ -40,7 +40,7 @@ public class Labelmaker {
     public static final String DB_PASSWORD = "db-password";
     /** The ontology-dir system property should contain the path to a folder with ontologies to be loaded. */
     
-    public final String sqlQuery = 
+    public final String sqlQueryForPostComposedEntities = 
     	"SELECT DISTINCT " +
     	"entity_uid " +
     	"FROM " +
@@ -48,10 +48,34 @@ public class Labelmaker {
     	"WHERE " +
     	"entity_label IS NULL";
     
-    public final String sqlUpdate = 
+    public final String sqlUpdateToFillInGeneratedLabelsForPostComposedEntities = 
     	"UPDATE phenotype_by_entity_character " +
     	"SET entity_label = ? " +
     	"WHERE entity_uid = ?";
+    
+    public final String sqlQueryForPhenotypesWithRelatedEntities = 
+    	"SELECT DISTINCT " +
+    	"phenotype_node.uid AS phenotype, " +
+    	"related_entity_node.node_id AS related_entity_nid, " +
+    	"related_entity_node.uid AS related_entity_uid, " +
+    	"related_entity_node.label AS related_entity_label " +
+    	"FROM " +
+    	"node AS phenotype_node " +
+    	"JOIN (link AS towards_link " +
+    	"JOIN node AS related_entity_node " +
+    	"ON (related_entity_node.node_id = towards_link.object_id AND " +
+    	"	towards_link.predicate_id = (SELECT node_id FROM node WHERE uid = 'OBO_REL:towards'))) " +
+    	"ON (towards_link.node_id = phenotype_node.node_id) " +
+    	"WHERE " +
+    	"phenotype_node.uid LIKE '%('||related_entity_node.uid || ')%'";
+    
+    public final String sqlUpdatePhenotypesWithRelatedEntityInfo = 
+    	"UPDATE phenotype_by_entity_character " +
+    	"SET " +
+    	"related_entity_nid = ?, " +
+    	"related_entity_uid = ?, " +
+    	"related_entity_label = ? " +
+    	"WHERE phenotype_uid = ?";
     
     private AbstractSQLShard shard;
     private Connection conn; 
@@ -123,9 +147,9 @@ public class Labelmaker {
      */
     public void makeLabel() throws SQLException{
     	Statement stmt = conn.createStatement();
-    	ResultSet rs = stmt.executeQuery(sqlQuery);
+    	ResultSet rs = stmt.executeQuery(sqlQueryForPostComposedEntities);
     	
-    	PreparedStatement ps = conn.prepareStatement(sqlUpdate);
+    	PreparedStatement ps = conn.prepareStatement(sqlUpdateToFillInGeneratedLabelsForPostComposedEntities);
 
     	String id, label; 
     	while(rs.next()){
@@ -137,9 +161,41 @@ public class Labelmaker {
     	}
     }
     
+    /**
+     * @PURPOSE This method updates the data warehouse table with information about 
+     * which are associated with the phenotype through comparative relations. For example, 
+     * if fused_with(E1, E2) is a phenotype, this method will update the phenotype with 
+     * information about E2. E1 is associated with the phenotype through the 'OBO_REL:inheres_in'
+     * relation. E2 is associated with the phenotype through the 'OBO_REL:towards' relation.
+     * @throws SQLException
+     */
+    public void updateRelatedEntityInformationForPhenotypes() throws SQLException{
+    	Statement stmt = conn.createStatement();
+    	ResultSet rs = stmt.executeQuery(sqlQueryForPhenotypesWithRelatedEntities);
+    	
+    	PreparedStatement ps = conn.prepareStatement(sqlUpdatePhenotypesWithRelatedEntityInfo);
+    	Integer relatedEntityNid;
+    	String phenotypeUid, relatedEntityUid, relatedEntityLabel;
+    	while(rs.next()){
+    		phenotypeUid = rs.getString(1);
+    		relatedEntityNid = rs.getInt(2);
+    		relatedEntityUid = rs.getString(3);
+    		relatedEntityLabel = rs.getString(4);
+    		if(relatedEntityLabel == null || relatedEntityLabel.length() < 1){
+    			relatedEntityLabel = simpleLabel(relatedEntityUid);
+    		}
+    		ps.setInt(1, relatedEntityNid);
+    		ps.setString(2, relatedEntityUid);
+    		ps.setString(3, relatedEntityLabel);
+    		ps.setString(4, phenotypeUid);
+    		ps.execute();
+    	}
+    }
+    
     public static void main(String[] args) throws SQLException, ClassNotFoundException{
     	Labelmaker lm = new Labelmaker();
     	lm.makeLabel();
+    	lm.updateRelatedEntityInformationForPhenotypes();
     }
 
 }

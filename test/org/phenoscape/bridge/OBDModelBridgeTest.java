@@ -31,6 +31,7 @@ import org.obd.query.impl.OBDSQLShard;
 import org.phenoscape.io.NeXMLReader;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.OntologyController;
+import org.phenoscape.model.Taxon;
 
 public class OBDModelBridgeTest {
 
@@ -127,4 +128,24 @@ public class OBDModelBridgeTest {
 		Assert.assertTrue(annots.size() > 0);
 	}
 
+	/** Date: 071509 Trying to locate source of duplicate TAXON - PHENOTYPE assertions*/
+	@Test
+	public void testMoFileLoad() throws XmlException, IOException{
+		OntologyController oc = new OntologyController();
+		File file = new File("/home/cartik/workspace/OBDAPI/phenoscape/staging/nexml/Siluriformes/Mo_1991_siluroids_Tbl5-8.xml");
+		NeXMLReader reader = new NeXMLReader(file, oc.getOBOSession());
+		DataSet ds = reader.getDataSet();
+		for(Taxon t : ds.getTaxa()){
+			if (t.getValidName() != null && t.getValidName().getName() != null
+					&& t.getValidName().getName().length() > 0) {
+				if (t.toString().equals("Proeutropiichthys taakree"))
+					System.out.println("Found occurrence in the data set");
+				Node tn = new Node(t.getValidName().getID());
+				tn.setLabel(t.getValidName().getName());
+				if(tn.getId().equals("TTO:1051712")){
+					System.out.println(t + "\t\t" + tn + "\t\t" + tn.getId());
+				}
+			}
+		}
+	}
 }

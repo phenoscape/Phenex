@@ -113,6 +113,27 @@ public class Taxon extends AbstractPropertyChangeObject {
         return this.getValidName() != null ? this.getValidName().toString() : "untitled";
     }
 
+    /* TODO Work in Progress
+    @Override
+    public boolean equals(Object o){
+    	if(o == null) return false;
+    	if(o instanceof Taxon){
+    		Taxon otherTaxon = (Taxon)o;
+    		if(otherTaxon.getValidName() != null && 
+    				otherTaxon.getValidName().getID() != null &&
+    				otherTaxon.getValidName().getName() != null){
+    			String otherTaxonName = otherTaxon.getValidName().getName();
+    			String otherTaxonId = otherTaxon.getValidName().getID();
+    			String thisTaxonName = this.getValidName().getName();
+    			String thisTaxonId = this.getValidName().getID();
+    			
+    			if(thisTaxonName.equals(otherTaxonName) && thisTaxonId.equals(otherTaxonId))
+    				return true;
+    		}
+    	}
+    	return false;
+    }
+    */
     public Class<?> getClass(String propertyKey) throws UndefinedKeyException {
         if (propertyKey.equals(VALID_NAME)) {
             return OBOClass.class;

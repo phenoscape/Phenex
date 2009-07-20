@@ -7,7 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.obd.model.CompositionalDescription;
@@ -39,6 +41,19 @@ public class Labelmaker {
     /** The db-password system property should contain the database password. */
     public static final String DB_PASSWORD = "db-password";
     /** The ontology-dir system property should contain the path to a folder with ontologies to be loaded. */
+    
+    /**
+	 * Mapping for how to represent relations used in post-comp differentia when generating a human-readable label.
+	 * If the relation is not in this map, use "of".
+	 */
+	private static final Map<String, String> POSTCOMP_RELATIONS = new HashMap<String, String>();
+    static {
+        POSTCOMP_RELATIONS.put("OBO_REL:connected_to", "on");
+        POSTCOMP_RELATIONS.put("connected_to", "on");
+        POSTCOMP_RELATIONS.put("anterior_to", "anterior to");
+        POSTCOMP_RELATIONS.put("posterior_to", "posterior to");
+        POSTCOMP_RELATIONS.put("adjacent_to", "adjacent to");
+    }
     
     public final String sqlQueryForPostComposedEntities = 
     	"SELECT DISTINCT " +
@@ -125,8 +140,17 @@ public class Labelmaker {
                 return node.getId();
             }
             for (CompositionalDescription differentium : differentiaArguments) {
+                final String relationID = differentium.getRestriction().getRelationId();
+                final String relationSubstitute;
+                if (POSTCOMP_RELATIONS.containsKey(relationID)) {
+                    relationSubstitute = POSTCOMP_RELATIONS.get(relationID);
+                } else {
+                    relationSubstitute = "of";
+                }
                 final StringBuffer buffer = new StringBuffer();
-                buffer.append(" of ");
+                buffer.append(" ");
+                buffer.append(relationSubstitute);
+                buffer.append(" ");
                 buffer.append(simpleLabel(differentium.getRestriction().getTargetId()));
                 differentia.add(buffer.toString());
             }

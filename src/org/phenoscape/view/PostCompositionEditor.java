@@ -1,5 +1,6 @@
 package org.phenoscape.view;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -122,21 +123,12 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
         }
     }
 
-    public int runPostCompositionDialog() {
+    public int runPostCompositionDialog(Component parentComponent) {
         if (this.genusBox == null) {
             this.init();
         }
         this.setPreferredSize(new Dimension(300, 200));
-        return JOptionPane.showConfirmDialog(null, this, "Post-composition Editor", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-    }
-
-    private void runPostCompositionForGenus() {
-        final PostCompositionEditor pce = new PostCompositionEditor(this.getController(), this.termSet);
-        pce.setTerm(this.genus);
-        final int result = pce.runPostCompositionDialog();
-        if (result == JOptionPane.OK_OPTION) {
-            this.genusBox.setValue(pce.getTerm());
-        }
+        return JOptionPane.showConfirmDialog(parentComponent, this, "Post-composition Editor", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     }
 
     private void runPostCompositionForTermAtPoint(Point p) {
@@ -147,7 +139,7 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
         final OBOClass term = (OBOClass)(this.tableFormat.getColumnValue(differentia, column));
         final PostCompositionEditor pce = new PostCompositionEditor(this.getController(), this.termSet);
         pce.setTerm(term);
-        final int result = pce.runPostCompositionDialog();
+        final int result = pce.runPostCompositionDialog(this);
         if (result == JOptionPane.OK_OPTION) {
             this.tableFormat.setColumnValue(differentia, pce.getTerm(), column);
         }
@@ -170,13 +162,6 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
         this.add(this.genusBox, comboConstraints);
         final GridBagConstraints postComposeGenusConstraints = new GridBagConstraints();
         postComposeGenusConstraints.gridx = 2;
-        final JButton postComposeGenusButton = new JButton();
-        postComposeGenusButton.setAction(new AbstractAction("PC...") {
-            public void actionPerformed(ActionEvent e) {
-                runPostCompositionForGenus();
-            }
-        });
-        //this.add(postComposeGenusButton, postComposeGenusConstraints);
         this.tableFormat = new DifferentiaTableFormat();
         final EventTableModel<Differentium> model = new EventTableModel<Differentium>(this.diffs, this.tableFormat);
         this.diffTable = new BugWorkaroundTable(model);

@@ -24,10 +24,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
-import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
-import org.obo.util.TermUtil;
 import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.State;
@@ -37,7 +35,6 @@ import org.phenoscape.swing.PlaceholderRenderer;
 import org.phenoscape.swing.PopupListener;
 import org.phenoscape.util.TermSelection;
 
-import phenote.datamodel.OboUtil;
 import phenote.gui.SortDisabler;
 import phenote.gui.TableColumnPrefsSaver;
 import ca.odell.glazedlists.EventList;
@@ -174,7 +171,7 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
         final OBOClass term = (OBOClass)(this.tableFormat.getColumnValue(phenotype, column));
         final PostCompositionEditor pce = new PostCompositionEditor(this.getController(), this.tableFormat.getColumnTermSet(column));
         pce.setTerm(term);
-        final int result = pce.runPostCompositionDialog();
+        final int result = pce.runPostCompositionDialog(this);
         if (result == JOptionPane.OK_OPTION) {
             this.tableFormat.setColumnValue(phenotype, pce.getTerm(), column);
         }

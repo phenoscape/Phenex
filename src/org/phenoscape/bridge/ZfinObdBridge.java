@@ -30,10 +30,9 @@ import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.Dbxref;
 import org.obo.datamodel.IdentifiedObject;
-import org.obo.datamodel.Namespace;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOSession;
-import org.obo.datamodel.Type;
+import org.obo.util.TermUtil;
 import org.purl.obo.vocab.RelationVocabulary;
 
 public class ZfinObdBridge {
@@ -64,7 +63,6 @@ public class ZfinObdBridge {
     public static String HAS_PUB_REL_ID = "PHENOSCAPE:has_publication";
     public static final String GENOTYPE_TYPE_ID = "SO:0001027";
     public static final String GENE_TYPE_ID = "SO:0000704";
-    private static final String TELEOST_ANATOMY = "teleost_anatomy";
     private static final RelationVocabulary relationVocabulary = new RelationVocabulary();
 
     private Shard shard;
@@ -217,7 +215,8 @@ public class ZfinObdBridge {
             	Set<LinkStatement> diffs = new HashSet<LinkStatement>();
             	if (entity1Id != null) {
             		String taoId = getEquivalentTAOID(entity1Id);
-            		String target = taoId != null?taoId : entity1Id;
+            		String target = taoId.equals("Not found")?entity1Id : taoId;
+            		log().trace("Replacing " + entity1Id + " with " + target);
             		if(id2AlternateIdMap.containsKey(target)){
                     	log().info("Replacing alternate ID: " + target);
                     	target = id2AlternateIdMap.get(target);
@@ -230,7 +229,7 @@ public class ZfinObdBridge {
             	}
             	if (towardsId != null) {
             		String taoId = getEquivalentTAOID(towardsId);
-            		String target = taoId != null?taoId : towardsId;
+            		String target = taoId.equals("Not found")?towardsId : taoId;
             		if(target != null && target.trim().length() > 0 && target.matches("[A-Z]+:[0-9]+")){
             			if(id2AlternateIdMap.containsKey(target)){
                         	log().info("Replacing alternate ID: " + target);
@@ -305,22 +304,22 @@ public class ZfinObdBridge {
         this.shard.putGraph(graph);
     }
 
+    /**
+     * Finds the equivalent TAO term for the given ZFA term
+     * @param entityId
+     * @return
+     */
     public String getEquivalentTAOID(String entityId) {
-        for(IdentifiedObject io : oboSession.getObjects()){
-            Namespace ns = io.getNamespace();
-            Type<OBOClass> type = io.getType();
-            if(ns != null && ns.toString().equals(TELEOST_ANATOMY) &&
-                    type.toString().equals("obo:TERM")){
-                OBOClass oClass = (OBOClass)io;
-                for(Dbxref dbx : oClass.getDbxrefs()){
-                    String zfaId = dbx.getDatabase().toString() + ":" + dbx.getDatabaseID().toString();
-                    if(zfaId.equals(entityId)){
-                        return oClass.getID();
-                    }
-                }
-            }
+    	for(OBOClass oboClass : TermUtil.getTerms(oboSession)){
+         	if(oboClass.getID().equals(entityId)){
+         		for(Dbxref dbx : oboClass.getDbxrefs()){
+         			if(dbx.getDatabase().toString().equals("TAO")){
+         				return dbx.getDatabase().toString() + ":" + dbx.getDatabaseID().toString();
+         			}
+         		}
+         	}
         }
-        return null;
+        return "Not found";
     }
 
     /**

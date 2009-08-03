@@ -110,7 +110,7 @@ public class AutocompleteField<T> extends JComponent {
     protected void fireActionPerformed() {
         if (!this.hasBeenEdited) return;
         for (ActionListener l : this.actionListeners) {
-            l.actionPerformed(new ActionEvent(this, 42, "value changed")); //TODO should the int be different every time?
+            l.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "value changed"));
         }
     }
     
@@ -277,7 +277,7 @@ public class AutocompleteField<T> extends JComponent {
 
     }
 
-    private class AutocompleteTextField extends TabActionTextField {
+    private class AutocompleteTextField extends JTextField {
 
         @Override
         public void setText(String t) {

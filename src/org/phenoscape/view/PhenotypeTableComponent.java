@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -34,6 +37,7 @@ import org.phenoscape.swing.BugWorkaroundTable;
 import org.phenoscape.swing.PlaceholderRenderer;
 import org.phenoscape.swing.PopupListener;
 import org.phenoscape.util.TermSelection;
+import org.phenoscape.util.TermTransferObject;
 
 import phenote.gui.SortDisabler;
 import phenote.gui.TableColumnPrefsSaver;
@@ -198,10 +202,12 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
         final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         if (Arrays.asList(clipboard.getAvailableDataFlavors()).contains(TermSelection.termFlavor)) {
             try {
+                clipboard.getData(DataFlavor.stringFlavor);
+                log().debug("Made it past string flavor");
                 final Object data = clipboard.getData(TermSelection.termFlavor);
                 //final IdentifiedObject obj = this.getController().getOntologyController().getOBOSession().getObject(data.toString());
-                if (data instanceof OBOClass) {
-                    final OBOClass term = (OBOClass)data;
+                if (data instanceof TermTransferObject) {
+                    final OBOClass term = ((TermTransferObject)data).getTerm(this.getController().getOntologyController().getOBOSession());
                     this.tableFormat.setColumnValue(phenotype, term, column);
                 } else {
                     log().error("The object on the clipboard was not an OBOClass");

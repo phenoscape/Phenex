@@ -10,26 +10,26 @@ import org.obo.datamodel.OBOClass;
 
 public class TermSelection implements Transferable {
     
-    private final OBOClass term;
+    private final TermTransferObject term;
+    private final String termName;
     public static DataFlavor termFlavor = createTermFlavor();
 
     public TermSelection(OBOClass term) {
-        this.term = term;
+        this.term = new TermTransferObject(term);
+        this.termName = term.getName();
     }
 
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+        log().debug("Is flavor supported? " + flavor + ": " + (this.isDataFlavorSupported(flavor)));
         if (this.isDataFlavorSupported(flavor)) {
             log().debug("Returning the term: " + this.term);
             if (flavor instanceof TermFlavor) {
                 return this.term;
             } else if (flavor.equals(DataFlavor.stringFlavor)) {
-                return this.term.getName();
-            } else {
-                return null;
+                return this.termName;
             }
-        } else {
-            throw new UnsupportedFlavorException(flavor);
-        }
+        } 
+        throw new UnsupportedFlavorException(flavor);
     }
 
     public DataFlavor[] getTransferDataFlavors() {
@@ -37,7 +37,6 @@ public class TermSelection implements Transferable {
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        log().debug("Is flavor supported? " + flavor + ": " + (flavor instanceof TermFlavor));
         if (flavor instanceof TermFlavor) {
             return true;
         } else if (flavor.equals(DataFlavor.stringFlavor)) {
@@ -58,11 +57,14 @@ public class TermSelection implements Transferable {
     public static class TermFlavor extends DataFlavor {
         
         public TermFlavor() throws ClassNotFoundException {
-            super(DataFlavor.javaJVMLocalObjectMimeType + ";class=" + OBOClass.class.getName());
+            //super(DataFlavor.javaJVMLocalObjectMimeType + ";class=" + OBOClass.class.getName());
+            super(TermTransferObject.class, "OBO Term Transfer Object");
         }
+        
     }
-
+    
     private static Logger log() {
         return Logger.getLogger(TermSelection.class);
     }
+    
 }

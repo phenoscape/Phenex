@@ -18,7 +18,6 @@ import org.obd.model.Node;
 import org.obd.model.Statement;
 import org.obd.model.CompositionalDescription.Predicate;
 import org.obd.model.Node.Metatype;
-import org.obd.model.vocabulary.TermVocabulary;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.OBOClass;
 import org.obo.util.ReasonerUtil;
@@ -80,7 +79,6 @@ public class OBDModelBridge {
 	private static final String HAS_MSRMNT_REL_ID = "PHENOSCAPE:has_measurement";
 	private static final String HAS_UNIT_REL_ID = "PHENOSCAPE:has_unit";
 	
-	private static TermVocabulary vocab = new TermVocabulary();
 	private static RelationVocabulary relationVocabulary = new RelationVocabulary();
 	private Map<Character, String> characterIdMap;
 	private Map<State, String> stateIdMap;
@@ -111,7 +109,7 @@ public class OBDModelBridge {
 		bw.append("\n\n" + dataFile.getName().toUpperCase() + 
 				"\n-----------------------------------------\n\n");
 		
-		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
+		createInstanceNode(dsId, DATASET_TYPE_ID);
 		String curators = ds.getCurators();
 		Node pubNode = createInstanceNode(ds.getPublication(),
 				PUBLICATION_TYPE_ID);

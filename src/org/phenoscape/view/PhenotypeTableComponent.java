@@ -4,9 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -180,7 +178,7 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
             this.tableFormat.setColumnValue(phenotype, pce.getTerm(), column);
         }
     }
-    
+
     private void copyTermAtPoint(Point p) {
         final int column = this.phenotypesTable.getTableHeader().columnAtPoint(p);
         final int row = this.phenotypesTable.rowAtPoint(p);
@@ -192,8 +190,8 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
         log().debug("Putting term on clipboard: " + term);
         clipboard.setContents(termSelection, null);
     }
-    
-    
+
+
     private void pasteTermAtPoint(Point p) {
         final int column = this.phenotypesTable.getTableHeader().columnAtPoint(p);
         final int row = this.phenotypesTable.rowAtPoint(p);

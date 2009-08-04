@@ -114,7 +114,7 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
       return urls;
     }
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "unused" })
     private Map<String, String> getOntologyPrefs() {
       try {
         final Object obj = PrefObj.getObject(this.getPrefsRoot(), this.field.name());
@@ -139,6 +139,7 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
       this.getPrefsRoot().put(this.field.name(), urlString);
     }
     
+    @SuppressWarnings("unused")
     private void writeOntologyPrefs(Map<String, String> prefs) {
       try {
         PrefObj.putObject(this.getPrefsRoot(), this.field.name(), prefs);

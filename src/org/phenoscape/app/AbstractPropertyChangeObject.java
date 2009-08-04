@@ -66,7 +66,6 @@ public abstract class AbstractPropertyChangeObject implements PropertyChangeObje
      * for a given "property", taking no arguments. If no such method is found, UndefinedKeyException is thrown.
      */
     public Object getValue(String propertyKey) throws UndefinedKeyException {
-        @SuppressWarnings("unchecked")
         final String getter = this.getter(propertyKey);
         final Object item;
         if (this.hasMethod(getter)) {

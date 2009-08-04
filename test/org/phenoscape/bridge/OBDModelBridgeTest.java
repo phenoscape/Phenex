@@ -31,7 +31,6 @@ import org.obd.query.impl.OBDSQLShard;
 import org.phenoscape.io.NeXMLReader;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.OntologyController;
-import org.phenoscape.model.Taxon;
 
 public class OBDModelBridgeTest {
 

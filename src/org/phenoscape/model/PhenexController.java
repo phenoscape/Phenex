@@ -200,7 +200,7 @@ public class PhenexController extends DocumentController {
     }
 
     public void openMergeTaxa() {
-        final JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = this.createFileChooser();
         final int result = fileChooser.showOpenDialog(GUIManager.getManager().getFrame());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
@@ -209,7 +209,7 @@ public class PhenexController extends DocumentController {
     }
 
     public void openMergeCharacters() {
-        final JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = this.createFileChooser();
         final int result = fileChooser.showOpenDialog(GUIManager.getManager().getFrame());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
@@ -218,7 +218,7 @@ public class PhenexController extends DocumentController {
     }
 
     public void openMergeNEXUS() {
-        final JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = this.createFileChooser();
         final int result = fileChooser.showOpenDialog(GUIManager.getManager().getFrame());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
@@ -227,7 +227,7 @@ public class PhenexController extends DocumentController {
     }
 
     public void openMergeNeXML() {
-        final JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = this.createFileChooser();
         final int result = fileChooser.showOpenDialog(GUIManager.getManager().getFrame());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
@@ -236,7 +236,7 @@ public class PhenexController extends DocumentController {
     }
     
     public void exportToExcel() {
-        final JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = this.createFileChooser();
         final int result = fileChooser.showSaveDialog(GUIManager.getManager().getFrame());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();

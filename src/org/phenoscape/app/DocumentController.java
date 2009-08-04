@@ -1,7 +1,10 @@
 package org.phenoscape.app;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -17,6 +20,7 @@ import org.phenoscape.app.UndoController.UnsavedChangesListener;
  */
 public abstract class DocumentController {
 
+    private static final String FILE_CHOOSER_LAST_DIRECTORY_KEY = "FileChooserLastDirectory";
     private File currentFile;
     private final UndoController undo = new UndoController();
     private final DirtyDocumentIndicator dirtyIndicator = new DirtyDocumentIndicator();
@@ -28,7 +32,7 @@ public abstract class DocumentController {
 
     public void open() {
         if (!this.canCloseDocument()) return;
-        final JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = this.createFileChooser();
         final FileFilter filter = new FileFilter() {
             
             @Override
@@ -64,7 +68,7 @@ public abstract class DocumentController {
 
     public void importFile() {
         if (!this.canCloseDocument()) return;
-        final JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = this.createFileChooser();
         final int result = fileChooser.showOpenDialog(this.getWindow());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
@@ -100,7 +104,7 @@ public abstract class DocumentController {
     }
 
     public void saveAs() {
-        final JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = this.createFileChooser();
         final int result = fileChooser.showSaveDialog(this.getWindow());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
@@ -192,6 +196,28 @@ public abstract class DocumentController {
             return true;
         }
         return false;
+    }
+    
+    protected JFileChooser createFileChooser() {
+        final JFileChooser chooser = new JFileChooser(this.getPreviousFileChooserDirectory());
+        chooser.addPropertyChangeListener(JFileChooser.DIRECTORY_CHANGED_PROPERTY, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                storeCurrentFileChooserDirectory(chooser.getCurrentDirectory().getAbsolutePath());
+            }
+        });
+        return chooser;
+    }
+    
+    private String getPreviousFileChooserDirectory() {
+        return this.getFileChooserPrefsNode().get(FILE_CHOOSER_LAST_DIRECTORY_KEY, null);
+    }
+    
+    private void storeCurrentFileChooserDirectory(String path) {
+        this.getFileChooserPrefsNode().put(FILE_CHOOSER_LAST_DIRECTORY_KEY, path);
+    }
+    
+    private Preferences getFileChooserPrefsNode() {
+        return Preferences.userNodeForPackage(this.getClass()).node(getAppName());
     }
     
     private class DirtyDocumentIndicator implements UnsavedChangesListener {

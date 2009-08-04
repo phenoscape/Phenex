@@ -23,6 +23,8 @@ import org.bbop.framework.VetoableShutdownListener;
 import org.bbop.framework.dock.LayoutDriver;
 import org.bbop.framework.dock.idw.IDWDriver;
 import org.jdesktop.swingworker.SwingWorker;
+import org.oboedit.gui.factory.SearchComponentFactory;
+import org.oboedit.gui.factory.SearchResultsComponentFactory;
 import org.oboedit.gui.tasks.DefaultGUIStartupTask;
 import org.phenoscape.app.CrossPlatform;
 import org.phenoscape.model.OntologyController;
@@ -67,6 +69,12 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
     factories.add(new SessionTermInfoFactory());
     factories.add(new PhenoteOntologyTreeEditorFactory());
     factories.add(new PhenoteGraphViewFactory());
+    factories.add(new SearchComponentFactory() {
+        public FactoryCategory getCategory() {
+            return FactoryCategory.ONTOLOGY;
+        }
+    });
+    factories.add(new SearchResultsComponentFactory());
     factories.add(new LogViewComponentFactory());
     return factories;
   }

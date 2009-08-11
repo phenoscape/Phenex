@@ -37,7 +37,7 @@ public class AutocompleteField<T> extends JComponent {
 
     private final AutocompleteComboBox comboBox = new AutocompleteComboBox();
     private final List<ActionListener> actionListeners = new ArrayList<ActionListener>();
-    private final AutocompleteSearcher<T> searcher;
+    private AutocompleteSearcher<T> searcher;
     private final EventList<SearchHit<T>> completeList = new BasicEventList<SearchHit<T>>();
     private final ComboBoxModel comboBoxModel = new EventComboBoxModel<SearchHit<T>>(completeList);
     private Action action;
@@ -61,6 +61,14 @@ public class AutocompleteField<T> extends JComponent {
         this.setLayout(new BorderLayout());
         this.add(this.comboBox, BorderLayout.CENTER);
     }
+    
+    public AutocompleteSearcher<T> getSearcher() {
+        return this.searcher;
+    }
+    
+    public void setSearcher(AutocompleteSearcher<T> newSearcher) {
+        this.searcher = newSearcher;
+    }
 
     public void setValue(T value) {
         this.hasBeenEdited = false;
@@ -72,7 +80,7 @@ public class AutocompleteField<T> extends JComponent {
         this.currentValue = value;
         this.externallySettingText = true;
         this.comboBox.setSelectedItem(null);
-        getEditorField().setText(this.searcher.toString(value));
+        getEditorField().setText(this.getSearcher().toString(value));
     }
 
     public T getValue() {
@@ -127,8 +135,8 @@ public class AutocompleteField<T> extends JComponent {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                searcher.setSearch(getEditorField().getText());
-                final List<SearchHit<T>> matches = searcher.getMatches();
+                getSearcher().setSearch(getEditorField().getText());
+                final List<SearchHit<T>> matches = getSearcher().getMatches();
                 if (!matches.isEmpty()) {
                     //TODO maybe autofill textbox?  only if starts with input?
                 }
@@ -150,10 +158,10 @@ public class AutocompleteField<T> extends JComponent {
     private void setValueWithTextInput(String text) {
         final SearchHit<T> hit;
         // if there is more than one exact hit for the text we want the one we had before
-        if (this.searcher.isSame(text, this.currentValue)) {
-            hit = this.searcher.getAsHit(this.currentValue);
+        if (this.getSearcher().isSame(text, this.currentValue)) {
+            hit = this.getSearcher().getAsHit(this.currentValue);
         } else {
-            hit = this.searcher.getExactHit(text);
+            hit = this.getSearcher().getExactHit(text);
         }
         if (hit != null) {
             comboBox.setSelectedItem(hit);

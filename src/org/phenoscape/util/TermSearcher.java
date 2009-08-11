@@ -34,7 +34,7 @@ public class TermSearcher implements AutocompleteSearcher<OBOObject> {
             return o1.getMatchText().compareTo(o2.getMatchText());
         }
     };
-    
+
     public TermSearcher(Collection<OBOObject> terms) {
         this.terms = terms;
     }
@@ -44,7 +44,7 @@ public class TermSearcher implements AutocompleteSearcher<OBOObject> {
     }
 
     public void setSearch(String input) {
-        matches.clear();
+        this.matches.clear();
         final List<TermHit> startsWith = new ArrayList<TermHit>();
         final List<TermHit> containedIn = new ArrayList<TermHit>();
         final String lowerInput = input.toLowerCase();
@@ -70,8 +70,8 @@ public class TermSearcher implements AutocompleteSearcher<OBOObject> {
         }
         Collections.sort(startsWith, COMPARATOR);
         Collections.sort(containedIn, COMPARATOR);
-        matches.addAll(startsWith);
-        matches.addAll(containedIn);
+        this.matches.addAll(startsWith);
+        this.matches.addAll(containedIn);
     }
 
     public String toString(OBOObject valueObject) {
@@ -91,7 +91,7 @@ public class TermSearcher implements AutocompleteSearcher<OBOObject> {
         }
         return null;
     }
-    
+
     public Class<OBOObject> getHitClass() {
         return OBOObject.class;
     }

@@ -140,6 +140,7 @@ public class OBDModelBridge {
 					for(Specimen s : t.getSpecimens()){
 						//System.out.println(s.toString());
 						if(s.getCollectionCode() != null){
+						    //FIXME should not be relying on toString of Specimen to generate a useful ID for OBD
 							Node specimenNode = createInstanceNode(s.toString(), SPECIMEN_TYPE_ID);
 							LinkStatement otu2specimen = new LinkStatement(otuId, HAS_SPECIMEN_REL_ID, specimenNode.getId());
 							graph.addStatement(otu2specimen);

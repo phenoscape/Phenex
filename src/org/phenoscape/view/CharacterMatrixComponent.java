@@ -1,22 +1,31 @@
 package org.phenoscape.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import org.apache.log4j.Logger;
@@ -28,11 +37,8 @@ import org.phenoscape.model.Taxon;
 import org.phenoscape.swing.BugWorkaroundTable;
 import org.phenoscape.swing.PlaceholderRenderer;
 
-import com.eekboom.utils.Strings;
-
 import phenote.gui.SortDisabler;
 import phenote.util.EverythingEqualComparator;
-
 import ca.odell.glazedlists.CollectionList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -44,10 +50,15 @@ import ca.odell.glazedlists.gui.WritableTableFormat;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 
+import com.eekboom.utils.Strings;
+
 public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 
     private EventTableModel<Taxon> headerModel;
     private EventTableModel<Taxon> matrixTableModel;
+    private JTable matrixTable;
+    private DefaultCellEditor popupEditor;
+    private DefaultCellEditor quickEditor;
     private final SortedList<Taxon> sortedTaxa = new SortedList<Taxon>(this.getController().getDataSet().getTaxa(), new EverythingEqualComparator<Taxon>());
     private final EventList<State> allStates;
     private static enum TaxonDisplay {
@@ -94,17 +105,18 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
         final TableComparatorChooser<Taxon> sortChooser = new TableComparatorChooser<Taxon>(headerTable, this.sortedTaxa, false);
         sortChooser.addSortActionListener(new SortDisabler());
         this.matrixTableModel = new EventTableModel<Taxon>(this.sortedTaxa, new MatrixTableFormat());
-        final JTable matrixTable = new BugWorkaroundTable(this.matrixTableModel);
-        matrixTable.setCellSelectionEnabled(true);
-        matrixTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
-        matrixTable.setDefaultRenderer(State.class, new StateCellRenderer());
+        this.matrixTable = new BugWorkaroundTable(this.matrixTableModel);
+        this.matrixTable.setCellSelectionEnabled(true);
+        this.matrixTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
+        this.matrixTable.setDefaultRenderer(State.class, new StateCellRenderer());
         final JComboBox statesBox = new JComboBox();
         statesBox.setRenderer(new StateListRenderer());
-        final StateCellEditor editor = new StateCellEditor(statesBox);
-        editor.setClickCountToStart(2);
-        matrixTable.setDefaultEditor(State.class, editor);
-        matrixTable.putClientProperty("Quaqua.Table.style", "striped");
-        matrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        this.popupEditor = new PopupStateCellEditor(statesBox);
+        this.popupEditor.setClickCountToStart(2);
+        this.quickEditor = new QuickStateCellEditor(new JTextField());
+        this.matrixTable.setDefaultEditor(State.class, this.popupEditor);
+        this.matrixTable.putClientProperty("Quaqua.Table.style", "striped");
+        this.matrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         this.getController().getDataSet().getCharacters().addListEventListener(new ListEventListener<Character>() {
             public void listChanged(ListEvent<Character> listChanges) {
                 matrixTableModel.fireTableStructureChanged();
@@ -159,9 +171,20 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
                 matrixTableModel.fireTableDataChanged();
             }
         });
+        final JCheckBox editorTypeCheckBox = new JCheckBox("Use quick editor");
+        editorTypeCheckBox.setSelected(false);
+        editorTypeCheckBox.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    matrixTable.setDefaultEditor(State.class, quickEditor);
+                } else {
+                    matrixTable.setDefaultEditor(State.class, popupEditor);
+                }
+            }});
         toolBar.add(taxonBox);
         toolBar.add(characterBox);
         toolBar.add(stateBox);
+        toolBar.add(editorTypeCheckBox);
         toolBar.setFloatable(false);
         return toolBar;
     }
@@ -293,11 +316,11 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 
     }
 
-    private class StateCellEditor extends DefaultCellEditor {
+    private class PopupStateCellEditor extends DefaultCellEditor {
 
         private final DefaultComboBoxModel model = new DefaultComboBoxModel();
 
-        public StateCellEditor(JComboBox comboBox) {
+        public PopupStateCellEditor(JComboBox comboBox) {
             super(comboBox);
             comboBox.setModel(model);
         }
@@ -313,6 +336,100 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
             return super.getTableCellEditorComponent(table, value, isSelected, row, column);
         }
 
+    }
+    
+    private class QuickStateCellEditor extends DefaultCellEditor {
+        
+        private List<State> states = new ArrayList<State>();
+        private State originalValue;
+        private State currentValue;
+        private final JTextField field;
+        private boolean invalid = false;
+
+        public QuickStateCellEditor(JTextField textField) {
+            super(textField);
+            this.field = textField;
+            this.field.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            textField.getDocument().addDocumentListener(new FieldListener());
+        }
+        
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            final Character character = getController().getDataSet().getCharacters().get(column);
+            this.states = character.getStates();
+            final State state = (State)value;
+            final Object newValue = state != null ? state.getSymbol() : null;
+            this.originalValue = state;
+            this.currentValue = state;
+            final Component component = super.getTableCellEditorComponent(table, newValue, isSelected, row, column);
+            this.field.selectAll();
+            return component;
+        }
+
+        @Override
+        public void cancelCellEditing() {
+            this.currentValue = this.originalValue;
+            super.cancelCellEditing();
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return this.currentValue;
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            if (this.getInvalid()) {
+                return false;
+            }
+            return super.stopCellEditing();
+        }
+        
+        private boolean getInvalid() {
+            return this.invalid;
+        }
+        
+        private void setInvalid(boolean value) {
+            this.invalid = value;
+            if (this.invalid) {
+                field.setForeground(Color.RED);
+            } else {
+                field.setForeground(Color.BLACK);
+            }
+        }
+        
+        private class FieldListener implements DocumentListener {
+
+            public void changedUpdate(DocumentEvent e) { this.documentChanged(); }
+
+            public void insertUpdate(DocumentEvent e) { this.documentChanged(); }
+           
+            public void removeUpdate(DocumentEvent e) { this.documentChanged(); }
+            
+            private void documentChanged() {
+                final String text = field.getText();
+                if ((text == null) || (text.equals(""))) {
+                    currentValue = null;
+                    setInvalid(false);
+                } else {
+                    boolean found = false;
+                    for (State state : states) {
+                        if (text.equals(state.getSymbol())) {
+                            currentValue = state;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        setInvalid(false);
+                    } else {
+                        setInvalid(true);
+                    }
+                }
+            }
+            
+        }
+        
     }
 
     private class TaxonRenderer extends TermRenderer {

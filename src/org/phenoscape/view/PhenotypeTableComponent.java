@@ -55,6 +55,7 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
     private PopupListener tablePopup;
     private PhenotypesTableFormat tableFormat;
     private JTable phenotypesTable;
+    private static final String COUNT = "PATO:0000070";
 
     public PhenotypeTableComponent(String id, PhenexController controller) {
         super(id, controller);
@@ -95,6 +96,10 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
         if (state != null) {
             final Phenotype phenotype = state.newPhenotype();
             phenotype.setEntity(this.getAutofillEntity());
+            final OBOClass possibleQuality = this.getAutofillQuality();
+            if ((possibleQuality != null) && (possibleQuality.getID().equals(COUNT))) {
+                phenotype.setQuality(this.getAutofillQuality());
+            }
         }
     }
 
@@ -112,6 +117,26 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
             for (Phenotype phenotype : state.getPhenotypes()) {
                 if (phenotype.getEntity() != null) {
                     return phenotype.getEntity();
+                }
+            }
+        }
+        return null;
+    }
+    
+    private OBOClass getAutofillQuality() {
+        //check current state
+        for (State state : this.getController().getCurrentStatesSelectionModel().getSelected()) {
+            for (Phenotype phenotype : state.getPhenotypes()) {
+                if (phenotype.getQuality() != null) {
+                    return phenotype.getQuality();
+                }
+            }
+        }
+        //then check all states
+        for (State state : this.getController().getStatesForCurrentCharacterSelection()) {
+            for (Phenotype phenotype : state.getPhenotypes()) {
+                if (phenotype.getQuality() != null) {
+                    return phenotype.getQuality();
                 }
             }
         }

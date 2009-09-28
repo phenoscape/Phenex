@@ -37,6 +37,7 @@ public class OntologyController {
     private String REL = "";
     private String REL_PROPOSED = "";
     private String GO = "";
+    private String CHARACTER_SLIM = "";
 
     private TermSet entityTermSet = null;
     private TermSet qualityTermSet = null;
@@ -74,7 +75,8 @@ public class OntologyController {
             this.REL = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro.obo")).toURI().toString();
             this.REL_PROPOSED = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro_proposed.obo")).toURI().toString();
             this.GO = proxy.get(new URL("http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo")).toURI().toString();
-            String[] paths = { TTO, COLLECTION, TAO, PATO, SPATIAL, UNIT, REL, REL_PROPOSED, GO };
+            this.CHARACTER_SLIM = proxy.get(new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/character_slims.obo")).toURI().toString();
+            String[] paths = { TTO, COLLECTION, TAO, PATO, SPATIAL, UNIT, REL, REL_PROPOSED, GO, CHARACTER_SLIM };
             return paths;
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block

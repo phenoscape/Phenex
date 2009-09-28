@@ -5,8 +5,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.obo.datamodel.OBOClass;
+import org.obo.datamodel.TermSubset;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.Phenotype;
@@ -14,10 +18,10 @@ import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 
-import com.eekboom.utils.Strings;
-
 import phenote.datamodel.OboUtil;
 import ca.odell.glazedlists.SortedList;
+
+import com.eekboom.utils.Strings;
 
 public class TabDelimitedWriter {
 
@@ -45,10 +49,64 @@ public class TabDelimitedWriter {
         writer.newLine();
         int i = 1;
         for (Character character : this.data.getCharacters()) {
-            writer.write(i + "\t");
+            final List<State> sortedStates = new SortedList<State>(character.getStates(), new Comparator<State>() {
+                public int compare(State o1, State o2) {
+                    return Strings.compareNatural(o1.getSymbol(), o2.getSymbol());
+                }});
+            for (State state : sortedStates) {
+                for (Phenotype phenotype : state.getPhenotypes()) {
+                    writer.write(i + "");
+                    writer.write("\t");
+                    writer.write(character.getLabel());
+                    writer.write("\t");
+                    writer.write(character.getComment());
+                    writer.write("\t");
+                    writer.write(state.getSymbol());
+                    writer.write("\t");
+                    writer.write(state.getLabel());
+                    writer.write("\t");
+                    writer.write(state.getComment());
+                    writer.write("\t");
+                    if (phenotype.getEntity() != null) {
+                        if (!OboUtil.isPostCompTerm(phenotype.getEntity())) {
+                            writer.write(String.format(LINK_FORMAT, TAO + phenotype.getEntity().getID(), phenotype.getEntity().getName()));
+                        } else {
+                            writer.write(phenotype.getEntity().getName());
+                        }
+                    }
+                    writer.write("\t");
+                    if (phenotype.getQuality() != null) {
+                        if (!OboUtil.isPostCompTerm(phenotype.getQuality())) {
+                            writer.write(String.format(LINK_FORMAT, PATO + phenotype.getQuality().getID(), phenotype.getQuality().getName()));
+                        } else {
+                            writer.write(phenotype.getQuality().getName());
+                        }
+                    }
+                    writer.write("\t");
+                    if (phenotype.getQuality() != null) {
+                        final OBOClass characterAttribute = this.getCharacterAttributeForValue(phenotype.getQuality());
+                        if (!OboUtil.isPostCompTerm(characterAttribute)) {
+                            writer.write(String.format(LINK_FORMAT, PATO + characterAttribute.getID(), characterAttribute.getName()));
+                        } else {
+                            writer.write(characterAttribute.getName());
+                        }
+                    }
+                    writer.write("\t");
+                    if (phenotype.getRelatedEntity() != null) {
+                        if (!OboUtil.isPostCompTerm(phenotype.getRelatedEntity())) {
+                            writer.write(String.format(LINK_FORMAT, TAO + phenotype.getRelatedEntity().getID(), phenotype.getRelatedEntity().getName()));
+                        } else {
+                            writer.write(phenotype.getRelatedEntity().getName());
+                        }
+                    }
+                    writer.write("\t");
+                    writer.write(phenotype.getCount() != null ? phenotype.getCount().toString() : "");
+                    writer.write("\t");
+                    writer.write(phenotype.getComment() != null ? phenotype.getComment() : "");
+                    writer.newLine();
+                }
+            }
             i++;
-            writer.write(this.getCharacterRow(character));
-            writer.newLine();
         }
         writer.close();
     }
@@ -109,75 +167,25 @@ public class TabDelimitedWriter {
     }
     
     private String getCharacterHeader() {
-        return "Character Number\tCharacter Description\tCharacter Comment\tState Number\tState Description\tState Comment\tEntity\tQuality\tRelated Entity\tCount\tComment";
+        return "Character Number\tCharacter Description\tCharacter Comment\tState Number\tState Description\tState Comment\tEntity\tQuality\tCharacter Attribute\tRelated Entity\tCount\tComment";
     }
     
-    private String getCharacterRow(Character character) {
-        final StringBuffer sb = new StringBuffer();
-        sb.append(character.getLabel());
-        sb.append("\t");
-        sb.append(character.getComment());
-        sb.append("\t");
-        sb.append(this.getStates(character));
-        return sb.toString();
-    }
-    
-    private String getStates(Character character) {
-        final StringBuffer sb = new StringBuffer();
-        boolean first = true;
-        final List<State> sortedStates = new SortedList<State>(character.getStates(), new Comparator<State>() {
-            public int compare(State o1, State o2) {
-                return Strings.compareNatural(o1.getSymbol(), o2.getSymbol());
-            }});
-        for (State state : sortedStates) {
-            if (!first) sb.append("\n\t\t\t");
-            first = false;
-            sb.append(state.getSymbol());
-            sb.append("\t");
-            sb.append(state.getLabel());
-            sb.append("\t");
-            sb.append(state.getComment());
-            sb.append("\t");
-            sb.append(this.getPhenotypes(state));
+    private OBOClass getCharacterAttributeForValue(OBOClass valueTerm) {
+        final Set<TermSubset> categories = valueTerm.getSubsets();
+        final Set<String> categoryNames = new HashSet<String>();
+        for (TermSubset category : categories) {
+            categoryNames.add(category.getName());
         }
-        return sb.toString();
-    }
-    
-    private String getPhenotypes(State state) {
-        final StringBuffer sb = new StringBuffer();
-        boolean first = true;
-        for (Phenotype phenotype : state.getPhenotypes()) {
-            if (!first) sb.append("\n\t\t\t\t\t\t");
-            first = false;
-            if (phenotype.getEntity() != null) {
-                if (!OboUtil.isPostCompTerm(phenotype.getEntity())) {
-                    sb.append(String.format(LINK_FORMAT, TAO + phenotype.getEntity().getID(), phenotype.getEntity().getName()));
-                } else {
-                    sb.append(phenotype.getEntity().getName());
-                }
+        if (categoryNames.contains("character_slim")) {
+            return valueTerm;
+        } else {
+            final OBOClass parent = OboUtil.getIsaParentForTerm(valueTerm);
+            if (parent != null) {
+                return getCharacterAttributeForValue(parent);
+            } else {
+                return valueTerm;
             }
-            sb.append("\t");
-            if (phenotype.getQuality() != null) {
-                if (!OboUtil.isPostCompTerm(phenotype.getQuality())) {
-                    sb.append(String.format(LINK_FORMAT, PATO + phenotype.getQuality().getID(), phenotype.getQuality().getName()));
-                } else {
-                    sb.append(phenotype.getQuality().getName());
-                }
-            }
-            sb.append("\t");
-            if (phenotype.getRelatedEntity() != null) {
-                if (!OboUtil.isPostCompTerm(phenotype.getRelatedEntity())) {
-                    sb.append(String.format(LINK_FORMAT, TAO + phenotype.getRelatedEntity().getID(), phenotype.getRelatedEntity().getName()));
-                } else {
-                    sb.append(phenotype.getRelatedEntity().getName());
-                }
-            }
-            sb.append("\t");
-            sb.append(phenotype.getCount() != null ? phenotype.getCount() : "");
-            sb.append("\t");
-            sb.append(phenotype.getComment() != null ? phenotype.getComment() : "");
         }
-        return sb.toString();
     }
     
 }

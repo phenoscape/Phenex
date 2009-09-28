@@ -15,8 +15,9 @@
 	<tstamp>
 		<format property="NOW" pattern="yyyy-MM-dd_HH:mm:ss"/>
 	</tstamp>
-	<property name="phenex.version" value="1.0-beta25"/>
+	<property name="phenex.version" value="1.0-beta26"/>
 	<property name="phenex.build" value="${NOW}"/>
+	<property name="java-minimum" value="1.5"/>
 	
 <!-- The init target makes sure that the prerequisite directories exist. -->
 	<target name="init">
@@ -65,13 +66,13 @@
 	
 <!-- The compile target runs javac on all the java files, and saves them into  the classfiles directory  -->
 	<target name="compile" depends="init">
-		<javac srcdir="${src}" destdir="${classfiles}" debug="yes">
+		<javac srcdir="${src}" destdir="${classfiles}" debug="yes" source="${java-minimum}" target="${java-minimum}">
 			<classpath refid="project.classpath"/>
 		</javac>
 	</target>
 	
     <target name="build-test" depends="compile">
-        <javac srcdir="${test}" destdir="${classfiles}" debug="yes">
+        <javac srcdir="${test}" destdir="${classfiles}" debug="yes" source="${java-minimum}" target="${java-minimum}">
             <classpath refid="project.classpath"/>
         </javac>
     </target>

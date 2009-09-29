@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -47,25 +48,30 @@ public class TabDelimitedWriter {
         writer.newLine();
         writer.write(this.getCharacterHeader());
         writer.newLine();
-        int i = 1;
+        int i = 0;
         for (Character character : this.data.getCharacters()) {
+            i++;
+            if (character.getStates().size() == 0) {
+                this.writeCharacter(character, i, writer);
+                writer.newLine();
+                continue;
+            }
             final List<State> sortedStates = new SortedList<State>(character.getStates(), new Comparator<State>() {
                 public int compare(State o1, State o2) {
                     return Strings.compareNatural(o1.getSymbol(), o2.getSymbol());
                 }});
             for (State state : sortedStates) {
+                if (state.getPhenotypes().size() == 0) {
+                    this.writeCharacter(character, i, writer);
+                    writer.write("\t");
+                    this.writeState(state, writer);
+                    writer.newLine();
+                    continue;
+                }
                 for (Phenotype phenotype : state.getPhenotypes()) {
-                    writer.write(i + "");
+                    this.writeCharacter(character, i, writer);
                     writer.write("\t");
-                    writer.write(character.getLabel());
-                    writer.write("\t");
-                    writer.write(character.getComment());
-                    writer.write("\t");
-                    writer.write(state.getSymbol());
-                    writer.write("\t");
-                    writer.write(state.getLabel());
-                    writer.write("\t");
-                    writer.write(state.getComment());
+                    this.writeState(state, writer);
                     writer.write("\t");
                     if (phenotype.getEntity() != null) {
                         if (!OboUtil.isPostCompTerm(phenotype.getEntity())) {
@@ -106,9 +112,24 @@ public class TabDelimitedWriter {
                     writer.newLine();
                 }
             }
-            i++;
         }
         writer.close();
+    }
+    
+    private void writeCharacter(Character character, int index, Writer writer) throws IOException {
+        writer.write(index + "");
+        writer.write("\t");
+        writer.write(character.getLabel());
+        writer.write("\t");
+        writer.write(character.getComment());
+    }
+    
+    private void writeState(State state, Writer writer) throws IOException {
+        writer.write(state.getSymbol());
+        writer.write("\t");
+        writer.write(state.getLabel());
+        writer.write("\t");
+        writer.write(state.getComment());
     }
 
     private String getTaxonHeader() {

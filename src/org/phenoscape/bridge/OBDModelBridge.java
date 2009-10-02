@@ -61,7 +61,7 @@ public class OBDModelBridge {
 	public static String HAS_PUB_REL_ID = "PHENOSCAPE:has_publication";
 	public static String HAS_SPECIMEN_REL_ID = "PHENOSCAPE:has_specimen";
 	public static String HAS_STATE_REL_ID = "cdao:has_Datum";
-	public static String REFERS_TO_TAXON_REL_ID = "PHENOSCAPE:has_taxon"; 
+	public static String REFERS_TO_TAXON_REL_ID = "PHENOSCAPE:has_taxon";
 	public static String HAS_TU_REL_ID = "cdao:has_TU";
 	
 	public static String HAS_CHARACTER_REL_ID = "cdao:has_Character"; 
@@ -78,6 +78,8 @@ public class OBDModelBridge {
 	private static final String HAS_COUNT_REL_ID = "PHENOSCAPE:has_count";
 	private static final String HAS_MSRMNT_REL_ID = "PHENOSCAPE:has_measurement";
 	private static final String HAS_UNIT_REL_ID = "PHENOSCAPE:has_unit";
+	
+	public static String HAS_PUBLICATION_NAME = "PHENOSCAPE:has_publication_name";
 	
 	private static RelationVocabulary relationVocabulary = new RelationVocabulary();
 	private Map<Character, String> characterIdMap;
@@ -136,6 +138,13 @@ public class OBDModelBridge {
 					LinkStatement otu2t = new LinkStatement(otuId,
 							REFERS_TO_TAXON_REL_ID, tn.getId());
 					graph.addStatement(otu2t);
+					
+					String publicationName = t.getPublicationName();
+					if(publicationName != null){
+						LiteralStatement otu2pubName = new LiteralStatement(otuId, HAS_PUBLICATION_NAME, publicationName);
+						graph.addStatement(otu2pubName);
+					}
+					
 					//link otu to specimens
 					for(Specimen s : t.getSpecimens()){
 						//System.out.println(s.toString());

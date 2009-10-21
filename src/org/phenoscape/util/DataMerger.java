@@ -11,12 +11,7 @@ import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 
 /**
- * @author jim
- *
- */
-/**
- * @author jim
- *
+ * @author Jim Balhoff
  */
 public class DataMerger {
  

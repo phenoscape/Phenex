@@ -17,7 +17,7 @@ import org.obd.query.impl.OBDSQLShard;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.OBOSession;
-import org.phenoscape.io.NeXMLReader;
+import org.phenoscape.io.NeXMLReader_1_0;
 import org.phenoscape.model.DataSet;
 
 public class PhenoscapeDataLoader {
@@ -75,7 +75,7 @@ public class PhenoscapeDataLoader {
 
     private void processDataFile(File file, BufferedWriter bw) throws XmlException, IOException {
         log().info("Started work with " + file.getAbsolutePath());
-        NeXMLReader reader = new NeXMLReader(file, this.session);
+        NeXMLReader_1_0 reader = new NeXMLReader_1_0(file, this.session);
         DataSet ds = reader.getDataSet();
         OBDModelBridge bridge = new OBDModelBridge();
         Graph g = bridge.translate(ds, file, bw);

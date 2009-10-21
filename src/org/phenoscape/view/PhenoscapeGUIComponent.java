@@ -86,7 +86,7 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
                 final JList menu = (JList)source;
                 try {
                     final Object value = menu.getSelectedValue();
-                    if ((value instanceof SearchHit) && (((SearchHit<?>)value).getHit() instanceof OBOClass)) {
+                    if ((value instanceof SearchHit<?>) && (((SearchHit<?>)value).getHit() instanceof OBOClass)) {
                         updateGlobalTermSelection((OBOClass)((SearchHit<?>)value).getHit());
                     } else {
                         // sometimes the selection is a String instead

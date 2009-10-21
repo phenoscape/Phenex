@@ -48,7 +48,7 @@ import org.w3c.dom.NodeList;
 import phenote.dataadapter.phenoxml.PhenoXmlAdapter;
 import phenote.datamodel.PhenotypeCharacterI;
 
-public class NeXMLReader {
+public class NeXMLReader_1_0 {
 
     private final DataSet data = new DataSet();
     private final NexmlDocument xmlDoc;
@@ -57,13 +57,13 @@ public class NeXMLReader {
     private final Set<String> secondaryIDs = new HashSet<String>();
     private String charactersBlockID = UUID.randomUUID().toString();
 
-    public NeXMLReader(File aFile, OBOSession session) throws XmlException, IOException {
+    public NeXMLReader_1_0(File aFile, OBOSession session) throws XmlException, IOException {
         this.session = session;
         this.xmlDoc = NexmlDocument.Factory.parse(aFile);
         this.parseNeXML();
     }
 
-    public NeXMLReader(Reader aReader, OBOSession session) throws XmlException, IOException {
+    public NeXMLReader_1_0(Reader aReader, OBOSession session) throws XmlException, IOException {
         this.session = session;
         this.xmlDoc = NexmlDocument.Factory.parse(aReader);
         this.parseNeXML();
@@ -110,14 +110,14 @@ public class NeXMLReader {
     }
 
     private void parseNeXML() {
-        final Dict metadata = NeXMLUtil.findOrCreateMetadataDict(this.xmlDoc);
+        final Dict metadata = NeXMLUtil_1_0.findOrCreateMetadataDict(this.xmlDoc);
         this.parseMetadata(metadata);
         for (AbstractBlock block : this.xmlDoc.getNexml().getCharactersArray()) {
             if (block instanceof StandardCells) {
                 this.charactersBlockID = block.getId();
                 final StandardCells cells = (StandardCells)block;
                 this.parseStandardCells(cells);
-                final Taxa taxa = NeXMLUtil.findOrCreateTaxa(this.xmlDoc, cells.getOtus());
+                final Taxa taxa = NeXMLUtil_1_0.findOrCreateTaxa(this.xmlDoc, cells.getOtus());
                 this.parseTaxa(taxa);
                 final AbstractObsMatrix abstractMatrix = cells.getMatrix();
                 if (abstractMatrix != null) {
@@ -143,7 +143,7 @@ public class NeXMLReader {
             newCharacter.setLabel(standardChar.getLabel());
             newCharacter.setComment(this.getComment(standardChar));
             newCharacter.setFigure(this.getFigure(standardChar));
-            final AbstractStates states = NeXMLUtil.findOrCreateStates(format, newCharacter.getStatesNexmlID());
+            final AbstractStates states = NeXMLUtil_1_0.findOrCreateStates(format, newCharacter.getStatesNexmlID());
             if (states instanceof StandardStates) {
                 for (AbstractState abstractState : states.getStateArray()) {
                     final State newState = new State(abstractState.getId());
@@ -151,9 +151,9 @@ public class NeXMLReader {
                     newState.setLabel(abstractState.getLabel());
                     newState.setComment(this.getComment(abstractState));
                     newState.setFigure(this.getFigure(abstractState));
-                    final Dict phenotypeDict = NeXMLUtil.findOrCreateDict(abstractState, "OBO_phenotype", abstractState.getDomNode().getOwnerDocument().createElement("any"));
-                    final Element any = NeXMLUtil.getFirstChildWithTagName((Element)(phenotypeDict.getDomNode()), "any");
-                    final Element phenoXML = NeXMLUtil.getFirstChildWithTagNameNS(any, "http://www.bioontologies.org/obd/schema/pheno", "phenotype");
+                    final Dict phenotypeDict = NeXMLUtil_1_0.findOrCreateDict(abstractState, "OBO_phenotype", abstractState.getDomNode().getOwnerDocument().createElement("any"));
+                    final Element any = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(phenotypeDict.getDomNode()), "any");
+                    final Element phenoXML = NeXMLUtil_1_0.getFirstChildWithTagNameNS(any, "http://www.bioontologies.org/obd/schema/pheno", "phenotype");
                     if (phenoXML != null) {
                         try {
                             PhenotypeDocument xmlPhen = org.bioontologies.obd.schema.pheno.PhenotypeDocument.Factory.parse(phenoXML);
@@ -190,7 +190,7 @@ public class NeXMLReader {
         for (org.nexml.x10.Taxon xmlTaxon : taxa.getOtuArray()) {
             final Taxon newTaxon = new Taxon(xmlTaxon.getId());
             newTaxon.setPublicationName((xmlTaxon.getLabel() == null || xmlTaxon.getLabel().equals("")) ? null : xmlTaxon.getLabel());
-            final Dict oboIDDict = NeXMLUtil.findOrCreateDict(xmlTaxon, "OBO_ID", xmlTaxon.getDomNode().getOwnerDocument().createElement("string"));
+            final Dict oboIDDict = NeXMLUtil_1_0.findOrCreateDict(xmlTaxon, "OBO_ID", xmlTaxon.getDomNode().getOwnerDocument().createElement("string"));
             for (String id : oboIDDict.getStringArray()) {
                 final String taxonID = id.trim();
                 if ((taxonID != null) && (!taxonID.equals(""))) {
@@ -201,7 +201,7 @@ public class NeXMLReader {
             newTaxon.setComment(this.getComment(xmlTaxon));
             newTaxon.setFigure(this.getFigure(xmlTaxon));
             newTaxon.setMatrixTaxonName(this.getMatrixTaxon(xmlTaxon));
-            final Dict specimensDict = NeXMLUtil.findOrCreateDict(xmlTaxon, "OBO_specimens", xmlTaxon.getDomNode().getOwnerDocument().createElement("any"));
+            final Dict specimensDict = NeXMLUtil_1_0.findOrCreateDict(xmlTaxon, "OBO_specimens", xmlTaxon.getDomNode().getOwnerDocument().createElement("any"));
             for (XmlObject xmlObj : specimensDict.getAnyArray()) {
                 final NodeList nodes = ((Element)(xmlObj.getDomNode())).getElementsByTagName("specimen");
                 for (int i = 0; i < nodes.getLength(); i++) {
@@ -238,19 +238,19 @@ public class NeXMLReader {
     }
 
     private void parseMetadata(Dict metadataDict) {
-        final Element any = NeXMLUtil.getFirstChildWithTagName(((Element)(metadataDict.getDomNode())), "any");
+        final Element any = NeXMLUtil_1_0.getFirstChildWithTagName(((Element)(metadataDict.getDomNode())), "any");
         if (any != null) {
-            final Element curators = NeXMLUtil.getFirstChildWithTagName(any, "curators");
-            this.data.setCurators(curators != null ? NeXMLUtil.getTextContent(curators) : null);
-            final Element publication = NeXMLUtil.getFirstChildWithTagName(any, "publication");
-            this.data.setPublication(publication != null ? NeXMLUtil.getTextContent(publication) : null);
-            final Element pubNotes = NeXMLUtil.getFirstChildWithTagName(any, "publicationNotes");
-            this.data.setPublicationNotes(pubNotes != null ? NeXMLUtil.getTextContent(pubNotes) : null);
+            final Element curators = NeXMLUtil_1_0.getFirstChildWithTagName(any, "curators");
+            this.data.setCurators(curators != null ? NeXMLUtil_1_0.getTextContent(curators) : null);
+            final Element publication = NeXMLUtil_1_0.getFirstChildWithTagName(any, "publication");
+            this.data.setPublication(publication != null ? NeXMLUtil_1_0.getTextContent(publication) : null);
+            final Element pubNotes = NeXMLUtil_1_0.getFirstChildWithTagName(any, "publicationNotes");
+            this.data.setPublicationNotes(pubNotes != null ? NeXMLUtil_1_0.getTextContent(pubNotes) : null);
         }
     }
 
     private String getComment(Annotated node) {
-        final Dict commentDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.COMMENT_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+        final Dict commentDict = NeXMLUtil_1_0.findOrCreateDict(node, NeXMLUtil_1_0.COMMENT_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
         for (String comment : commentDict.getStringArray()) {
             return comment;
         }
@@ -258,7 +258,7 @@ public class NeXMLReader {
     }
 
     private String getFigure(Annotated node) {
-        final Dict figureDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.FIGURE_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+        final Dict figureDict = NeXMLUtil_1_0.findOrCreateDict(node, NeXMLUtil_1_0.FIGURE_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
         for (String figure : figureDict.getStringArray()) {
             return figure;
         }
@@ -266,7 +266,7 @@ public class NeXMLReader {
     }
 
     private String getMatrixTaxon(Annotated node) {
-        final Dict matrixTaxonDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.MATRIX_TAXON_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+        final Dict matrixTaxonDict = NeXMLUtil_1_0.findOrCreateDict(node, NeXMLUtil_1_0.MATRIX_TAXON_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
         for (String matrixTaxon : matrixTaxonDict.getStringArray()) {
             return matrixTaxon;
         }

@@ -185,7 +185,7 @@ public abstract class DocumentController {
     
     private boolean runUnsavedChangesDialog() {
         final String[] options = {"Save", "Don't Save", "Cancel"};
-        String message = "You have unsaved changes.  Would you like to save before closing" + ((this.getCurrentFile() == null) ? "" : (" \"" + this.getCurrentFile().getName() + "\"")) + "?";
+        final String message = "You have unsaved changes.  Would you like to save before closing" + ((this.getCurrentFile() == null) ? "" : (" \"" + this.getCurrentFile().getName() + "\"")) + "?";
         final int result =  JOptionPane.showOptionDialog(this.getWindow(), message, "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         if (result == JOptionPane.YES_OPTION) {
             this.save();

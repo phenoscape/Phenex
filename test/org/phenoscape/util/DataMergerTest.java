@@ -12,7 +12,7 @@ import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.impl.OBOSessionImpl;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
-import org.phenoscape.io.NeXMLReader;
+import org.phenoscape.io.NeXMLReader_1_0;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.OntologyController;
 import org.phenoscape.model.Phenotype;
@@ -25,7 +25,7 @@ public class DataMergerTest {
   public void mergeCharacters() throws IOException, XmlException {
     final OBOSession session = new OBOSessionImpl();
     final CharacterTabReader reader = new CharacterTabReader(new File("testfiles/CharacterTabReaderTestFile1.tab"), session);
-    final NeXMLReader nexmlReader = new NeXMLReader(new File("testfiles/DataMergerTestFile1.xml"), session);
+    final NeXMLReader_1_0 nexmlReader = new NeXMLReader_1_0(new File("testfiles/DataMergerTestFile1.xml"), session);
     final DataSet data = nexmlReader.getDataSet();
     Assert.assertNull("Character 2, State 0, should not exist in the original data set", this.findState(data.getCharacters().get(1).getStates(), "0"));
     final Phenotype originalPhenotypeC1S0 = data.getCharacters().get(0).getStates().get(0).getPhenotypes().get(0);
@@ -42,8 +42,8 @@ public class DataMergerTest {
   @Test
   public void mergeTaxa() throws XmlException, IOException {
       final OBOSession session = new OntologyController().getOBOSession();
-      final NeXMLReader nexmlReader4 = new NeXMLReader(new File("testfiles/DataMergerTestFile4.xml"), session);
-      final NeXMLReader nexmlReader5 = new NeXMLReader(new File("testfiles/DataMergerTestFile5.xml"), session);
+      final NeXMLReader_1_0 nexmlReader4 = new NeXMLReader_1_0(new File("testfiles/DataMergerTestFile4.xml"), session);
+      final NeXMLReader_1_0 nexmlReader5 = new NeXMLReader_1_0(new File("testfiles/DataMergerTestFile5.xml"), session);
       final DataSet existingData = nexmlReader4.getDataSet();
       Assert.assertEquals("Three taxa to start out with", 3, existingData.getTaxa().size());
       DataMerger.mergeTaxa(nexmlReader5.getDataSet(), existingData);
@@ -61,7 +61,7 @@ public class DataMergerTest {
   public void mergeData() throws ParseException, IOException, XmlException {
     final OBOSession session = new OBOSessionImpl();
     final NEXUSReader nexusReader = new NEXUSReader(new File("testfiles/DataMergerTestFile3.nex"));
-    final NeXMLReader nexmlReader = new NeXMLReader(new File("testfiles/DataMergerTestFile2.xml"), session);
+    final NeXMLReader_1_0 nexmlReader = new NeXMLReader_1_0(new File("testfiles/DataMergerTestFile2.xml"), session);
     final DataSet data = nexmlReader.getDataSet();
     Assert.assertEquals("Original data set should have 3 characters", 3, data.getCharacters().size());
     Assert.assertNull("Cell 0,0 should be empty in the original data set", this.getCellValue(data, 0, 0));

@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class NeXMLUtil {
+public class NeXMLUtil_1_0 {
 
     public static String COMMENT_KEY = "phenex_comment";
     public static String FIGURE_KEY = "phenex_figure_ref";
@@ -153,7 +153,7 @@ public class NeXMLUtil {
 
     @SuppressWarnings("unused")
     private static Logger log() {
-        return Logger.getLogger(NeXMLUtil.class);
+        return Logger.getLogger(NeXMLUtil_1_0.class);
     }
 
 }

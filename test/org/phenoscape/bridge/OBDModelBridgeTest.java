@@ -28,7 +28,7 @@ import org.obd.query.Shard;
 import org.obd.query.BooleanQueryTerm.BooleanOperator;
 import org.obd.query.impl.AbstractSQLShard;
 import org.obd.query.impl.OBDSQLShard;
-import org.phenoscape.io.NeXMLReader;
+import org.phenoscape.io.NeXMLReader_1_0;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.OntologyController;
 
@@ -40,7 +40,7 @@ public class OBDModelBridgeTest {
 			ClassNotFoundException {
 		OntologyController oc = new OntologyController();
 		OBDModelBridge bridge = new OBDModelBridge();
-		NeXMLReader reader;
+		NeXMLReader_1_0 reader;
 		DataSet ds;
 		Graph g;
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("problemLog.txt")));
@@ -72,7 +72,7 @@ public class OBDModelBridgeTest {
 					if (dataFile.isFile()) {
 						System.out.println(++i + ". Started work with "
 								+ dataFile.getAbsolutePath());
-						reader = new NeXMLReader(dataFile, oc.getOBOSession());
+						reader = new NeXMLReader_1_0(dataFile, oc.getOBOSession());
 						ds = reader.getDataSet();
 						bridge.translate(ds, dataFile, bw);
 						g = bridge.getGraph();
@@ -94,7 +94,7 @@ public class OBDModelBridgeTest {
 			ClassNotFoundException {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("problemLog.txt")));
 		OntologyController oc = new OntologyController();
-		NeXMLReader reader = new NeXMLReader(new File("?"), oc.getOBOSession());
+		NeXMLReader_1_0 reader = new NeXMLReader_1_0(new File("?"), oc.getOBOSession());
 		DataSet ds = reader.getDataSet();
 		OBDModelBridge bridge = new OBDModelBridge();
 		bridge.translate(ds, new File("?"), bw);

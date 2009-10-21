@@ -49,7 +49,7 @@ import org.w3c.dom.Node;
 
 import phenote.dataadapter.phenoxml.PhenoXmlAdapter;
 
-public class NeXMLWriter {
+public class NeXMLWriter_1_0 {
 
     private final NexmlDocument xmlDoc;
     private final String charactersBlockID;
@@ -57,11 +57,11 @@ public class NeXMLWriter {
     private String generator;
     private final XmlOptions options = new XmlOptions();
 
-    public NeXMLWriter(String charactersBlockID) {
+    public NeXMLWriter_1_0(String charactersBlockID) {
         this(charactersBlockID, NexmlDocument.Factory.newInstance());
     }
 
-    public NeXMLWriter(String charactersBlockID, NexmlDocument startingDoc) {
+    public NeXMLWriter_1_0(String charactersBlockID, NexmlDocument startingDoc) {
         this.charactersBlockID = charactersBlockID;
         this.xmlDoc = startingDoc;
         this.options.setSavePrettyPrint();
@@ -97,9 +97,9 @@ public class NeXMLWriter {
         if (newDoc.getNexml() == null) { newDoc.addNewNexml(); }
         if (this.generator != null) { newDoc.getNexml().setGenerator(this.generator); }
         newDoc.getNexml().setVersion(BigDecimal.valueOf(1.0));
-        Dict metadata = NeXMLUtil.findOrCreateMetadataDict(newDoc);
+        Dict metadata = NeXMLUtil_1_0.findOrCreateMetadataDict(newDoc);
         this.writeToMetadata(metadata, this.data.getCurators(), this.data.getPublication(), this.data.getPublicationNotes());
-        final AbstractBlock charBlock = NeXMLUtil.findOrCreateCharactersBlock(newDoc, this.charactersBlockID);
+        final AbstractBlock charBlock = NeXMLUtil_1_0.findOrCreateCharactersBlock(newDoc, this.charactersBlockID);
         this.writeCharacters(charBlock);
         final String taxaID;
         if ((charBlock.getOtus() == null) || (charBlock.getOtus().equals(""))) {
@@ -108,7 +108,7 @@ public class NeXMLWriter {
         } else {
             taxaID = charBlock.getOtus();
         }
-        final Taxa taxaBlock = NeXMLUtil.findOrCreateTaxa(newDoc, taxaID);
+        final Taxa taxaBlock = NeXMLUtil_1_0.findOrCreateTaxa(newDoc, taxaID);
         this.writeTaxa(taxaBlock);
         // move taxa ahead of characters
         final XmlCursor firstCharCursor = newDoc.getNexml().getCharactersArray()[0].newCursor();
@@ -259,31 +259,31 @@ public class NeXMLWriter {
     }
 
     private void writeToMetadata(Dict metadata, String curatorsText, String publicationText, String pubNotesText) {
-        final Element any = NeXMLUtil.getFirstChildWithTagName(((Element)(metadata.getDomNode())), "any");
-        final Element curators = NeXMLUtil.getFirstChildWithTagName(any, "curators");
-        NeXMLUtil.setTextContent(curators, curatorsText);
-        final Element publication = NeXMLUtil.getFirstChildWithTagName(any, "publication");
-        NeXMLUtil.setTextContent(publication, publicationText);
-        final Element pubNotes = NeXMLUtil.getFirstChildWithTagName(any, "publicationNotes");
-        NeXMLUtil.setTextContent(pubNotes, pubNotesText);
+        final Element any = NeXMLUtil_1_0.getFirstChildWithTagName(((Element)(metadata.getDomNode())), "any");
+        final Element curators = NeXMLUtil_1_0.getFirstChildWithTagName(any, "curators");
+        NeXMLUtil_1_0.setTextContent(curators, curatorsText);
+        final Element publication = NeXMLUtil_1_0.getFirstChildWithTagName(any, "publication");
+        NeXMLUtil_1_0.setTextContent(publication, publicationText);
+        final Element pubNotes = NeXMLUtil_1_0.getFirstChildWithTagName(any, "publicationNotes");
+        NeXMLUtil_1_0.setTextContent(pubNotes, pubNotesText);
     }
 
     private void writeOBOID(org.nexml.x10.Taxon otu, Taxon taxon) {
-        final Dict oboIDDict = NeXMLUtil.findOrCreateDict(otu, "OBO_ID", otu.getDomNode().getOwnerDocument().createElement("string"));
+        final Dict oboIDDict = NeXMLUtil_1_0.findOrCreateDict(otu, "OBO_ID", otu.getDomNode().getOwnerDocument().createElement("string"));
         if (taxon.getValidName() == null) {
-            NeXMLUtil.removeDict(otu, oboIDDict);
+            NeXMLUtil_1_0.removeDict(otu, oboIDDict);
         } else {
-            final Element stringNode = NeXMLUtil.getFirstChildWithTagName((Element)(oboIDDict.getDomNode()), "string");
-            NeXMLUtil.setTextContent(stringNode, taxon.getValidName().getID());
+            final Element stringNode = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(oboIDDict.getDomNode()), "string");
+            NeXMLUtil_1_0.setTextContent(stringNode, taxon.getValidName().getID());
         }
     }
 
     private void writeSpecimens(org.nexml.x10.Taxon otu, Taxon taxon) {
-        final Dict specimensDict = NeXMLUtil.findOrCreateDict(otu, "OBO_specimens", otu.getDomNode().getOwnerDocument().createElement("any"));
-        final Element any = NeXMLUtil.getFirstChildWithTagName((Element)(specimensDict.getDomNode()), "any");
-        NeXMLUtil.clearChildren(any);
+        final Dict specimensDict = NeXMLUtil_1_0.findOrCreateDict(otu, "OBO_specimens", otu.getDomNode().getOwnerDocument().createElement("any"));
+        final Element any = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(specimensDict.getDomNode()), "any");
+        NeXMLUtil_1_0.clearChildren(any);
         if (taxon.getSpecimens().isEmpty()) {
-            NeXMLUtil.removeDict(otu, specimensDict);
+            NeXMLUtil_1_0.removeDict(otu, specimensDict);
         } else {
             for (Specimen specimen : taxon.getSpecimens()) {
                 final Element specimenXML = any.getOwnerDocument().createElement("specimen");
@@ -295,43 +295,43 @@ public class NeXMLWriter {
     }
 
     private void writeComment(Annotated node, String comment) {
-        final Dict commentDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.COMMENT_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+        final Dict commentDict = NeXMLUtil_1_0.findOrCreateDict(node, NeXMLUtil_1_0.COMMENT_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
         if ((comment == null) || (comment.equals(""))) {
-            NeXMLUtil.removeDict(node, commentDict);
+            NeXMLUtil_1_0.removeDict(node, commentDict);
         } else {
-            final Element stringNode = NeXMLUtil.getFirstChildWithTagName((Element)(commentDict.getDomNode()), "string");
-            NeXMLUtil.setTextContent(stringNode, comment);
+            final Element stringNode = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(commentDict.getDomNode()), "string");
+            NeXMLUtil_1_0.setTextContent(stringNode, comment);
         }
     }
 
     private void writeFigure(Annotated node, String figure) {
-        final Dict figureDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.FIGURE_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+        final Dict figureDict = NeXMLUtil_1_0.findOrCreateDict(node, NeXMLUtil_1_0.FIGURE_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
         if ((figure == null) || (figure.equals(""))) {
-            NeXMLUtil.removeDict(node, figureDict);
+            NeXMLUtil_1_0.removeDict(node, figureDict);
         } else {
-            final Element stringNode = NeXMLUtil.getFirstChildWithTagName((Element)(figureDict.getDomNode()), "string");
-            NeXMLUtil.setTextContent(stringNode, figure);
+            final Element stringNode = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(figureDict.getDomNode()), "string");
+            NeXMLUtil_1_0.setTextContent(stringNode, figure);
         }
     }
 
     private void writeMatrixTaxon(Annotated node, String matrixTaxon) {
-        final Dict matrixTaxonDict = NeXMLUtil.findOrCreateDict(node, NeXMLUtil.MATRIX_TAXON_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+        final Dict matrixTaxonDict = NeXMLUtil_1_0.findOrCreateDict(node, NeXMLUtil_1_0.MATRIX_TAXON_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
         if ((matrixTaxon == null) || (matrixTaxon.equals(""))) {
-            NeXMLUtil.removeDict(node, matrixTaxonDict);
+            NeXMLUtil_1_0.removeDict(node, matrixTaxonDict);
         } else {
-            final Element stringNode = NeXMLUtil.getFirstChildWithTagName((Element)(matrixTaxonDict.getDomNode()), "string");
-            NeXMLUtil.setTextContent(stringNode, matrixTaxon);
+            final Element stringNode = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(matrixTaxonDict.getDomNode()), "string");
+            NeXMLUtil_1_0.setTextContent(stringNode, matrixTaxon);
         }
     }
 
     private void writePhenotypes(AbstractState xmlState, State state) {
-        final Dict phenotypeDict = NeXMLUtil.findOrCreateDict(xmlState, "OBO_phenotype", xmlState.getDomNode().getOwnerDocument().createElement("any"));
+        final Dict phenotypeDict = NeXMLUtil_1_0.findOrCreateDict(xmlState, "OBO_phenotype", xmlState.getDomNode().getOwnerDocument().createElement("any"));
         if (state.getPhenotypes().isEmpty()) {
-            NeXMLUtil.removeDict(xmlState, phenotypeDict);
+            NeXMLUtil_1_0.removeDict(xmlState, phenotypeDict);
             return;
         }
-        final Element any = NeXMLUtil.getFirstChildWithTagName((Element)(phenotypeDict.getDomNode()), "any");
-        NeXMLUtil.clearChildren(any);
+        final Element any = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(phenotypeDict.getDomNode()), "any");
+        NeXMLUtil_1_0.clearChildren(any);
         final List<PhenotypeCharacter> pcs = new ArrayList<PhenotypeCharacter>();
         for (Phenotype phenotype : state.getPhenotypes()) {
             final PhenotypeCharacter pc = PhenoXmlAdapter.createPhenotypeCharacter(new PhenoXMLPhenotypeWrapper(phenotype));

@@ -28,8 +28,8 @@ import org.phenoscape.app.DocumentController;
 import org.phenoscape.app.UserCancelledReadException;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
-import org.phenoscape.io.NeXMLReader;
-import org.phenoscape.io.NeXMLWriter;
+import org.phenoscape.io.NeXMLReader_1_0;
+import org.phenoscape.io.NeXMLWriter_1_0;
 import org.phenoscape.io.TabDelimitedWriter;
 import org.phenoscape.io.TaxonTabReader;
 import org.phenoscape.swing.ListSelectionMaintainer;
@@ -160,7 +160,7 @@ public class PhenexController extends DocumentController {
 
     private void readNeXML(File aFile) throws IOException {
         try {
-            final NeXMLReader reader = new NeXMLReader(aFile, this.getOntologyController().getOBOSession());
+            final NeXMLReader_1_0 reader = new NeXMLReader_1_0(aFile, this.getOntologyController().getOBOSession());
             if (reader.didCreateDanglers()) {
                 final boolean result = this.runDanglerAlert(aFile, reader.getDanglersList());
                 if (!result) {
@@ -193,7 +193,7 @@ public class PhenexController extends DocumentController {
 
     @Override
     public void writeData(File aFile) throws IOException {
-        final NeXMLWriter writer = new NeXMLWriter(this.charactersBlockID, this.xmlDoc);
+        final NeXMLWriter_1_0 writer = new NeXMLWriter_1_0(this.charactersBlockID, this.xmlDoc);
         writer.setDataSet(this.dataSet);
         writer.setGenerator(this.getAppName() + " " + this.getAppVersion());
         writer.write(aFile);
@@ -317,7 +317,7 @@ public class PhenexController extends DocumentController {
 
     private void mergeNeXML(File aFile) {
         try {
-            final NeXMLReader reader = new NeXMLReader(aFile, this.getOntologyController().getOBOSession());
+            final NeXMLReader_1_0 reader = new NeXMLReader_1_0(aFile, this.getOntologyController().getOBOSession());
             DataMerger.mergeDataSets(reader.getDataSet(), this.getDataSet());
         } catch (XmlException e) {
             log().error("Error parsing NeXML file", e);

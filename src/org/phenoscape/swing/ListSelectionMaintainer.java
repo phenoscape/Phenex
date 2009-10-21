@@ -18,48 +18,48 @@ import ca.odell.glazedlists.swing.EventSelectionModel;
  */
 public class ListSelectionMaintainer<T> {
 
-  private final EventList<T> list;
-  private final EventSelectionModel<T> selectionModel;
+    private final EventList<T> list;
+    private final EventSelectionModel<T> selectionModel;
 
-  public ListSelectionMaintainer(EventList<T> list, EventSelectionModel<T> selectionModel) {
-    this.list = list;
-    this.selectionModel = selectionModel;
-    this.list.addListEventListener(new ListListener<T>());
-  }
-  
-  private void selectIndex(int index) {
-    if (index < this.list.size()) {
-      selectionModel.setSelectionInterval(index, index);
+    public ListSelectionMaintainer(EventList<T> list, EventSelectionModel<T> selectionModel) {
+        this.list = list;
+        this.selectionModel = selectionModel;
+        this.list.addListEventListener(new ListListener<T>());
     }
-  }
 
-  private class ListListener<E> implements ListEventListener<E> {
-
-    public void listChanged(final ListEvent<E> listChanges) {
-      int index = -1;
-      while (listChanges.hasNext()) {
-        listChanges.next();
-        if ((listChanges.getType() == ListEvent.UPDATE) || (listChanges.isReordering())) {
-          return;
+    private void selectIndex(int index) {
+        if (index < this.list.size()) {
+            selectionModel.setSelectionInterval(index, index);
         }
-        index = listChanges.getIndex();
-      }
-      final int selectionIndex = (index > (list.size() - 1)) ? (list.size() - 1) : index;
-      if (selectionIndex > -1) {
-        // must use invokeLater because the selection model will not have found out about the inserted item yet
-        SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            selectIndex(selectionIndex);
-          }
-        });
-      }
     }
 
-  }
+    private class ListListener<E> implements ListEventListener<E> {
 
-  @SuppressWarnings("unused")
-  private Logger log() {
-    return Logger.getLogger(this.getClass());
-  }
+        public void listChanged(final ListEvent<E> listChanges) {
+            int index = -1;
+            while (listChanges.hasNext()) {
+                listChanges.next();
+                if ((listChanges.getType() == ListEvent.UPDATE) || (listChanges.isReordering())) {
+                    return;
+                }
+                index = listChanges.getIndex();
+            }
+            final int selectionIndex = (index > (list.size() - 1)) ? (list.size() - 1) : index;
+            if (selectionIndex > -1) {
+                // must use invokeLater because the selection model will not have found out about the inserted item yet
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        selectIndex(selectionIndex);
+                    }
+                });
+            }
+        }
+
+    }
+
+    @SuppressWarnings("unused")
+    private Logger log() {
+        return Logger.getLogger(this.getClass());
+    }
 
 }

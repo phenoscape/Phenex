@@ -8,28 +8,28 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 public class TablePopupListener extends PopupListener {
-  
-  private final JTable table;
-  private final Collection<Integer> columns = new ArrayList<Integer>();
-  
-  public TablePopupListener(JPopupMenu popupMenu, JTable table) {
-    super(popupMenu);
-    this.table = table;
-  }
-  
-  public void setPopupColumns(Collection<Integer> columns) {
-    this.columns.clear();
-    this.columns.addAll(columns);
-  }
 
-  @Override
-  protected void maybeShowPopup(MouseEvent e) {
-    final int column = this.table.getTableHeader().columnAtPoint(e.getPoint());
-    if (this.columns.contains(new Integer(column))) {
-      super.maybeShowPopup(e);;
+    private final JTable table;
+    private final Collection<Integer> columns = new ArrayList<Integer>();
+
+    public TablePopupListener(JPopupMenu popupMenu, JTable table) {
+        super(popupMenu);
+        this.table = table;
     }
-  }
-  
-  
+
+    public void setPopupColumns(Collection<Integer> columns) {
+        this.columns.clear();
+        this.columns.addAll(columns);
+    }
+
+    @Override
+    protected void maybeShowPopup(MouseEvent e) {
+        final int column = this.table.getTableHeader().columnAtPoint(e.getPoint());
+        if (this.columns.contains(new Integer(column))) {
+            super.maybeShowPopup(e);;
+        }
+    }
+
+
 
 }

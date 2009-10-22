@@ -55,14 +55,23 @@ public class ZfinObdBridge {
     public static final String GENOTYPE_URL = "genotype-url";
     /** The gene-name-url system property should contain the URL of the ZFIN genetic markers file. */
     public static final String GENE_NAME_URL = "gene-name-url"; 
+    /** The morpholino-url system property should contain the URL of the ZFIN morpholinos file. */
+    public static final String MORPHOLINO_URL = "morpholino-url";
+    /** The pheno-environment-url system property should contain the URL of the ZFIN pheno environment file. */
+    public static final String PHENO_ENVIRONMENT_URL = "pheno-environment-url";
 
     public static final String DATASET_TYPE_ID = "cdao:CharacterStateDataMatrix";
     public static final String GENOTYPE_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits";
     public static final String GENE_GENOTYPE_REL_ID = "PHENOSCAPE:has_allele";
     public static final String PUBLICATION_TYPE_ID = "PHENOSCAPE:Publication";
-    public static String HAS_PUB_REL_ID = "PHENOSCAPE:has_publication";
+    public static final String HAS_PUB_REL_ID = "PHENOSCAPE:has_publication";
     public static final String GENOTYPE_TYPE_ID = "SO:0001027";
     public static final String GENE_TYPE_ID = "SO:0000704";
+    public static final String POSITED_BY_REL_ID = "posited_by";
+    
+    private final String MORPHOLINO_STRING = "morpholino";
+    private final String WILD_TYPE_STRING = "wild type (unspecified)";
+    
     private static final RelationVocabulary relationVocabulary = new RelationVocabulary();
 
     private Shard shard;
@@ -70,6 +79,11 @@ public class ZfinObdBridge {
     private OBOSession oboSession;
     
     private Map<String, String> zfinGeneIdToNameMap;
+    private Map<String, String> zfinGeneIdToSymbolMap;
+    private Map<String, String> envToMorpholinoMap;
+    private Map<String, String> morpholinoToGeneMap;
+    private Map<String, String> genotypeToGeneMap;
+    
     /*
      * This map has been created to keep track of main IDs and their mapping to alternate IDs
      * These are stored in key=ALTERNATE-ID value=ID format 
@@ -81,9 +95,20 @@ public class ZfinObdBridge {
         this.shard = this.initializeShard();
         this.graph = new Graph();
         this.setOboSession(this.loadOBOSession());
+        
         this.id2AlternateIdMap = createAltIdMappings(this.getOboSession());
+        
         this.zfinGeneIdToNameMap = new HashMap<String, String>();
+        this.zfinGeneIdToSymbolMap = new HashMap<String, String>();
+        this.envToMorpholinoMap = new HashMap<String, String>();
+        this.morpholinoToGeneMap = new HashMap<String, String>();
+        this.genotypeToGeneMap = new HashMap<String, String>();
+        
         this.createZfinNameDirectory();
+        this.mapEnvToMorpholino();
+        this.mapMorpholinoToGene();
+        this.mapGenotypeToGene();
+        this.mapGenotypeToGeneViaMissingMarkers();
     }
 
     public OBOSession getOboSession() {
@@ -92,260 +117,6 @@ public class ZfinObdBridge {
 
     public void setOboSession(OBOSession oboSession) {
         this.oboSession = oboSession;
-    }
-
-    private void createZfinNameDirectory() throws IOException{
-    	URL geneticMarkersURL = new URL(System.getProperty(GENE_NAME_URL));
-    	BufferedReader reader = new BufferedReader(new InputStreamReader(geneticMarkersURL.openStream()));
-    	String line, zfinId, zfinName; 
-    	while((line = reader.readLine()) != null){
-    		if(line.startsWith("ZDB-GENE")){
-    			String[] lineComps = line.split("\\t");
-    			zfinId = lineComps[0];
-    			zfinName = lineComps[2];
-    			this.zfinGeneIdToNameMap.put(zfinId, zfinName);
-    		}
-    	}
-    }
-    
-    public void loadZfinData() throws MalformedURLException, IOException {
-        String phenoFileLine, genoFileLine, missingMarkersFileLine;
-        LinkStatement geneAnnotLink;
-
-        /*
-         * A set of genotypes that are associated with known genes
-         */
-        Set<String> allowableGenotypes = new HashSet<String>(); 
-        
-        URL phenotypeURL = new URL(System.getProperty(PHENOTYPE_URL));
-        URL missingMarkersURL = new URL(System.getProperty(MISSING_MARKERS_URL));
-        URL genotypeURL = new URL(System.getProperty(GENOTYPE_URL));
-
-        BufferedReader br1 = new BufferedReader(new InputStreamReader(phenotypeURL.openStream()));
-        BufferedReader br2 = new BufferedReader(new InputStreamReader(
-                genotypeURL.openStream()));
-        BufferedReader br3 = new BufferedReader(new InputStreamReader(
-                missingMarkersURL.openStream()));
-
-        while ((genoFileLine = br2.readLine()) != null) {
-            String geneID = "", geneName = null, geneSymbol = "";
-            String[] gComps = genoFileLine.split("\\t");
-            String genotypeID = normalizetoZfin(gComps[0]);
-            NodeAlias na = null;
-            if (gComps.length > 9) {
-                geneID = normalizetoZfin(gComps[9]);
-                geneSymbol = gComps[8];
-                if(this.zfinGeneIdToNameMap.get(gComps[9]) != null){
-                	geneName = zfinGeneIdToNameMap.get(gComps[9]);
-                }
-            }
-
-            if (geneID != null && geneID.trim().length() > 0) {
-                Node geneNode = createInstanceNode(geneID, GENE_TYPE_ID);
-                if(geneName == null){
-                	geneNode.setLabel(geneSymbol);
-                }
-                else{
-                	geneNode.setLabel(geneName);
-                	na = new NodeAlias();
-                	na.setNodeId(geneID);
-                	na.setTargetId(geneSymbol);
-                }
-                
-                graph.addNode(geneNode);
-                if(na != null)
-                	graph.addStatement(na);
-                Node genotypeNode = createInstanceNode(genotypeID, GENOTYPE_TYPE_ID);
-                genotypeNode.setLabel(gComps[1]);
-                graph.addNode(genotypeNode);
-                
-                geneAnnotLink = new LinkStatement();
-                geneAnnotLink.setNodeId(geneID);
-                geneAnnotLink.setRelationId(GENE_GENOTYPE_REL_ID);
-                geneAnnotLink.setTargetId(genotypeID);
-                graph.addStatement(geneAnnotLink);
-                
-                allowableGenotypes.add(genotypeID);
-                
-            } else {
-                while ((missingMarkersFileLine = br3.readLine()) != null) {
-                    String[] mmComps = missingMarkersFileLine
-                    .split("\\t");
-                    if (mmComps[0].equals(gComps[0])) {
-                        if (mmComps[4] != null
-                                && mmComps[4].trim().length() > 0) {
-                            geneID = normalizetoZfin(mmComps[4]);
-                            Node geneNode = createInstanceNode(geneID,
-                                    GENE_TYPE_ID);
-                            geneNode.setLabel(mmComps[3]);
-                            graph.addNode(geneNode);
-                            
-                            Node genotypeNode = createInstanceNode(genotypeID, GENOTYPE_TYPE_ID);
-                            genotypeNode.setLabel(mmComps[1]);
-                            graph.addNode(genotypeNode);
-                            geneAnnotLink = new LinkStatement();
-                            geneAnnotLink.setNodeId(geneID);
-                            geneAnnotLink
-                            .setRelationId(GENE_GENOTYPE_REL_ID);
-                            geneAnnotLink.setTargetId(genotypeID);
-                            graph.addLinkStatement(geneNode, GENE_GENOTYPE_REL_ID, genotypeID);
-                            
-                            allowableGenotypes.add(genotypeID);
-                        }
-                    }
-                }
-            }
-        }
-        
-        while ((phenoFileLine = br1.readLine()) != null) {
-            String[] pComps = phenoFileLine.split("\\t");
-            String pub = pComps[8];
-            String qualId = pComps[5];
-            String ab = pComps[7];
-            String entity1Id = pComps[4];
-            String genotypeId = pComps[0];
-            String towardsId = pComps[6];
-                       		
-            if(id2AlternateIdMap.containsKey(qualId)){
-            	log().info("Replacing alternate ID: " + qualId);
-            	qualId = id2AlternateIdMap.get(qualId);
-            }
-            
-            if(allowableGenotypes.contains(genotypeId)){ //check this genotype links to a gene
-            	Set<LinkStatement> diffs = new HashSet<LinkStatement>();
-            	if (entity1Id != null) {
-            		String taoId = getEquivalentTAOID(entity1Id);
-            		String target = taoId.equals("Not found")?entity1Id : taoId;
-            		log().trace("Replacing " + entity1Id + " with " + target);
-            		if(id2AlternateIdMap.containsKey(target)){
-                    	log().info("Replacing alternate ID: " + target);
-                    	target = id2AlternateIdMap.get(target);
-                    }
-
-            		LinkStatement d = new LinkStatement();
-            		d.setRelationId(relationVocabulary.inheres_in());
-            		d.setTargetId(target);
-            		diffs.add(d);
-            	}
-            	if (towardsId != null) {
-            		String taoId = getEquivalentTAOID(towardsId);
-            		String target = taoId.equals("Not found")?towardsId : taoId;
-            		if(target != null && target.trim().length() > 0 && target.matches("[A-Z]+:[0-9]+")){
-            			if(id2AlternateIdMap.containsKey(target)){
-                        	log().info("Replacing alternate ID: " + target);
-                        	target = id2AlternateIdMap.get(target);
-                        }
-            			LinkStatement d = new LinkStatement();
-            			d.setRelationId(relationVocabulary.towards());
-            			d.setTargetId(target);
-            			diffs.add(d);
-            		}
-            	}
-            	String quality = qualId;
-            	if(ab != null){
-            		for (String qual : ab.split("/")) {
-            			String patoId;
-            			if(qualId.equals("PATO:0000001")){
-            				if (qual.equals("normal"))
-            					patoId = "PATO:0000461";
-            				else if (qual.equals("absent"))
-            					patoId = "PATO:0000462";
-            				else if (qual.equals("present"))
-            					patoId = "PATO:0000467";
-            				else
-            					patoId = "PATO:0000460"; // abnormal
-            				quality = patoId;
-            			}
-            		}
-            	}
-
-            	CompositionalDescription desc = new CompositionalDescription(quality, diffs);
-            	String phenoId = desc.generateId();
-            	desc.setId(phenoId);
-            	graph.addStatements(desc);
-
-            	LinkStatement annot = new LinkStatement();
-            	annot.setNodeId(genotypeId);
-            	annot.setRelationId(GENOTYPE_PHENOTYPE_REL_ID);
-
-            	if (!pub.equals("")) {
-            		Node publicationNode = createInstanceNode(pub, PUBLICATION_TYPE_ID);
-            		graph.addNode(publicationNode);
-
-            		String dsId = UUID.randomUUID().toString();
-            		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
-            		graph.addNode(dsNode);
-
-            		LinkStatement dsLink = new LinkStatement();
-            		dsLink.setRelationId("posited_by");
-            		dsLink.setTargetId(dsId);
-            		annot.addSubStatement(dsLink);
-            		
-            		LinkStatement pubLink = new LinkStatement();
-            		pubLink.setNodeId(dsId);
-            		pubLink.setRelationId("PHENOSCAPE:has_publication");
-            		pubLink.setTargetId(pub);
-            		graph.addStatement(pubLink);
-            	}
-
-            	annot.setTargetId(phenoId);
-
-            	graph.addStatement(annot);
-
-            	LinkStatement ls = new LinkStatement();
-            	ls.setNodeId(phenoId);
-            	ls.setRelationId(relationVocabulary.is_a());
-            	ls.setTargetId(quality);
-
-            	graph.addStatement(ls);
-            }
-        }
-        
-        this.shard.putGraph(graph);
-    }
-
-    /**
-     * Finds the equivalent TAO term for the given ZFA term
-     * @param entityId
-     * @return
-     */
-    public String getEquivalentTAOID(String entityId) {
-    	for(OBOClass oboClass : TermUtil.getTerms(oboSession)){
-         	if(oboClass.getID().equals(entityId)){
-         		for(Dbxref dbx : oboClass.getDbxrefs()){
-         			if(dbx.getDatabase().toString().equals("TAO")){
-         				return dbx.getDatabase().toString() + ":" + dbx.getDatabaseID().toString();
-         			}
-         		}
-         	}
-        }
-        return "Not found";
-    }
-
-    /**
-     * Another helper method to deal with the prefix inconsistencies in ZFIN
-     * Gene to Genotype files lack the ZFIN prefix Genotype to Phenotype files
-     * have the prefix
-     * 
-     * @param string
-     * @return
-     */
-    private String normalizetoZfin(String string) {
-        return "ZFIN:" + string;
-    }
-
-    protected Node createInstanceNode(String id, String typeId) {
-        Node n = new Node(id);
-        n.setMetatype(Metatype.CLASS);
-        n.addStatement(new LinkStatement(id, relationVocabulary.instance_of(),
-                typeId));
-        graph.addNode(n);
-        return n;
-    }
-
-    public static void main(String[] args) throws SQLException, ClassNotFoundException, MalformedURLException, IOException {
-        ZfinObdBridge zob = new ZfinObdBridge();
-        zob.loadZfinData();
     }
 
     private OBOSession loadOBOSession() {
@@ -382,11 +153,23 @@ public class ZfinObdBridge {
     private Logger log() {
         return Logger.getLogger(this.getClass());
     }
-    
-    
-    /**
-     * This method populates the alternate id to id map
-     */
+        
+    private void createZfinNameDirectory() throws IOException{
+    	URL geneticMarkersURL = new URL(System.getProperty(GENE_NAME_URL));
+    	BufferedReader reader = new BufferedReader(new InputStreamReader(geneticMarkersURL.openStream()));
+    	String line, zfinId, zfinName, zfinAlias; 
+    	while((line = reader.readLine()) != null){
+    		if(line.startsWith("ZDB-GENE")){
+    			String[] lineComps = line.split("\\t");
+    			zfinId = normalizetoZfin(lineComps[0]);
+    			zfinAlias = lineComps[1];
+    			zfinName = lineComps[2];
+    			this.zfinGeneIdToNameMap.put(zfinId, zfinName);
+    			this.zfinGeneIdToSymbolMap.put(zfinId, zfinAlias);
+    		}
+    	}
+    	reader.close();
+    }
     
     private Map<String, String> createAltIdMappings(OBOSession session) {
     	Map<String, String> altIDMappings = new HashMap<String, String>();
@@ -403,4 +186,269 @@ public class ZfinObdBridge {
         }
         return altIDMappings;
     }
+    
+    private void mapEnvToMorpholino() throws IOException{
+    	String line, environmentId, morpholinoId;
+    	
+    	URL phenoEnvironmentURL = new URL(System.getProperty(PHENO_ENVIRONMENT_URL));
+    	BufferedReader reader = new BufferedReader(new InputStreamReader(phenoEnvironmentURL.openStream()));
+    	
+    	while((line = reader.readLine()) != null){
+    		String[] lComps = line.split("\\t");
+    		if(lComps[1].equals(MORPHOLINO_STRING)){
+    			environmentId = normalizetoZfin(lComps[0]);
+    			morpholinoId = lComps[2];
+    			this.envToMorpholinoMap.put(environmentId, morpholinoId);
+    		}
+    	}
+    	
+    	reader.close();
+    }
+    
+    private void mapMorpholinoToGene() throws IOException{
+    	String line, geneId, morpholinoId;
+    	
+    	URL morpholinoURL = new URL(System.getProperty(MORPHOLINO_URL));
+    	BufferedReader reader = new BufferedReader(new InputStreamReader(morpholinoURL.openStream()));
+    	
+    	while((line = reader.readLine()) != null){
+    		String[] lComps = line.split("\\t");
+   			geneId = this.normalizetoZfin(lComps[0]);
+   			morpholinoId = lComps[2];
+    		this.morpholinoToGeneMap.put(morpholinoId, geneId);
+    	}
+    	
+    	reader.close();
+    }
+    
+    /**
+     * Finds the equivalent TAO term for the given ZFA term
+     * @param entityId
+     * @return
+     */
+    private String getEquivalentTAOID(String entityId) {
+    	for(OBOClass oboClass : TermUtil.getTerms(oboSession)){
+         	if(oboClass.getID().equals(entityId)){
+         		for(Dbxref dbx : oboClass.getDbxrefs()){
+         			if(dbx.getDatabase().toString().equals("TAO")){
+         				return dbx.getDatabase().toString() + ":" + dbx.getDatabaseID().toString();
+         			}
+         		}
+         	}
+        }
+        return "Not found";
+    }
+
+    private CompositionalDescription postComposeTerms(String[] comps){
+    	String entityId, qualityId, towardsId, ab;
+    	Set<LinkStatement> diffs = new HashSet<LinkStatement>();
+    	
+    	entityId = comps[4];
+    	qualityId = comps[5];
+    	towardsId = comps[6];
+    	ab = comps[7];
+    	
+    	if(entityId != null){
+    		entityId = replaceZfinEntityWithTaoEntity(entityId);
+    		entityId = replaceAlternateId(entityId);
+
+    		LinkStatement diffFromInheresIn = new LinkStatement();
+    		diffFromInheresIn.setRelationId(relationVocabulary.inheres_in());
+    		diffFromInheresIn.setTargetId(entityId);
+    		diffs.add(diffFromInheresIn);
+    	}
+    	
+    	if(towardsId != null && towardsId.trim().length() > 0 && towardsId.matches("[A-Z]+:[0-9]+")){
+    		towardsId = replaceZfinEntityWithTaoEntity(towardsId);
+    		towardsId = replaceAlternateId(towardsId);
+    		
+    		LinkStatement diffFromTowards = new LinkStatement();
+			diffFromTowards.setRelationId(relationVocabulary.towards());
+			diffFromTowards.setTargetId(towardsId);
+			diffs.add(diffFromTowards);
+    	}
+    	
+    	qualityId = replaceAlternateId(qualityId);
+    	
+    	if(ab != null){
+    		for (String qual : ab.split("/")) {
+    			if(qualityId.equals("PATO:0000001")){
+    				String patoId = replaceDefaultQualityIdWithPatoId(qual);
+    				qualityId = patoId;
+    			}
+    		}
+    	}
+    	
+    	CompositionalDescription desc = new CompositionalDescription(qualityId, diffs);    	
+    	return desc;
+    }
+    
+    private String replaceZfinEntityWithTaoEntity(String zfinEntity){
+    	String taoEntity = getEquivalentTAOID(zfinEntity);
+    	String target = taoEntity.equals("Not found")? zfinEntity : taoEntity;
+    	return target;
+    }
+    
+    private String replaceAlternateId(String alternateId){
+    	String id = alternateId;
+    	if(id2AlternateIdMap.containsKey(alternateId)){
+    		log().info("Replacing alternate ID: " + alternateId);
+    		id = id2AlternateIdMap.get(alternateId);
+    	}
+    	return id;
+    }
+    
+    private String replaceDefaultQualityIdWithPatoId(String qual){
+    	String patoId;
+		if (qual.equals("normal"))
+			patoId = "PATO:0000461";
+		else if (qual.equals("absent"))
+			patoId = "PATO:0000462";
+		else if (qual.equals("present"))
+			patoId = "PATO:0000467";
+		else
+			patoId = "PATO:0000460"; // abnormal
+    	return patoId;
+    }
+
+    private void mapGenotypeToGene() throws IOException{
+    	String lineFromGenotypeToPhenotypeFile;
+    	String genotypeId, geneId = null;
+    	URL genotypeURL = new URL(System.getProperty(GENOTYPE_URL));
+    
+    	BufferedReader reader = new BufferedReader(new InputStreamReader(genotypeURL.openStream()));
+    	while((lineFromGenotypeToPhenotypeFile = reader.readLine()) != null){
+    		String[] comps = lineFromGenotypeToPhenotypeFile.split("\\t");
+    		genotypeId = normalizetoZfin(comps[0]);
+    		if(comps.length > 9){
+    			geneId = normalizetoZfin(comps[9]);
+    			this.genotypeToGeneMap.put(genotypeId, geneId);
+    		}
+    	}
+    	
+    	reader.close();
+    }
+    
+    private void mapGenotypeToGeneViaMissingMarkers() throws IOException{
+    	String lineFromFile;
+    	String genotypeId, geneId;
+    	URL missingMarkersURL = new URL(System.getProperty(MISSING_MARKERS_URL));
+    	
+    	BufferedReader reader = new BufferedReader(new InputStreamReader(missingMarkersURL.openStream()));
+    	while((lineFromFile = reader.readLine()) != null){
+    		String[] comps = lineFromFile.split("\\t");
+			genotypeId = normalizetoZfin(comps[0]);
+    		if(comps[4] != null && comps[4].trim().length() > 0){
+    			geneId = normalizetoZfin(comps[4]);
+    			this.genotypeToGeneMap.put(genotypeId, geneId);
+    		}
+    	}
+    	
+    	reader.close();
+    }
+    
+    public void loadZfinData() throws MalformedURLException, IOException {
+        String phenoFileLine;
+        String genotypeId, genotype, pub, qualityId, environmentId, geneId = null; 
+        LinkStatement genotypeToPhenotypeLink;
+        
+        URL phenotypeURL = new URL(System.getProperty(PHENOTYPE_URL));
+        
+        BufferedReader br1 = new BufferedReader(new InputStreamReader(phenotypeURL.openStream()));
+        while ((phenoFileLine = br1.readLine()) != null) {
+            String[] pComps = phenoFileLine.split("\\t");
+            genotypeId = pComps[0];
+            genotype = pComps[1];
+            qualityId = pComps[5];
+            pub = pComps[8];
+            environmentId = pComps[9];
+            
+            if(genotype.equals(this.WILD_TYPE_STRING)){
+            	String morpholinoId = this.envToMorpholinoMap.get(environmentId);
+            	if(morpholinoId != null)
+            		geneId = this.morpholinoToGeneMap.get(morpholinoId);
+            }
+            else{
+            	geneId = this.genotypeToGeneMap.get(genotypeId);
+            }
+            	
+            if(geneId != null){
+                CompositionalDescription cd = this.postComposeTerms(pComps);
+            	String phenoId = cd.generateId();
+            	cd.setId(phenoId);
+            	graph.addStatements(cd);
+            	
+            	Node geneNode = createInstanceNode(geneId, GENE_TYPE_ID);
+            	String geneName = this.zfinGeneIdToNameMap.get(geneId);
+            	String geneSymbol = this.zfinGeneIdToSymbolMap.get(geneId);
+            	if(geneName != null){
+            		geneNode.setLabel(geneName);
+            		NodeAlias na = new NodeAlias();
+                	na.setNodeId(geneId);
+                	na.setTargetId(geneSymbol);
+                	graph.addStatement(na);
+            	}
+            	else{
+            		geneNode.setLabel(geneSymbol);
+            	}
+            	graph.addNode(geneNode);
+
+            	Node genotypeNode = createInstanceNode(genotypeId, GENOTYPE_TYPE_ID);
+            	genotypeNode.setLabel(genotype);
+            	graph.addNode(genotypeNode);
+            	
+            	this.createLinkStatementAndAddToGraph(geneId, GENE_GENOTYPE_REL_ID, genotypeId);
+                genotypeToPhenotypeLink = 
+                	this.createLinkStatementAndAddToGraph(genotypeId, GENOTYPE_PHENOTYPE_REL_ID, phenoId);
+            	
+            	if (!pub.equals("")) {
+            		Node publicationNode = createInstanceNode(pub, PUBLICATION_TYPE_ID);
+            		graph.addNode(publicationNode);
+
+            		String dsId = UUID.randomUUID().toString();
+            		Node dsNode = createInstanceNode(dsId, DATASET_TYPE_ID);
+            		graph.addNode(dsNode);
+
+            		LinkStatement dsLink = new LinkStatement();
+            		dsLink.setRelationId(POSITED_BY_REL_ID);
+            		dsLink.setTargetId(dsId);
+            		genotypeToPhenotypeLink.addSubStatement(dsLink);
+            		
+            		this.createLinkStatementAndAddToGraph(dsId, HAS_PUB_REL_ID, pub);
+            	}
+
+            	this.createLinkStatementAndAddToGraph(phenoId, relationVocabulary.is_a(), qualityId);
+            }
+        }
+        
+        this.shard.putGraph(graph);
+    }
+
+    private String normalizetoZfin(String string) {
+        return "ZFIN:" + string;
+    }
+
+    protected Node createInstanceNode(String id, String typeId) {
+        Node n = new Node(id);
+        n.setMetatype(Metatype.CLASS);
+        n.addStatement(new LinkStatement(id, relationVocabulary.instance_of(),
+                typeId));
+        return n;
+    }
+    
+    private LinkStatement createLinkStatementAndAddToGraph(String subject, String predicate, String object){
+    	LinkStatement ls = new LinkStatement();
+    	ls.setNodeId(subject);
+    	ls.setRelationId(predicate);
+    	ls.setTargetId(object);
+    	
+    	graph.addStatement(ls);
+    	return ls;
+    }
+    
+    public static void main(String[] args) throws SQLException, ClassNotFoundException, MalformedURLException, IOException {
+        ZfinObdBridge zob = new ZfinObdBridge();
+        zob.loadZfinData();
+    }
+
 }

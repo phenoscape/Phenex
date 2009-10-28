@@ -1,22 +1,25 @@
 package org.phenoscape.model;
 
+import java.beans.XMLDecoder;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
 import org.bbop.framework.GUIManager;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
-import org.obo.dataadapter.OBOMetaData;
-import org.obo.datamodel.Namespace;
+import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOSession;
+import org.obo.filters.Filter;
 import org.oboedit.controller.SessionManager;
+import org.phenoscape.app.CrossPlatform;
 import org.phenoscape.io.URLProxy;
 
 /**
@@ -24,9 +27,6 @@ import org.phenoscape.io.URLProxy;
  * @author Jim Balhoff
  */
 public class OntologyController {
-
-    private final OBOFileAdapter fileAdapter;
-    private final OBOMetaData metadata;
 
     private String TTO = "";
     private String COLLECTION = "";
@@ -38,6 +38,13 @@ public class OntologyController {
     private String REL_PROPOSED = "";
     private String GO = "";
     private String CHARACTER_SLIM = "";
+    private static final String ENTITY_FILTER = "entities";
+    private static final String QUALITY_FILTER = "qualities";
+    private static final String RELATION_FILTER = "relations";
+    private static final String UNIT_FILTER = "units";
+    private static final String TAXON_FILTER = "taxa";
+    private static final String MUSEUM_FILTER = "museums";
+    private File overridingFiltersFolder = new File(CrossPlatform.getUserPreferencesFolder("Phenex"), "Filters"); //FIXME should set this from outside this class
 
     private TermSet entityTermSet = null;
     private TermSet qualityTermSet = null;
@@ -47,18 +54,17 @@ public class OntologyController {
     private TermSet relationsTermSet = null;
 
     public OntologyController() {
-        this.fileAdapter = new OBOFileAdapter();
+        final OBOFileAdapter fileAdapter = new OBOFileAdapter();
         OBOFileAdapter.OBOAdapterConfiguration config = new OBOFileAdapter.OBOAdapterConfiguration();
         config.setReadPaths(Arrays.asList(this.getPaths()));
         config.setBasicSave(false);
         config.setAllowDangling(true);
         config.setFollowImports(false); // this is required because OBO currently fails if it tries to follow an import and there is no network connection
         try {
-            SessionManager.getManager().setSession(this.fileAdapter.doOperation(OBOAdapter.READ_ONTOLOGY, config, null));
+            SessionManager.getManager().setSession(fileAdapter.doOperation(OBOAdapter.READ_ONTOLOGY, config, null));
         } catch (DataAdapterException e) {
             log().fatal("Failed to load ontologies", e);
         }
-        this.metadata = this.fileAdapter.getMetaData();
         this.prefetchTermSets();
     }
 
@@ -79,8 +85,8 @@ public class OntologyController {
             String[] paths = { TTO, COLLECTION, TAO, PATO, SPATIAL, UNIT, REL, REL_PROPOSED, GO, CHARACTER_SLIM };
             return paths;
         } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            //TODO alert user somehow
+            log().fatal("Unable to read one or more ontologies", e);
         } catch (IOException e) {
             //TODO alert user somehow
             log().fatal("Unable to read one or more ontologies", e);
@@ -94,32 +100,39 @@ public class OntologyController {
 
     public TermSet getTaxonTermSet() {
         if (this.taxonTermSet == null) {
-            this.taxonTermSet = this.getTermSet(TTO); 
+            final TermSet terms =  new TermSet();
+            terms.setOBOSession(this.getOBOSession());
+            terms.setTermFilter(this.loadFilterWithName(TAXON_FILTER));
+            this.taxonTermSet = terms;
         }
         return this.taxonTermSet;
     }
 
     public TermSet getCollectionTermSet() {
         if (this.collectionTermSet == null) {
-            this.collectionTermSet = this.getTermSet(COLLECTION); 
+            final TermSet terms =  new TermSet();
+            terms.setOBOSession(this.getOBOSession());
+            terms.setTermFilter(this.loadFilterWithName(MUSEUM_FILTER));
+            this.collectionTermSet = terms;
         }
         return this.collectionTermSet;
     }
 
     public TermSet getEntityTermSet() {
         if (this.entityTermSet == null) {
-            final TermSet terms = this.getTermSet(TAO, SPATIAL, PATO, GO);
-            //terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
+            final TermSet terms =  new TermSet();
+            terms.setOBOSession(this.getOBOSession());
+            terms.setTermFilter(this.loadFilterWithName(ENTITY_FILTER));
             this.entityTermSet = terms;
         }
-        
         return this.entityTermSet;
     }
 
     public TermSet getQualityTermSet() {
         if (this.qualityTermSet == null) {
-            final TermSet terms = this.getTermSet(PATO);
-            //terms.setTermFilter(new AnatomyTermFilter(this.getOBOSession()));
+            final TermSet terms =  new TermSet();
+            terms.setOBOSession(this.getOBOSession());
+            terms.setTermFilter(this.loadFilterWithName(QUALITY_FILTER));
             this.qualityTermSet = terms;
         }
         return this.qualityTermSet;
@@ -131,30 +144,30 @@ public class OntologyController {
 
     public TermSet getUnitTermSet() {
         if (this.unitTermSet == null) {
-            this.unitTermSet = this.getTermSet(UNIT);
+            final TermSet terms =  new TermSet();
+            terms.setOBOSession(this.getOBOSession());
+            terms.setTermFilter(this.loadFilterWithName(UNIT_FILTER));
+            this.unitTermSet = terms;
         }
         return this.unitTermSet;
     }
 
     public TermSet getRelationsTermSet() {
-        if (this.relationsTermSet == null) {
-            final TermSet set = this.getTermSet();
-            set.setTermFilter(new RelationTermFilter(this.getOBOSession()));
-            set.setIncludesProperties(true);
+        if (this.relationsTermSet == null) {;
+            final TermSet set =  new TermSet();
+            set.setOBOSession(this.getOBOSession());
+            set.setTermFilter(this.loadFilterWithName(RELATION_FILTER));
             this.relationsTermSet = set;
         }
         return this.relationsTermSet;
     }
 
-    private TermSet getTermSet(String... urls) {
-        final Collection<Namespace> namespaces = new ArrayList<Namespace>();
-        for (String url : urls) {
-            namespaces.addAll(this.metadata.getNamespaces(url));
-        }
-        final TermSet terms =  new TermSet();
-        terms.setOBOSession(this.getOBOSession());
-        terms.setNamespaces(namespaces);
-        return terms;
+    public File getOverridingFiltersFolder() {
+        return this.overridingFiltersFolder;
+    }
+    
+    public void setOverridingFiltersFolder(File folder) {
+        this.overridingFiltersFolder = folder;
     }
     
     /**
@@ -169,6 +182,39 @@ public class OntologyController {
         this.getCollectionTermSet().getTerms();
         this.getUnitTermSet().getTerms();
         this.getRelationsTermSet().getTerms();
+        this.getQualityTermSet().getTerms();
+        this.getRelatedEntityTermSet().getTerms();
+    }
+    
+    private Filter<IdentifiedObject> loadFilterWithName(String filterName) {
+        final String filename = filterName + ".xml";
+        final File filterFile = new File(this.getOverridingFiltersFolder(), filename);
+        if (filterFile.exists()) {
+            return this.loadFilter(filterFile);
+        } else {
+            return this.loadFilterFromResource("/org/phenoscape/filters/" + filename);
+        }
+    }
+    
+    private Filter<IdentifiedObject> loadFilterFromResource(String resourcePath) {
+        return this.loadFilter(this.getClass().getResourceAsStream(resourcePath));
+    }
+    
+    private Filter<IdentifiedObject> loadFilter(File xmlFile) {
+        try {
+            return this.loadFilter(new FileInputStream(xmlFile));
+        } catch (FileNotFoundException e) {
+            log().error("Could not find specified filter file", e);
+        }
+        return null;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private Filter<IdentifiedObject> loadFilter(InputStream stream) {
+        final XMLDecoder d = new XMLDecoder(stream);
+        final Filter<IdentifiedObject> result = (Filter<IdentifiedObject>) d.readObject();
+        d.close();
+        return result;
     }
 
     private Logger log() {

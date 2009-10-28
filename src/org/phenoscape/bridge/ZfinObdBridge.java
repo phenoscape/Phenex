@@ -23,6 +23,7 @@ import org.obd.model.Graph;
 import org.obd.model.LinkStatement;
 import org.obd.model.Node;
 import org.obd.model.NodeAlias;
+import org.obd.model.CompositionalDescription.Predicate;
 import org.obd.model.Node.Metatype;
 import org.obd.query.Shard;
 import org.obd.query.impl.OBDSQLShard;
@@ -240,32 +241,26 @@ public class ZfinObdBridge {
     }
 
     private CompositionalDescription postComposeTerms(String[] comps){
-    	String entityId, qualityId, towardsId, ab;
-    	Set<LinkStatement> diffs = new HashSet<LinkStatement>();
+    	String aggregateEntityId, qualityId, componentEntityId, ab;
+    	CompositionalDescription componentAggregateDesc = null;
     	
-    	entityId = comps[4];
-    	qualityId = comps[5];
-    	towardsId = comps[6];
+    	aggregateEntityId = comps[4];
+    	qualityId = comps[6];
+    	componentEntityId = comps[5];
     	ab = comps[7];
     	
-    	if(entityId != null){
-    		entityId = replaceZfinEntityWithTaoEntity(entityId);
-    		entityId = replaceAlternateId(entityId);
-
-    		LinkStatement diffFromInheresIn = new LinkStatement();
-    		diffFromInheresIn.setRelationId(relationVocabulary.inheres_in());
-    		diffFromInheresIn.setTargetId(entityId);
-    		diffs.add(diffFromInheresIn);
+    	if(aggregateEntityId != null){
+    		aggregateEntityId = replaceZfinEntityWithTaoEntity(aggregateEntityId);
+    		aggregateEntityId = replaceAlternateId(aggregateEntityId);
     	}
     	
-    	if(towardsId != null && towardsId.trim().length() > 0 && towardsId.matches("[A-Z]+:[0-9]+")){
-    		towardsId = replaceZfinEntityWithTaoEntity(towardsId);
-    		towardsId = replaceAlternateId(towardsId);
+    	if(componentEntityId != null && componentEntityId.trim().length() > 0 && componentEntityId.matches("[A-Z]+:[0-9]+")){
+    		componentEntityId = replaceZfinEntityWithTaoEntity(componentEntityId);
+    		componentEntityId = replaceAlternateId(componentEntityId);
     		
-    		LinkStatement diffFromTowards = new LinkStatement();
-			diffFromTowards.setRelationId(relationVocabulary.towards());
-			diffFromTowards.setTargetId(towardsId);
-			diffs.add(diffFromTowards);
+    		componentAggregateDesc = new CompositionalDescription(Predicate.INTERSECTION);
+    		componentAggregateDesc.addArgument(componentEntityId);
+    		componentAggregateDesc.addArgument(relationVocabulary.part_of(), aggregateEntityId);
     	}
     	
     	qualityId = replaceAlternateId(qualityId);
@@ -279,8 +274,16 @@ public class ZfinObdBridge {
     		}
     	}
     	
-    	CompositionalDescription desc = new CompositionalDescription(qualityId, diffs);    	
-    	return desc;
+   		CompositionalDescription desc = new CompositionalDescription(Predicate.INTERSECTION);    	
+   		desc.addArgument(qualityId);
+   		if(componentAggregateDesc != null)
+   			desc.addArgument(relationVocabulary.inheres_in(), componentAggregateDesc);
+   		else
+   			desc.addArgument(relationVocabulary.inheres_in(), aggregateEntityId);
+   			
+    	desc.setId(desc.generateId());
+    	
+   		return desc;
     }
     
     private String replaceZfinEntityWithTaoEntity(String zfinEntity){
@@ -359,7 +362,7 @@ public class ZfinObdBridge {
             String[] pComps = phenoFileLine.split("\\t");
             genotypeId = pComps[0];
             genotype = pComps[1];
-            qualityId = pComps[5];
+            qualityId = pComps[6];
             pub = pComps[8];
             environmentId = pComps[9];
             
@@ -401,6 +404,7 @@ public class ZfinObdBridge {
                 genotypeToPhenotypeLink = 
                 	this.createLinkStatementAndAddToGraph(genotypeId, GENOTYPE_PHENOTYPE_REL_ID, phenoId);
             	
+                /*//TODO This may have to be refined for future implementation Cartik 10/27/09
             	if (!pub.equals("")) {
             		Node publicationNode = createInstanceNode(pub, PUBLICATION_TYPE_ID);
             		graph.addNode(publicationNode);
@@ -416,6 +420,7 @@ public class ZfinObdBridge {
             		
             		this.createLinkStatementAndAddToGraph(dsId, HAS_PUB_REL_ID, pub);
             	}
+            	*/
 
             	this.createLinkStatementAndAddToGraph(phenoId, relationVocabulary.is_a(), qualityId);
             }

@@ -4,18 +4,22 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.prefs.Preferences;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 
 import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
+import org.phenoscape.model.OntologySource;
+import org.phenoscape.model.UserOntologyConfiguration;
 import org.phenoscape.swing.BugWorkaroundTable;
 import org.phenoscape.swing.PlaceholderRenderer;
 
@@ -35,32 +39,50 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
     private JButton deleteURLButton;
     private JButton applyButton;
     private JButton revertButton;
-    private final EventList<Source> sources = new BasicEventList<Source>();
-    private final EventSelectionModel<Source> sourcesSelectionModel = new EventSelectionModel<Source>(sources);
+    private final EventList<OntologySource> sources = new BasicEventList<OntologySource>();
+    private final EventSelectionModel<OntologySource> sourcesSelectionModel = new EventSelectionModel<OntologySource>(sources);
+    private final List<OntologySource> oldSources = new ArrayList<OntologySource>();
+    public static final String SOURCES_STORAGE_KEY = "sources";
+    private final UserOntologyConfiguration config;
 
-    public OntologyPreferencesComponent(String id) {
+    //TODO enable/disable apply & revert buttons
+    public OntologyPreferencesComponent(String id, UserOntologyConfiguration configuration) {
         super(id);
+        this.config = configuration;
     }
 
     @Override
     public void init() {
         super.init();
-        //TODO load current sources into list
-        //
+        final List<OntologySource> storedSources = this.config.getStoredSources();
+        if (storedSources != null) {
+            this.sources.addAll(storedSources);
+        }
+        this.cloneContents(this.sources, this.oldSources);
         this.initializeInterface();
     }
 
     private void addSource() {
-        this.sources.add(new Source());
+        this.sources.add(new OntologySource());
     }
 
     private void deleteSelectedSource() {
-        final Source source = this.getSelectedSource();
+        final OntologySource source = this.getSelectedSource();
         if (source != null) { this.sources.remove(source); }
     }
 
-    private Source getSelectedSource() {
-        final EventList<Source> selected = this.sourcesSelectionModel.getSelected();
+    private void applyChanges() {
+        this.config.storeSources(this.sources);
+        this.cloneContents(this.sources, this.oldSources);
+        //TODO tell user they will need to restart to see changes
+    }
+
+    private void revertChanges() {
+        this.cloneContents(this.oldSources, this.sources);
+    }
+
+    private OntologySource getSelectedSource() {
+        final EventList<OntologySource> selected = this.sourcesSelectionModel.getSelected();
         if (selected.size() == 1) {
             return selected.get(0);
         } else {
@@ -68,9 +90,16 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
         }
     }
 
+    private void cloneContents(List<OntologySource> original, List<OntologySource> destination) {
+        destination.clear();
+        for (OntologySource item : original) {
+            destination.add(item.copy());
+        }
+    }
+
     private void initializeInterface() {
         this.setLayout(new BorderLayout());
-        final EventTableModel<Source> sourcesTableModel = new EventTableModel<Source>(this.sources, new OntologySourcesTableFormat());
+        final EventTableModel<OntologySource> sourcesTableModel = new EventTableModel<OntologySource>(this.sources, new OntologySourcesTableFormat());
         final JTable sourcesTable = new BugWorkaroundTable(sourcesTableModel);
         sourcesTable.setSelectionModel(this.sourcesSelectionModel);
         sourcesTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
@@ -80,7 +109,7 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
         //sortChooser.addSortActionListener(new SortDisabler());
         this.add(new JScrollPane(sourcesTable), BorderLayout.CENTER);
         this.add(this.createToolBar(), BorderLayout.NORTH);
-        this.add(this.createSaveToolBar(), BorderLayout.SOUTH);
+        this.add(this.createSavePanel(), BorderLayout.SOUTH);
     }
 
     private JToolBar createToolBar() {
@@ -102,42 +131,42 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
         toolBar.setFloatable(false);
         return toolBar;
     }
-    
-    private JToolBar createSaveToolBar() {
-        final JToolBar toolBar = new JToolBar();
+
+    private JPanel createSavePanel() {
+        final JPanel panel = new JPanel(new BorderLayout());
         this.revertButton = new JButton(new AbstractAction("Revert") {
             public void actionPerformed(ActionEvent e) {
-                //deleteSelectedSource();
+                revertChanges();
             }
         });
         this.revertButton.setToolTipText("Revert Changes");
-        toolBar.add(this.revertButton);
+        panel.add(this.revertButton, BorderLayout.WEST);
         this.applyButton = new JButton(new AbstractAction("Apply") {
             public void actionPerformed(ActionEvent e) {
-                //addSource();
+                applyChanges();
             }
         });
         this.applyButton.setToolTipText("Apply Changes");
-        toolBar.add(this.applyButton);
-        toolBar.setFloatable(false);
-        return toolBar;
+        panel.add(this.applyButton, BorderLayout.EAST);
+        return panel;
     }
 
-    private class OntologySourcesTableFormat implements WritableTableFormat<Source>, AdvancedTableFormat<Source> {
+    private class OntologySourcesTableFormat implements WritableTableFormat<OntologySource>, AdvancedTableFormat<OntologySource> {
 
-        public boolean isEditable(Source source, int column) {
+        public boolean isEditable(OntologySource source, int column) {
             return true;
         }
 
-        public Source setColumnValue(Source source, Object editedValue, int column) {
+        public OntologySource setColumnValue(OntologySource source, Object editedValue, int column) {
             switch(column) {
-            case 0: source.setLabel(editedValue.toString());
-            try {
-                source.setURL(new URL(editedValue.toString()));
-            } catch (MalformedURLException e) {
-                //TODO check correctness of URL in a cell editor instead
-                log().error("User entered bad URL");
-            } break;
+            case 0: source.setLabel(editedValue.toString()); break;
+            case 1:
+                try {
+                    source.setURL(new URL(editedValue.toString()));
+                } catch (MalformedURLException e) {
+                    //TODO check correctness of URL in a cell editor instead
+                    log().error("User entered bad URL");
+                } break;
             }
             return source;
         }
@@ -154,7 +183,7 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
             return null;
         }
 
-        public Object getColumnValue(Source source, int column) {
+        public Object getColumnValue(OntologySource source, int column) {
             switch(column) {
             case 0: return source.getLabel();
             case 1: return source.getURL();
@@ -183,34 +212,6 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
         }
 
     }
-
-    private static class Source {
-
-        private String label;
-        private URL url;
-
-        public String getLabel() {
-            return this.label;
-        }
-
-        public void setLabel(String newLabel) {
-            this.label = newLabel;
-        }
-
-        public URL getURL() {
-            return this.url;
-        }
-
-        public void setURL(URL newURL) {
-            this.url = newURL;
-        }
-
-    }
-
-    private Preferences getPrefsRoot() {
-        return Preferences.userNodeForPackage(this.getClass()).node("ontologyConfig");
-    }
-
 
     private Logger log() {
         return Logger.getLogger(this.getClass());

@@ -31,6 +31,7 @@ import org.obd.query.impl.OBDSQLShard;
 import org.phenoscape.io.NeXMLReader_1_0;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.OntologyController;
+import org.phenoscape.model.UserOntologyConfiguration;
 
 public class OBDModelBridgeTest {
 
@@ -38,7 +39,7 @@ public class OBDModelBridgeTest {
 	@Ignore
 	public void testLoad() throws XmlException, IOException, SQLException,
 			ClassNotFoundException {
-		OntologyController oc = new OntologyController();
+		OntologyController oc = new OntologyController(new UserOntologyConfiguration()); //TODO use a custom config
 		OBDModelBridge bridge = new OBDModelBridge();
 		NeXMLReader_1_0 reader;
 		DataSet ds;
@@ -93,7 +94,7 @@ public class OBDModelBridgeTest {
 	public void testOBDSave() throws XmlException, IOException, SQLException,
 			ClassNotFoundException {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("problemLog.txt")));
-		OntologyController oc = new OntologyController();
+		OntologyController oc = new OntologyController(new UserOntologyConfiguration()); //TODO use a custom config
 		NeXMLReader_1_0 reader = new NeXMLReader_1_0(new File("?"), oc.getOBOSession());
 		DataSet ds = reader.getDataSet();
 		OBDModelBridge bridge = new OBDModelBridge();

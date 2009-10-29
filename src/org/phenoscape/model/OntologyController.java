@@ -6,9 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
@@ -22,21 +22,10 @@ import org.oboedit.controller.SessionManager;
 import org.phenoscape.io.URLProxy;
 
 /**
- * This class is very much a work in progress and temporarily hardcodes much of ontology loading.
  * @author Jim Balhoff
  */
 public class OntologyController {
 
-    private String TTO = "";
-    private String COLLECTION = "";
-    private String TAO = "";
-    private String PATO = "";
-    private String SPATIAL = "";
-    private String UNIT = "";
-    private String REL = "";
-    private String REL_PROPOSED = "";
-    private String GO = "";
-    private String CHARACTER_SLIM = "";
     private static final String ENTITY_FILTER = "entities";
     private static final String QUALITY_FILTER = "qualities";
     private static final String RELATION_FILTER = "relations";
@@ -51,8 +40,11 @@ public class OntologyController {
     private TermSet collectionTermSet = null;
     private TermSet unitTermSet = null;
     private TermSet relationsTermSet = null;
+    
+    private final OntologyConfiguration config;
 
-    public OntologyController() {
+    public OntologyController(OntologyConfiguration configuration) {
+        this.config = configuration;
         final OBOFileAdapter fileAdapter = new OBOFileAdapter();
         OBOFileAdapter.OBOAdapterConfiguration config = new OBOFileAdapter.OBOAdapterConfiguration();
         config.setReadPaths(Arrays.asList(this.getPaths()));
@@ -62,35 +54,26 @@ public class OntologyController {
         try {
             SessionManager.getManager().setSession(fileAdapter.doOperation(OBOAdapter.READ_ONTOLOGY, config, null));
         } catch (DataAdapterException e) {
+            //TODO alert user?
             log().fatal("Failed to load ontologies", e);
         }
         this.prefetchTermSets();
     }
 
-    private String[] getPaths () {
+    private String[] getPaths() {
+        //TODO make proxy location configurable
         URLProxy proxy = new URLProxy(new File(GUIManager.getPrefsDir(),"Ontology Cache"));
-        try {
-            this.TTO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/taxonomy/teleost_taxonomy.obo")).toURI().toString();
-            this.COLLECTION = proxy.get(new URL("http://phenoscape.svn.sourceforge.net/viewvc/*checkout*/phenoscape/trunk/vocab/fish_collection_abbreviation.obo")).toURI().toString();
-            this.TAO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/fish/teleost_anatomy.obo")).toURI().toString();
-            //this.TAO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/amphibian/amphibian_anatomy.obo")).toURI().toString();
-            this.PATO = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo")).toURI().toString();
-            this.SPATIAL = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/anatomy/caro/spatial.obo")).toURI().toString();
-            this.UNIT = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/unit.obo")).toURI().toString();
-            this.REL = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro.obo")).toURI().toString();
-            this.REL_PROPOSED = proxy.get(new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro_proposed.obo")).toURI().toString();
-            this.GO = proxy.get(new URL("http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo")).toURI().toString();
-            this.CHARACTER_SLIM = proxy.get(new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/character_slims.obo")).toURI().toString();
-            String[] paths = { TTO, COLLECTION, TAO, PATO, SPATIAL, UNIT, REL, REL_PROPOSED, GO, CHARACTER_SLIM };
-            return paths;
-        } catch (MalformedURLException e) {
-            //TODO alert user somehow
-            log().fatal("Unable to read one or more ontologies", e);
-        } catch (IOException e) {
-            //TODO alert user somehow
-            log().fatal("Unable to read one or more ontologies", e);
+        final List<String> urls = new ArrayList<String>();
+        for (OntologySource source : this.config.getSources()) {
+            try {
+                final File localFile = proxy.get(source.getURL());
+                urls.add(localFile.toURI().toString());
+            } catch (IOException e) {
+                //TODO alert user somehow
+                log().error("Unable to read ontology at: " + source.getURL(), e);
+            }
         }
-        return new String[] {};
+        return urls.toArray(new String[] {});
     }
 
     public OBOSession getOBOSession() {
@@ -153,10 +136,10 @@ public class OntologyController {
 
     public TermSet getRelationsTermSet() {
         if (this.relationsTermSet == null) {;
-            final TermSet set =  new TermSet();
-            set.setOBOSession(this.getOBOSession());
-            set.setTermFilter(this.loadFilterWithName(RELATION_FILTER));
-            this.relationsTermSet = set;
+        final TermSet set =  new TermSet();
+        set.setOBOSession(this.getOBOSession());
+        set.setTermFilter(this.loadFilterWithName(RELATION_FILTER));
+        this.relationsTermSet = set;
         }
         return this.relationsTermSet;
     }
@@ -164,11 +147,11 @@ public class OntologyController {
     public File getOverridingFiltersFolder() {
         return this.overridingFiltersFolder;
     }
-    
+
     public void setOverridingFiltersFolder(File folder) {
         this.overridingFiltersFolder = folder;
     }
-    
+
     /**
      * This is just a startup "optimization" - it makes the term searches
      * happen while the ontology loading panel is displayed.  This reduces
@@ -184,7 +167,7 @@ public class OntologyController {
         this.getQualityTermSet().getTerms();
         this.getRelatedEntityTermSet().getTerms();
     }
-    
+
     private Filter<IdentifiedObject> loadFilterWithName(String filterName) {
         final String filename = filterName + ".xml";
         final File filterFile = new File(this.getOverridingFiltersFolder(), filename);
@@ -194,11 +177,11 @@ public class OntologyController {
             return this.loadFilterFromResource("/org/phenoscape/filters/" + filename);
         }
     }
-    
+
     private Filter<IdentifiedObject> loadFilterFromResource(String resourcePath) {
         return this.loadFilter(this.getClass().getResourceAsStream(resourcePath));
     }
-    
+
     private Filter<IdentifiedObject> loadFilter(File xmlFile) {
         try {
             return this.loadFilter(new FileInputStream(xmlFile));
@@ -207,7 +190,7 @@ public class OntologyController {
         }
         return null;
     }
-    
+
     @SuppressWarnings("unchecked")
     private Filter<IdentifiedObject> loadFilter(InputStream stream) {
         final XMLDecoder d = new XMLDecoder(stream);

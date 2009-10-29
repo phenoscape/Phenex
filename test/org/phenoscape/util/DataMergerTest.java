@@ -18,6 +18,7 @@ import org.phenoscape.model.OntologyController;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
+import org.phenoscape.model.UserOntologyConfiguration;
 
 public class DataMergerTest {
   
@@ -41,7 +42,7 @@ public class DataMergerTest {
   
   @Test
   public void mergeTaxa() throws XmlException, IOException {
-      final OBOSession session = new OntologyController().getOBOSession();
+      final OBOSession session = new OntologyController(new UserOntologyConfiguration()).getOBOSession(); //TODO use a custom config
       final NeXMLReader_1_0 nexmlReader4 = new NeXMLReader_1_0(new File("testfiles/DataMergerTestFile4.xml"), session);
       final NeXMLReader_1_0 nexmlReader5 = new NeXMLReader_1_0(new File("testfiles/DataMergerTestFile5.xml"), session);
       final DataSet existingData = nexmlReader4.getDataSet();

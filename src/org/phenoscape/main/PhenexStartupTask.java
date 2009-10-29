@@ -29,6 +29,7 @@ import org.oboedit.gui.tasks.DefaultGUIStartupTask;
 import org.phenoscape.app.CrossPlatform;
 import org.phenoscape.model.OntologyController;
 import org.phenoscape.model.PhenexController;
+import org.phenoscape.model.UserOntologyConfiguration;
 import org.phenoscape.swing.BlockingProgressDialog;
 import org.phenoscape.swing.WindowSizePrefsSaver;
 import org.phenoscape.view.CharacterMatrixComponentFactory;
@@ -55,6 +56,7 @@ import phenote.gui.selection.SelectionBridge;
 public class PhenexStartupTask extends DefaultGUIStartupTask {
 
     private PhenexController controller;
+    private UserOntologyConfiguration ontologyConfiguration;
 
     @Override
     protected Collection<GUIComponentFactory<?>> getDefaultComponentFactories() {
@@ -66,7 +68,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
         factories.add(new TaxonTableComponentFactory(this.controller));
         factories.add(new SpecimenTableComponentFactory(this.controller));
         factories.add(new CharacterMatrixComponentFactory(this.controller));
-        factories.add(new OntologyPreferencesComponentFactory());
+        factories.add(new OntologyPreferencesComponentFactory(this.ontologyConfiguration));
         factories.add(new SessionTermInfoFactory());
         factories.add(new PhenoteOntologyTreeEditorFactory());
         factories.add(new PhenoteGraphViewFactory());
@@ -113,10 +115,11 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
     @Override
     protected void configureSystem() {
         super.configureSystem();
+        this.ontologyConfiguration = new UserOntologyConfiguration();
         final SwingWorker<OntologyController, Void> ontologyLoader = new SwingWorker<OntologyController, Void>() {
             @Override
             protected OntologyController doInBackground() {
-                return new OntologyController();
+                return new OntologyController(ontologyConfiguration);
             }
         };
         // you would expect that displaying the progress dialog would make the splash screen go away, but it doesn't

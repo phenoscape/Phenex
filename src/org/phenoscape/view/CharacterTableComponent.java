@@ -109,7 +109,6 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
         });
         this.deleteCharacterButton.setToolTipText("Delete Character");
         toolBar.add(this.deleteCharacterButton);
-
         toolBar.setFloatable(false);
         return toolBar;
     }

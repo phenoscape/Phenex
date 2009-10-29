@@ -19,7 +19,6 @@ import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOSession;
 import org.obo.filters.Filter;
 import org.oboedit.controller.SessionManager;
-import org.phenoscape.app.CrossPlatform;
 import org.phenoscape.io.URLProxy;
 
 /**
@@ -44,7 +43,7 @@ public class OntologyController {
     private static final String UNIT_FILTER = "units";
     private static final String TAXON_FILTER = "taxa";
     private static final String MUSEUM_FILTER = "museums";
-    private File overridingFiltersFolder = new File(CrossPlatform.getUserPreferencesFolder("Phenex"), "Filters"); //FIXME should set this from outside this class
+    private File overridingFiltersFolder = new File(GUIManager.getPrefsDir(), "Filters");
 
     private TermSet entityTermSet = null;
     private TermSet qualityTermSet = null;

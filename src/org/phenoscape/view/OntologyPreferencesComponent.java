@@ -1,164 +1,219 @@
 package org.phenoscape.view;
 
 import java.awt.BorderLayout;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.prefs.BackingStoreException;
+import java.awt.event.ActionEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Comparator;
 import java.util.prefs.Preferences;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.JToolBar;
 
+import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
-import org.phenoscape.app.PrefObj;
-import org.phenoscape.model.TermField;
+import org.phenoscape.swing.BugWorkaroundTable;
+import org.phenoscape.swing.PlaceholderRenderer;
 
-import phenote.util.Collections;
+import phenote.gui.TableColumnPrefsSaver;
+import ca.odell.glazedlists.BasicEventList;
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.gui.AdvancedTableFormat;
+import ca.odell.glazedlists.gui.WritableTableFormat;
+import ca.odell.glazedlists.swing.EventSelectionModel;
+import ca.odell.glazedlists.swing.EventTableModel;
+
+import com.eekboom.utils.Strings;
 
 public class OntologyPreferencesComponent extends AbstractGUIComponent {
 
-  public OntologyPreferencesComponent(String id) {
-    super(id);
-  }
-  
-  @Override
-  public void init() {
-    super.init();
-    this.initializeInterface();
-  }
+    private JButton addURLButton;
+    private JButton deleteURLButton;
+    private JButton applyButton;
+    private JButton revertButton;
+    private final EventList<Source> sources = new BasicEventList<Source>();
+    private final EventSelectionModel<Source> sourcesSelectionModel = new EventSelectionModel<Source>(sources);
 
-  private void initializeInterface() {
-    this.setLayout(new BorderLayout());
-    final JTabbedPane tabPane = new JTabbedPane();
-    for (TermField field : TermField.values()) {
-      tabPane.add(this.createOntologyPrefPanel(field));
-    }
-    this.add(tabPane, BorderLayout.CENTER);
-  }
-  
-  private JComponent createOntologyPrefPanel(TermField field) {
-    final JPanel prefPanel = new JPanel(new BorderLayout());
-    prefPanel.setName(field.displayName());
-    final JTable table = new JTable(new OntologyPrefTableModel(field));
-    table.putClientProperty("Quaqua.Table.style", "striped");
-    prefPanel.add(new JScrollPane(table), BorderLayout.CENTER);
-    return prefPanel;
-  }
-  
-  private class OntologyPrefTableModel extends AbstractTableModel {
-
-    private final TermField field;
-
-    OntologyPrefTableModel(TermField field) {
-      this.field = field;
-    }
-
-    public int getColumnCount() {
-      return 1;
-    }
-
-    public int getRowCount() {
-      return this.getURLs().size() + 1;
-    }
-
-    public Object getValueAt(int rowIndex, int columnIndex) {
-      final List<String> urls = this.getURLs();
-      if (rowIndex > (urls.size() - 1)) {
-        return "";
-      } else {
-        return urls.get(rowIndex);
-      }
+    public OntologyPreferencesComponent(String id) {
+        super(id);
     }
 
     @Override
-    public String getColumnName(int column) {
-      return "Ontology URLs";
+    public void init() {
+        super.init();
+        //TODO load current sources into list
+        //
+        this.initializeInterface();
     }
 
-    @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-      return true;
+    private void addSource() {
+        this.sources.add(new Source());
     }
 
-    @Override
-    public void setValueAt(Object value, int rowIndex, int columnIndex) {
-      final List<String> urls = this.getURLs();
-      final boolean delete = (value == null) || (value.equals(""));
-      if (rowIndex > (urls.size() - 1)) {
-        if (!delete) {
-          urls.add(value.toString());
-        }
-      } else {
-        if (!delete) {
-          urls.set(rowIndex, value.toString());
+    private void deleteSelectedSource() {
+        final Source source = this.getSelectedSource();
+        if (source != null) { this.sources.remove(source); }
+    }
+
+    private Source getSelectedSource() {
+        final EventList<Source> selected = this.sourcesSelectionModel.getSelected();
+        if (selected.size() == 1) {
+            return selected.get(0);
         } else {
-          urls.remove(rowIndex);
+            return null;
         }
-      }
-      this.writeURLs(urls);
-      this.fireTableDataChanged();
     }
 
-    private List<String> getURLs() {
-      final String urlString = this.getPrefsRoot().get(this.field.name(), this.field.defaultURLs());
-      final List<String> urls = new ArrayList<String>(Arrays.asList(urlString.split(" ")));
-      urls.remove(""); // this is necessary because an empty list will be returned as a list with a single ""
-      return urls;
-    }
-    
-    @SuppressWarnings({ "unchecked", "unused" })
-    private Map<String, String> getOntologyPrefs() {
-      try {
-        final Object obj = PrefObj.getObject(this.getPrefsRoot(), this.field.name());
-        if (obj != null) {
-          return (Map<String, String>)obj;
-        }
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } catch (BackingStoreException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } catch (ClassNotFoundException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      return new HashMap<String, String>();
+    private void initializeInterface() {
+        this.setLayout(new BorderLayout());
+        final EventTableModel<Source> sourcesTableModel = new EventTableModel<Source>(this.sources, new OntologySourcesTableFormat());
+        final JTable sourcesTable = new BugWorkaroundTable(sourcesTableModel);
+        sourcesTable.setSelectionModel(this.sourcesSelectionModel);
+        sourcesTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
+        sourcesTable.putClientProperty("Quaqua.Table.style", "striped");
+        new TableColumnPrefsSaver(sourcesTable, this.getClass().getName());
+        //final TableComparatorChooser<Character> sortChooser = new TableComparatorChooser<Character>(charactersTable, this.getController().getSortedCharacters(), false);
+        //sortChooser.addSortActionListener(new SortDisabler());
+        this.add(new JScrollPane(sourcesTable), BorderLayout.CENTER);
+        this.add(this.createToolBar(), BorderLayout.NORTH);
+        this.add(this.createSaveToolBar(), BorderLayout.SOUTH);
     }
 
-    private void writeURLs(List<String> urls) {
-      final String urlString = Collections.join(urls, " ");
-      this.getPrefsRoot().put(this.field.name(), urlString);
+    private JToolBar createToolBar() {
+        final JToolBar toolBar = new JToolBar();
+        this.addURLButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
+            public void actionPerformed(ActionEvent e) {
+                addSource();
+            }
+        });
+        this.addURLButton.setToolTipText("Add Source URL");
+        toolBar.add(this.addURLButton);
+        this.deleteURLButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
+            public void actionPerformed(ActionEvent e) {
+                deleteSelectedSource();
+            }
+        });
+        this.deleteURLButton.setToolTipText("Delete Source URL");
+        toolBar.add(this.deleteURLButton);
+        toolBar.setFloatable(false);
+        return toolBar;
     }
     
-    @SuppressWarnings("unused")
-    private void writeOntologyPrefs(Map<String, String> prefs) {
-      try {
-        PrefObj.putObject(this.getPrefsRoot(), this.field.name(), prefs);
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } catch (BackingStoreException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } catch (ClassNotFoundException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
+    private JToolBar createSaveToolBar() {
+        final JToolBar toolBar = new JToolBar();
+        this.revertButton = new JButton(new AbstractAction("Revert") {
+            public void actionPerformed(ActionEvent e) {
+                //deleteSelectedSource();
+            }
+        });
+        this.revertButton.setToolTipText("Revert Changes");
+        toolBar.add(this.revertButton);
+        this.applyButton = new JButton(new AbstractAction("Apply") {
+            public void actionPerformed(ActionEvent e) {
+                //addSource();
+            }
+        });
+        this.applyButton.setToolTipText("Apply Changes");
+        toolBar.add(this.applyButton);
+        toolBar.setFloatable(false);
+        return toolBar;
     }
-    
+
+    private class OntologySourcesTableFormat implements WritableTableFormat<Source>, AdvancedTableFormat<Source> {
+
+        public boolean isEditable(Source source, int column) {
+            return true;
+        }
+
+        public Source setColumnValue(Source source, Object editedValue, int column) {
+            switch(column) {
+            case 0: source.setLabel(editedValue.toString());
+            try {
+                source.setURL(new URL(editedValue.toString()));
+            } catch (MalformedURLException e) {
+                //TODO check correctness of URL in a cell editor instead
+                log().error("User entered bad URL");
+            } break;
+            }
+            return source;
+        }
+
+        public int getColumnCount() {
+            return 2;
+        }
+
+        public String getColumnName(int column) {
+            switch(column) {
+            case 0: return "Label";
+            case 1: return "URL";
+            }
+            return null;
+        }
+
+        public Object getColumnValue(Source source, int column) {
+            switch(column) {
+            case 0: return source.getLabel();
+            case 1: return source.getURL();
+            }
+            return null;
+        }
+
+        public Class<?> getColumnClass(int column) {
+            switch(column) {
+            case 0: return String.class;
+            case 1: return URL.class;
+            }
+            return null;
+        }
+
+        public Comparator<?> getColumnComparator(int column) {
+            switch(column) {
+            case 0: return Strings.getNaturalComparator();
+            case 1: return new Comparator<URL>() {
+                public int compare(URL o1, URL o2) {
+                    return Strings.compareNatural(o1.toString(), o2.toString());
+                }
+            };
+            }
+            return null;
+        }
+
+    }
+
+    private static class Source {
+
+        private String label;
+        private URL url;
+
+        public String getLabel() {
+            return this.label;
+        }
+
+        public void setLabel(String newLabel) {
+            this.label = newLabel;
+        }
+
+        public URL getURL() {
+            return this.url;
+        }
+
+        public void setURL(URL newURL) {
+            this.url = newURL;
+        }
+
+    }
+
     private Preferences getPrefsRoot() {
-      return Preferences.userNodeForPackage(this.getClass()).node("ontologyConfig");
+        return Preferences.userNodeForPackage(this.getClass()).node("ontologyConfig");
     }
 
-  }
+
+    private Logger log() {
+        return Logger.getLogger(this.getClass());
+    }
 
 }

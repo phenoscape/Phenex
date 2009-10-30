@@ -11,6 +11,11 @@ import java.util.prefs.Preferences;
 import org.apache.log4j.Logger;
 import org.phenoscape.app.PrefObj;
 
+/**
+ * An implementation of OntologyConfiguration which contains default ontology sources, and can also read and write a persistent 
+ * list of ontology sources to the user's preferences.
+ * @author Jim Balhoff
+ */
 public class UserOntologyConfiguration implements OntologyConfiguration {
 
     public static final String SOURCES_STORAGE_KEY = "sources";
@@ -45,6 +50,9 @@ public class UserOntologyConfiguration implements OntologyConfiguration {
         return this.getStoredSources();
     }
 
+    /**
+     * Retrieve the list of ontology sources from the user's preferences.
+     */
     @SuppressWarnings("unchecked")
     public List<OntologySource> getStoredSources() {
         try {
@@ -66,6 +74,9 @@ public class UserOntologyConfiguration implements OntologyConfiguration {
         return null;
     }
 
+    /**
+     * Store a given list of ontology sources to the user's preferences.
+     */
     public void storeSources(List<OntologySource> theSources) {
         //TODO would be nice to communicate these errors to the user
         try {

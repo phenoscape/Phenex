@@ -151,14 +151,11 @@ public class URLProxy {
             // haven't serialized a map before
             return new HashMap<String, Object>();
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log().error("Unable to read download cache metadata", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log().error("Unable to read download cache metadata", e);
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log().error("Unable to read download cache metadata", e);
         }
         return null;
     }
@@ -194,11 +191,9 @@ public class URLProxy {
             output.writeObject(metadata);
             output.close();
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log().error("Unable to write download cache metadata", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log().error("Unable to write download cache metadata", e);
         }
     }
 

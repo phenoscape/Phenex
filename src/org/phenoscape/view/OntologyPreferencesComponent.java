@@ -42,7 +42,6 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
     private final EventList<OntologySource> sources = new BasicEventList<OntologySource>();
     private final EventSelectionModel<OntologySource> sourcesSelectionModel = new EventSelectionModel<OntologySource>(sources);
     private final List<OntologySource> oldSources = new ArrayList<OntologySource>();
-    public static final String SOURCES_STORAGE_KEY = "sources";
     private final UserOntologyConfiguration config;
 
     //TODO enable/disable apply & revert buttons
@@ -74,7 +73,7 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
     private void applyChanges() {
         this.config.storeSources(this.sources);
         this.cloneContents(this.sources, this.oldSources);
-        //TODO tell user they will need to restart to see changes
+        //TODO tell user they will need to relaunch to see changes
     }
 
     private void revertChanges() {
@@ -164,7 +163,6 @@ public class OntologyPreferencesComponent extends AbstractGUIComponent {
                 try {
                     source.setURL(new URL(editedValue.toString()));
                 } catch (MalformedURLException e) {
-                    //TODO check correctness of URL in a cell editor instead
                     log().error("User entered bad URL");
                 } break;
             }

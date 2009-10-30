@@ -42,7 +42,7 @@ public class DataMergerTest {
   
   @Test
   public void mergeTaxa() throws XmlException, IOException {
-      final OBOSession session = new OntologyController(new UserOntologyConfiguration()).getOBOSession(); //TODO use a custom config
+      final OBOSession session = new OntologyController(new UserOntologyConfiguration()).getOBOSession(); //TODO use a custom config with test ontologies
       final NeXMLReader_1_0 nexmlReader4 = new NeXMLReader_1_0(new File("testfiles/DataMergerTestFile4.xml"), session);
       final NeXMLReader_1_0 nexmlReader5 = new NeXMLReader_1_0(new File("testfiles/DataMergerTestFile5.xml"), session);
       final DataSet existingData = nexmlReader4.getDataSet();

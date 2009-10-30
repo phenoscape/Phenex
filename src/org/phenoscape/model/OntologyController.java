@@ -46,13 +46,13 @@ public class OntologyController {
     public OntologyController(OntologyConfiguration configuration) {
         this.config = configuration;
         final OBOFileAdapter fileAdapter = new OBOFileAdapter();
-        OBOFileAdapter.OBOAdapterConfiguration config = new OBOFileAdapter.OBOAdapterConfiguration();
-        config.setReadPaths(Arrays.asList(this.getPaths()));
-        config.setBasicSave(false);
-        config.setAllowDangling(true);
-        config.setFollowImports(false); // this is required because OBO currently fails if it tries to follow an import and there is no network connection
+        OBOFileAdapter.OBOAdapterConfiguration adapterConfig = new OBOFileAdapter.OBOAdapterConfiguration();
+        adapterConfig.setReadPaths(Arrays.asList(this.getPaths()));
+        adapterConfig.setBasicSave(false);
+        adapterConfig.setAllowDangling(true);
+        adapterConfig.setFollowImports(false); // this is required because OBO currently fails if it tries to follow an import and there is no network connection
         try {
-            SessionManager.getManager().setSession(fileAdapter.doOperation(OBOAdapter.READ_ONTOLOGY, config, null));
+            SessionManager.getManager().setSession(fileAdapter.doOperation(OBOAdapter.READ_ONTOLOGY, adapterConfig, null));
         } catch (DataAdapterException e) {
             //TODO alert user?
             log().fatal("Failed to load ontologies", e);

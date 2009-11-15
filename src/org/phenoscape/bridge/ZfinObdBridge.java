@@ -10,11 +10,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
@@ -84,6 +81,7 @@ public class ZfinObdBridge {
     private Map<String, String> envToMorpholinoMap;
     private Map<String, String> morpholinoToGeneMap;
     private Map<String, String> genotypeToGeneMap;
+    private Map<String, String> morpholinoIdToLabelMap;
     
     /*
      * This map has been created to keep track of main IDs and their mapping to alternate IDs
@@ -104,6 +102,7 @@ public class ZfinObdBridge {
         this.envToMorpholinoMap = new HashMap<String, String>();
         this.morpholinoToGeneMap = new HashMap<String, String>();
         this.genotypeToGeneMap = new HashMap<String, String>();
+        this.morpholinoIdToLabelMap = new HashMap<String, String>();
         
         this.createZfinNameDirectory();
         this.mapEnvToMorpholino();
@@ -207,7 +206,7 @@ public class ZfinObdBridge {
     }
     
     private void mapMorpholinoToGene() throws IOException{
-    	String line, geneId, morpholinoId;
+    	String line, geneId, morpholinoId, morpholinoLabel;
     	
     	URL morpholinoURL = new URL(System.getProperty(MORPHOLINO_URL));
     	BufferedReader reader = new BufferedReader(new InputStreamReader(morpholinoURL.openStream()));
@@ -216,7 +215,9 @@ public class ZfinObdBridge {
     		String[] lComps = line.split("\\t");
    			geneId = this.normalizetoZfin(lComps[0]);
    			morpholinoId = lComps[2];
+   			morpholinoLabel = lComps[3];
     		this.morpholinoToGeneMap.put(morpholinoId, geneId);
+    		this.morpholinoIdToLabelMap.put(morpholinoId, morpholinoLabel);
     	}
     	
     	reader.close();
@@ -367,15 +368,16 @@ public class ZfinObdBridge {
             environmentId = pComps[9];
             
             if(genotype.equals(this.WILD_TYPE_STRING)){
-            	String morpholinoId = this.envToMorpholinoMap.get(environmentId);
-            	if(morpholinoId != null)
-            		geneId = this.morpholinoToGeneMap.get(morpholinoId);
+            	genotypeId = this.envToMorpholinoMap.get(environmentId);
+            	genotype = this.morpholinoIdToLabelMap.get(genotypeId);
+            	if(genotypeId != null)
+            		geneId = this.morpholinoToGeneMap.get(genotypeId);
             }
             else{
             	geneId = this.genotypeToGeneMap.get(genotypeId);
             }
             	
-            if(geneId != null){
+            if(geneId != null && genotypeId != null){
                 CompositionalDescription cd = this.postComposeTerms(pComps);
             	String phenoId = cd.generateId();
             	cd.setId(phenoId);
@@ -395,14 +397,14 @@ public class ZfinObdBridge {
             		geneNode.setLabel(geneSymbol);
             	}
             	graph.addNode(geneNode);
-
-            	Node genotypeNode = createInstanceNode(genotypeId, GENOTYPE_TYPE_ID);
-            	genotypeNode.setLabel(genotype);
-            	graph.addNode(genotypeNode);
             	
-            	this.createLinkStatementAndAddToGraph(geneId, GENE_GENOTYPE_REL_ID, genotypeId);
-                genotypeToPhenotypeLink = 
-                	this.createLinkStatementAndAddToGraph(genotypeId, GENOTYPE_PHENOTYPE_REL_ID, phenoId);
+           		Node genotypeNode = createInstanceNode(genotypeId, GENOTYPE_TYPE_ID);
+           		if(genotype != null)
+           			genotypeNode.setLabel(genotype);
+           		graph.addNode(genotypeNode);
+           		this.createLinkStatementAndAddToGraph(geneId, GENE_GENOTYPE_REL_ID, genotypeId);
+           		genotypeToPhenotypeLink =
+           			this.createLinkStatementAndAddToGraph(genotypeId, GENOTYPE_PHENOTYPE_REL_ID, phenoId);
             	
                 /*//TODO This may have to be refined for future implementation Cartik 10/27/09
             	if (!pub.equals("")) {

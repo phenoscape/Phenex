@@ -197,7 +197,7 @@ public class ZfinObdBridge {
     		String[] lComps = line.split("\\t");
     		if(lComps[1].equals(MORPHOLINO_STRING)){
     			environmentId = normalizetoZfin(lComps[0]);
-    			morpholinoId = lComps[2];
+    			morpholinoId = this.normalizetoZfin(lComps[2]);
     			this.envToMorpholinoMap.put(environmentId, morpholinoId);
     		}
     	}
@@ -214,7 +214,7 @@ public class ZfinObdBridge {
     	while((line = reader.readLine()) != null){
     		String[] lComps = line.split("\\t");
    			geneId = this.normalizetoZfin(lComps[0]);
-   			morpholinoId = lComps[2];
+   			morpholinoId = this.normalizetoZfin(lComps[2]);
    			morpholinoLabel = lComps[3];
     		this.morpholinoToGeneMap.put(morpholinoId, geneId);
     		this.morpholinoIdToLabelMap.put(morpholinoId, morpholinoLabel);
@@ -423,8 +423,6 @@ public class ZfinObdBridge {
             		this.createLinkStatementAndAddToGraph(dsId, HAS_PUB_REL_ID, pub);
             	}
             	*/
-
-            	this.createLinkStatementAndAddToGraph(phenoId, relationVocabulary.is_a(), qualityId);
             }
         }
         
@@ -432,7 +430,7 @@ public class ZfinObdBridge {
     }
 
     private String normalizetoZfin(String string) {
-        return "ZFIN:" + string;
+        return ((string.startsWith("ZFIN:"))?string:"ZFIN:" + string);
     }
 
     protected Node createInstanceNode(String id, String typeId) {

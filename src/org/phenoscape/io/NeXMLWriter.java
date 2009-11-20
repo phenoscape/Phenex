@@ -14,29 +14,31 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.xml.namespace.QName;
+
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlAnySimpleType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlOptions;
 import org.bioontologies.obd.schema.pheno.PhenotypeCharacterDocument.PhenotypeCharacter;
 import org.bioontologies.obd.schema.pheno.PhenotypeManifestationDocument.PhenotypeManifestation;
-import org.nexml.x10.AbstractBlock;
-import org.nexml.x10.AbstractChar;
-import org.nexml.x10.AbstractObs;
-import org.nexml.x10.AbstractObsMatrix;
-import org.nexml.x10.AbstractObsRow;
-import org.nexml.x10.AbstractState;
-import org.nexml.x10.AbstractStates;
-import org.nexml.x10.Annotated;
-import org.nexml.x10.Dict;
-import org.nexml.x10.NexmlDocument;
-import org.nexml.x10.StandardCells;
-import org.nexml.x10.StandardChar;
-import org.nexml.x10.StandardMatrixObsRow;
-import org.nexml.x10.StandardObs;
-import org.nexml.x10.StandardState;
-import org.nexml.x10.StandardStates;
-import org.nexml.x10.Taxa;
+import org.nexml.schema_2009.AbstractBlock;
+import org.nexml.schema_2009.AbstractChar;
+import org.nexml.schema_2009.AbstractObs;
+import org.nexml.schema_2009.AbstractObsMatrix;
+import org.nexml.schema_2009.AbstractObsRow;
+import org.nexml.schema_2009.AbstractState;
+import org.nexml.schema_2009.AbstractStates;
+import org.nexml.schema_2009.Annotated;
+import org.nexml.schema_2009.NexmlDocument;
+import org.nexml.schema_2009.StandardCells;
+import org.nexml.schema_2009.StandardChar;
+import org.nexml.schema_2009.StandardMatrixObsRow;
+import org.nexml.schema_2009.StandardObs;
+import org.nexml.schema_2009.StandardState;
+import org.nexml.schema_2009.StandardStates;
+import org.nexml.schema_2009.Taxa;
+import org.phenoscape.io.NeXMLUtil.Annotatable;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.Phenotype;
@@ -44,12 +46,10 @@ import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 import org.w3c.dom.Attr;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import phenote.dataadapter.phenoxml.PhenoXmlAdapter;
 
-public class NeXMLWriter_1_0 {
+public class NeXMLWriter {
 
     private final NexmlDocument xmlDoc;
     private final String charactersBlockID;
@@ -57,19 +57,28 @@ public class NeXMLWriter_1_0 {
     private String generator;
     private final XmlOptions options = new XmlOptions();
 
-    public NeXMLWriter_1_0(String charactersBlockID) {
+    public NeXMLWriter(String charactersBlockID) {
         this(charactersBlockID, NexmlDocument.Factory.newInstance());
     }
 
-    public NeXMLWriter_1_0(String charactersBlockID, NexmlDocument startingDoc) {
+    public NeXMLWriter(String charactersBlockID, NexmlDocument startingDoc) {
         this.charactersBlockID = charactersBlockID;
         this.xmlDoc = startingDoc;
         this.options.setSavePrettyPrint();
-        Map<String, String> suggestedPrefixes = new HashMap<String, String>();
-        suggestedPrefixes.put("http://www.nexml.org/1.0", "nex");
+        final Map<String, String> suggestedPrefixes = new HashMap<String, String>();
+        suggestedPrefixes.put("http://www.nexml.org/2009", "");
+        suggestedPrefixes.put(NeXMLUtil.DARWIN_CORE_NAMESPACE, NeXMLUtil.DARWIN_CORE_PREFIX);
+        suggestedPrefixes.put(NeXMLUtil.DUBLIN_CORE_NAMESPACE, NeXMLUtil.DUBLIN_CORE_PREFIX);
+        suggestedPrefixes.put(NeXMLUtil.PHENOSCAPE_NAMESPACE, NeXMLUtil.PHENOSCAPE_PREFIX);
+        suggestedPrefixes.put(NeXMLUtil.RDFS_NAMESPACE, NeXMLUtil.RDFS_PREFIX);
         this.options.setSaveAggressiveNamespaces();
         this.options.setSaveSuggestedPrefixes(suggestedPrefixes);
         this.options.setSaveNamespacesFirst();
+        this.options.setUseDefaultNamespace();
+        
+        final Map<String, String> implicitNamespaces = new HashMap<String, String>();
+        implicitNamespaces.put("http://www.nexml.org/2009", "nex");
+        //this.options.setSaveImplicitNamespaces(implicitNamespaces);
     }
 
     public void setDataSet(DataSet data) {
@@ -96,10 +105,12 @@ public class NeXMLWriter_1_0 {
         final NexmlDocument newDoc = (NexmlDocument)(xmlDoc.copy());
         if (newDoc.getNexml() == null) { newDoc.addNewNexml(); }
         if (this.generator != null) { newDoc.getNexml().setGenerator(this.generator); }
-        newDoc.getNexml().setVersion(BigDecimal.valueOf(1.0));
-        Dict metadata = NeXMLUtil_1_0.findOrCreateMetadataDict(newDoc);
-        this.writeToMetadata(metadata, this.data.getCurators(), this.data.getPublication(), this.data.getPublicationNotes());
-        final AbstractBlock charBlock = NeXMLUtil_1_0.findOrCreateCharactersBlock(newDoc, this.charactersBlockID);
+        newDoc.getNexml().setVersion(BigDecimal.valueOf(0.9));
+        final Annotatable annotatableNexml = new Annotatable(newDoc.getNexml());
+        NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.CURATORS_PREDICATE, this.data.getCurators());
+        NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.PUBLICATION_PREDICATE, this.data.getPublication());
+        NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.PUBLICATION_NOTES_PREDICATE, this.data.getPublicationNotes());
+        final AbstractBlock charBlock = NeXMLUtil.findOrCreateCharactersBlock(newDoc, this.charactersBlockID);
         this.writeCharacters(charBlock);
         final String taxaID;
         if ((charBlock.getOtus() == null) || (charBlock.getOtus().equals(""))) {
@@ -108,7 +119,7 @@ public class NeXMLWriter_1_0 {
         } else {
             taxaID = charBlock.getOtus();
         }
-        final Taxa taxaBlock = NeXMLUtil_1_0.findOrCreateTaxa(newDoc, taxaID);
+        final Taxa taxaBlock = NeXMLUtil.findOrCreateTaxa(newDoc, taxaID);
         this.writeTaxa(taxaBlock);
         // move taxa ahead of characters
         final XmlCursor firstCharCursor = newDoc.getNexml().getCharactersArray()[0].newCursor();
@@ -186,10 +197,10 @@ public class NeXMLWriter_1_0 {
     }
 
     private void writeTaxa(Taxa taxaBlock) {
-        final List<org.nexml.x10.Taxon> existingOTUs = Arrays.asList(taxaBlock.getOtuArray());
-        final List<org.nexml.x10.Taxon> newOTUs = new ArrayList<org.nexml.x10.Taxon>();
+        final List<org.nexml.schema_2009.Taxon> existingOTUs = Arrays.asList(taxaBlock.getOtuArray());
+        final List<org.nexml.schema_2009.Taxon> newOTUs = new ArrayList<org.nexml.schema_2009.Taxon>();
         for (Taxon taxon : this.data.getTaxa()) {
-            final org.nexml.x10.Taxon otu = this.findOrCreateOTUWithID(existingOTUs, taxon.getNexmlID());
+            final org.nexml.schema_2009.Taxon otu = this.findOrCreateOTUWithID(existingOTUs, taxon.getNexmlID());
             newOTUs.add(otu);
             otu.setLabel(taxon.getPublicationName());
             this.writeOBOID(otu, taxon);
@@ -198,7 +209,7 @@ public class NeXMLWriter_1_0 {
             this.writeFigure(otu, taxon.getFigure());
             this.writeMatrixTaxon(otu, taxon.getMatrixTaxonName());
         }
-        taxaBlock.setOtuArray(newOTUs.toArray(new org.nexml.x10.Taxon[] {}));
+        taxaBlock.setOtuArray(newOTUs.toArray(new org.nexml.schema_2009.Taxon[] {}));
     }
 
     private AbstractObsRow findOrCreateRowForTaxon(List<AbstractObsRow> list, String id) {
@@ -222,11 +233,11 @@ public class NeXMLWriter_1_0 {
         return newCell;
     }
 
-    private org.nexml.x10.Taxon findOrCreateOTUWithID(List<org.nexml.x10.Taxon> list, String id) {
-        for (org.nexml.x10.Taxon otu : list) {
+    private org.nexml.schema_2009.Taxon findOrCreateOTUWithID(List<org.nexml.schema_2009.Taxon> list, String id) {
+        for (org.nexml.schema_2009.Taxon otu : list) {
             if (otu.getId().equals(id)) { return otu; }
         }
-        final org.nexml.x10.Taxon newOTU = org.nexml.x10.Taxon.Factory.newInstance();
+        final org.nexml.schema_2009.Taxon newOTU = org.nexml.schema_2009.Taxon.Factory.newInstance();
         newOTU.setId(id);
         return newOTU;
     }
@@ -258,91 +269,75 @@ public class NeXMLWriter_1_0 {
         return newState;
     }
 
-    private void writeToMetadata(Dict metadata, String curatorsText, String publicationText, String pubNotesText) {
-        final Element any = NeXMLUtil_1_0.getFirstChildWithTagName(((Element)(metadata.getDomNode())), "any");
-        final Element curators = NeXMLUtil_1_0.getFirstChildWithTagName(any, "curators");
-        NeXMLUtil_1_0.setTextContent(curators, curatorsText);
-        final Element publication = NeXMLUtil_1_0.getFirstChildWithTagName(any, "publication");
-        NeXMLUtil_1_0.setTextContent(publication, publicationText);
-        final Element pubNotes = NeXMLUtil_1_0.getFirstChildWithTagName(any, "publicationNotes");
-        NeXMLUtil_1_0.setTextContent(pubNotes, pubNotesText);
-    }
-
-    private void writeOBOID(org.nexml.x10.Taxon otu, Taxon taxon) {
-        final Dict oboIDDict = NeXMLUtil_1_0.findOrCreateDict(otu, "OBO_ID", otu.getDomNode().getOwnerDocument().createElement("string"));
+    private void writeOBOID(org.nexml.schema_2009.Taxon otu, Taxon taxon) {
+        final Annotatable annotatableOTU = new Annotatable(otu);
         if (taxon.getValidName() == null) {
-            NeXMLUtil_1_0.removeDict(otu, oboIDDict);
+            NeXMLUtil.unsetMetadata(annotatableOTU, NeXMLUtil.VALID_NAME_PREDICATE);
         } else {
-            final Element stringNode = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(oboIDDict.getDomNode()), "string");
-            NeXMLUtil_1_0.setTextContent(stringNode, taxon.getValidName().getID());
+            NeXMLUtil.setMetadata(annotatableOTU, NeXMLUtil.VALID_NAME_PREDICATE, NeXMLUtil.oboURI(taxon.getValidName()));
         }
     }
 
-    private void writeSpecimens(org.nexml.x10.Taxon otu, Taxon taxon) {
-        final Dict specimensDict = NeXMLUtil_1_0.findOrCreateDict(otu, "OBO_specimens", otu.getDomNode().getOwnerDocument().createElement("any"));
-        final Element any = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(specimensDict.getDomNode()), "any");
-        NeXMLUtil_1_0.clearChildren(any);
-        if (taxon.getSpecimens().isEmpty()) {
-            NeXMLUtil_1_0.removeDict(otu, specimensDict);
-        } else {
-            for (Specimen specimen : taxon.getSpecimens()) {
-                final Element specimenXML = any.getOwnerDocument().createElement("specimen");
-                specimenXML.setAttribute("collection", specimen.getCollectionCode() != null ? specimen.getCollectionCode().getID() : null);
-                specimenXML.setAttribute("accession", specimen.getCatalogID());
-                any.appendChild(specimenXML);
+    private void writeSpecimens(org.nexml.schema_2009.Taxon otu, Taxon taxon) {
+        final Annotatable annotatableOTU = new Annotatable(otu);
+        NeXMLUtil.unsetMetadata(annotatableOTU, NeXMLUtil.SPECIMEN_PREDICATE);
+        for (Specimen specimen : taxon.getSpecimens()) {
+            final Map<QName, Object> specimenData = new HashMap<QName, Object>();
+            if (specimen.getCollectionCode() != null) {
+                specimenData.put(NeXMLUtil.COLLECTION_PREDICATE, NeXMLUtil.oboURI(specimen.getCollectionCode()));    
             }
+            if (specimen.getCatalogID() != null) {
+                specimenData.put(NeXMLUtil.ACCESSION_PREDICATE, specimen.getCatalogID());    
+            }
+            NeXMLUtil.addMetadata(annotatableOTU, NeXMLUtil.SPECIMEN_PREDICATE, specimenData);
         }
+
     }
 
     private void writeComment(Annotated node, String comment) {
-        final Dict commentDict = NeXMLUtil_1_0.findOrCreateDict(node, NeXMLUtil_1_0.COMMENT_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+        final Annotatable annotatableNode = new Annotatable(node);
         if ((comment == null) || (comment.equals(""))) {
-            NeXMLUtil_1_0.removeDict(node, commentDict);
+            NeXMLUtil.unsetMetadata(annotatableNode, NeXMLUtil.COMMENT_PREDICATE);
         } else {
-            final Element stringNode = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(commentDict.getDomNode()), "string");
-            NeXMLUtil_1_0.setTextContent(stringNode, comment);
+            NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.COMMENT_PREDICATE, comment);
         }
     }
 
     private void writeFigure(Annotated node, String figure) {
-        final Dict figureDict = NeXMLUtil_1_0.findOrCreateDict(node, NeXMLUtil_1_0.FIGURE_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+        final Annotatable annotatableNode = new Annotatable(node);
         if ((figure == null) || (figure.equals(""))) {
-            NeXMLUtil_1_0.removeDict(node, figureDict);
+            NeXMLUtil.unsetMetadata(annotatableNode, NeXMLUtil.FIGURE_PREDICATE);
         } else {
-            final Element stringNode = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(figureDict.getDomNode()), "string");
-            NeXMLUtil_1_0.setTextContent(stringNode, figure);
+            NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.FIGURE_PREDICATE, figure);
         }
     }
 
-    private void writeMatrixTaxon(Annotated node, String matrixTaxon) {
-        final Dict matrixTaxonDict = NeXMLUtil_1_0.findOrCreateDict(node, NeXMLUtil_1_0.MATRIX_TAXON_KEY, node.getDomNode().getOwnerDocument().createElement("string"));
+    private void writeMatrixTaxon(org.nexml.schema_2009.Taxon otu, String matrixTaxon) {
+        final Annotatable annotatableOTU = new Annotatable(otu);
         if ((matrixTaxon == null) || (matrixTaxon.equals(""))) {
-            NeXMLUtil_1_0.removeDict(node, matrixTaxonDict);
+            NeXMLUtil.unsetMetadata(annotatableOTU, NeXMLUtil.MATRIX_NAME_PREDICATE);
         } else {
-            final Element stringNode = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(matrixTaxonDict.getDomNode()), "string");
-            NeXMLUtil_1_0.setTextContent(stringNode, matrixTaxon);
+            NeXMLUtil.setMetadata(annotatableOTU, NeXMLUtil.MATRIX_NAME_PREDICATE, matrixTaxon);
         }
     }
 
     private void writePhenotypes(AbstractState xmlState, State state) {
-        final Dict phenotypeDict = NeXMLUtil_1_0.findOrCreateDict(xmlState, "OBO_phenotype", xmlState.getDomNode().getOwnerDocument().createElement("any"));
+        final Annotatable annotatableState = new Annotatable(xmlState);
         if (state.getPhenotypes().isEmpty()) {
-            NeXMLUtil_1_0.removeDict(xmlState, phenotypeDict);
+            NeXMLUtil.unsetMetadata(annotatableState, NeXMLUtil.PHENOTYPE_PREDICATE);
             return;
+        } else {
+            final List<PhenotypeCharacter> pcs = new ArrayList<PhenotypeCharacter>();
+            for (Phenotype phenotype : state.getPhenotypes()) {
+                final PhenotypeCharacter pc = PhenoXmlAdapter.createPhenotypeCharacter(new PhenoXMLPhenotypeWrapper(phenotype));
+                if (pc != null) { pcs.add(pc); }
+            }
+            final org.bioontologies.obd.schema.pheno.PhenotypeDocument.Phenotype phenoXML = PhenoXmlAdapter.createPhenotype(pcs);
+            // for some reason the PhenoXML Phenotype appears only as a DocumentFragment instead of Element until it's stuck into a PhenotypeManifestation
+            final PhenotypeManifestation scratchPM = PhenotypeManifestation.Factory.newInstance();
+            scratchPM.setPhenotype(phenoXML);
+            NeXMLUtil.setMetadata(annotatableState, NeXMLUtil.PHENOTYPE_PREDICATE, scratchPM.getPhenotype().getDomNode());
         }
-        final Element any = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(phenotypeDict.getDomNode()), "any");
-        NeXMLUtil_1_0.clearChildren(any);
-        final List<PhenotypeCharacter> pcs = new ArrayList<PhenotypeCharacter>();
-        for (Phenotype phenotype : state.getPhenotypes()) {
-            final PhenotypeCharacter pc = PhenoXmlAdapter.createPhenotypeCharacter(new PhenoXMLPhenotypeWrapper(phenotype));
-            if (pc != null) { pcs.add(pc); }
-        }
-        final org.bioontologies.obd.schema.pheno.PhenotypeDocument.Phenotype phenoXML = PhenoXmlAdapter.createPhenotype(pcs);
-        // for some reason the PhenoXML Phenotype appears only as a DocumentFragment instead of Element until it's stuck into a PhenotypeManifestation
-        final PhenotypeManifestation scratchPM = PhenotypeManifestation.Factory.newInstance();
-        scratchPM.setPhenotype(phenoXML);
-        final Node importedPhenoXML = any.getOwnerDocument().importNode(scratchPM.getPhenotype().getDomNode(), true);
-        any.appendChild(importedPhenoXML);
     }
 
     /**

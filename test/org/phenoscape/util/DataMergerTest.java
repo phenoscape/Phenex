@@ -12,7 +12,7 @@ import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.impl.OBOSessionImpl;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
-import org.phenoscape.io.NeXMLReader_1_0;
+import org.phenoscape.io.nexml_1_0.NeXMLReader_1_0;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.OntologyController;
 import org.phenoscape.model.Phenotype;

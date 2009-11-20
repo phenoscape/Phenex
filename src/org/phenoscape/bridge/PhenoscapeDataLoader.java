@@ -17,7 +17,7 @@ import org.obd.query.impl.OBDSQLShard;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.OBOSession;
-import org.phenoscape.io.NeXMLReader_1_0;
+import org.phenoscape.io.nexml_1_0.NeXMLReader_1_0;
 import org.phenoscape.model.DataSet;
 
 public class PhenoscapeDataLoader {

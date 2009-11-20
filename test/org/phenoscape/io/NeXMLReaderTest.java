@@ -9,6 +9,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.impl.OBOSessionImpl;
+import org.phenoscape.io.nexml_1_0.NeXMLReader_1_0;
+import org.phenoscape.io.nexml_1_0.NeXMLWriter_1_0;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.Taxon;
 

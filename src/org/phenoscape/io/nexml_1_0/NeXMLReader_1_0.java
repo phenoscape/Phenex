@@ -1,4 +1,4 @@
-package org.phenoscape.io;
+package org.phenoscape.io.nexml_1_0;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +35,7 @@ import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.impl.DanglingClassImpl;
+import org.phenoscape.io.PhenoXMLPhenotypeWrapper;
 import org.phenoscape.io.PhenoXMLPhenotypeWrapper.PhenotypeWrapperFactory;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;

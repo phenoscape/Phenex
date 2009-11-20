@@ -54,23 +54,24 @@ public class MenuFactory {
         };
         openAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menu.add(new JMenuItem(openAction));
-        final Action mergeTaxaAction = new AbstractAction("Tab-delimited Taxa...") {
-            public void actionPerformed(ActionEvent e) { controller.openMergeTaxa(); }
-        };
-        final Action mergeCharactersAction = new AbstractAction("Tab-delimited Characters...") {
-            public void actionPerformed(ActionEvent e) { controller.openMergeCharacters(); }
-        };
-        final Action mergeNEXUSAction = new AbstractAction("NEXUS Data...") {
+//        final Action mergeTaxaAction = new AbstractAction("Tab-delimited Taxa...") {
+//            public void actionPerformed(ActionEvent e) { controller.openMergeTaxa(); }
+//        };
+//        final Action mergeCharactersAction = new AbstractAction("Tab-delimited Characters...") {
+//            public void actionPerformed(ActionEvent e) { controller.openMergeCharacters(); }
+//        };
+        final Action mergeNEXUSAction = new AbstractAction("NEXUS...") {
+            //TODO use import methods instead
             public void actionPerformed(ActionEvent e) { controller.openMergeNEXUS(); }
         };
-        final Action mergeNeXMLAction = new AbstractAction("NeXML Data...") {
-            public void actionPerformed(ActionEvent e) { controller.openMergeNeXML(); }
-        };
-        final JMenu mergeMenu = new JMenu("Merge");
-        mergeMenu.add(new JMenuItem(mergeTaxaAction));
-        mergeMenu.add(new JMenuItem(mergeCharactersAction));
+//        final Action mergeNeXMLAction = new AbstractAction("NeXML Data...") {
+//            public void actionPerformed(ActionEvent e) { controller.openMergeNeXML(); }
+//        };
+        final JMenu mergeMenu = new JMenu("Import");
+//        mergeMenu.add(new JMenuItem(mergeTaxaAction));
+//        mergeMenu.add(new JMenuItem(mergeCharactersAction));
         mergeMenu.add(new JMenuItem(mergeNEXUSAction));
-        mergeMenu.add(new JMenuItem(mergeNeXMLAction));
+//        mergeMenu.add(new JMenuItem(mergeNeXMLAction));
         menu.add(mergeMenu);
         menu.addSeparator();
         final Action saveAction = new AbstractAction("Save") {

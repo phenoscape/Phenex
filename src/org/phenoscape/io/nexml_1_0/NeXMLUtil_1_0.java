@@ -1,4 +1,4 @@
-package org.phenoscape.io;
+package org.phenoscape.io.nexml_1_0;
 
 import java.util.ArrayList;
 import java.util.Arrays;

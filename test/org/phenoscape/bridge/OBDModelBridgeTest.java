@@ -28,7 +28,7 @@ import org.obd.query.Shard;
 import org.obd.query.BooleanQueryTerm.BooleanOperator;
 import org.obd.query.impl.AbstractSQLShard;
 import org.obd.query.impl.OBDSQLShard;
-import org.phenoscape.io.NeXMLReader_1_0;
+import org.phenoscape.io.nexml_1_0.NeXMLReader_1_0;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.OntologyController;
 import org.phenoscape.model.UserOntologyConfiguration;

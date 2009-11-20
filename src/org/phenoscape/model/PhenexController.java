@@ -23,15 +23,16 @@ import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.bbop.framework.GUIManager;
 import org.biojava.bio.seq.io.ParseException;
-import org.nexml.x10.NexmlDocument;
+import org.nexml.schema_2009.NexmlDocument;
 import org.phenoscape.app.DocumentController;
 import org.phenoscape.app.UserCancelledReadException;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
-import org.phenoscape.io.NeXMLReader_1_0;
-import org.phenoscape.io.NeXMLWriter_1_0;
+import org.phenoscape.io.NeXMLReader;
+import org.phenoscape.io.NeXMLWriter;
 import org.phenoscape.io.TabDelimitedWriter;
 import org.phenoscape.io.TaxonTabReader;
+import org.phenoscape.io.nexml_1_0.NeXMLReader_1_0;
 import org.phenoscape.swing.ListSelectionMaintainer;
 import org.phenoscape.util.DataMerger;
 
@@ -155,10 +156,43 @@ public class PhenexController extends DocumentController {
 
     @Override
     public void readData(File aFile) throws IOException {
-        this.readNeXML(aFile);
+        try {
+            this.readNeXML(aFile);
+        } catch (XmlException e) {
+            log().info("File not valid NeXML 2009, trying previous schema", e);
+            this.readNeXML_1_0(aFile);
+            //TODO should warn user that file format will be upgraded upon save
+        }
+    }
+    
+    private void readNeXML(File aFile) throws XmlException, IOException {
+        final NeXMLReader reader = new NeXMLReader(aFile, this.getOntologyController().getOBOSession());
+        if (reader.didCreateDanglers()) {
+            final boolean result = this.runDanglerAlert(aFile, reader.getDanglersList());
+            if (!result) {
+                throw new UserCancelledReadException();
+            }
+        }
+        if (reader.didMigrateSecondaryIDs()) {
+            final boolean result = this.runSecondaryIDAlert(aFile, reader.getMigratedSecondaryIDsList());
+            if (!result) {
+                throw new UserCancelledReadException();
+            }
+        }
+        this.xmlDoc = reader.getXMLDoc();
+        this.charactersBlockID = reader.getCharactersBlockID();
+        this.dataSet.getCharacters().clear(); //TODO this is not well encapsulated
+        this.dataSet.getCharacters().addAll(reader.getDataSet().getCharacters());
+        this.getDataSet().getTaxa().clear(); //TODO this is not well encapsulated
+        this.getDataSet().getTaxa().addAll(reader.getDataSet().getTaxa());
+        this.getDataSet().setCurators(reader.getDataSet().getCurators());
+        this.getDataSet().setPublication(reader.getDataSet().getPublication());
+        this.getDataSet().setPublicationNotes(reader.getDataSet().getPublicationNotes());
+        this.getDataSet().setMatrixData(reader.getDataSet().getMatrixData());
+        this.fireDataChanged();
     }
 
-    private void readNeXML(File aFile) throws IOException {
+    private void readNeXML_1_0(File aFile) throws IOException {
         try {
             final NeXMLReader_1_0 reader = new NeXMLReader_1_0(aFile, this.getOntologyController().getOBOSession());
             if (reader.didCreateDanglers()) {
@@ -173,7 +207,7 @@ public class PhenexController extends DocumentController {
                     throw new UserCancelledReadException();
                 }
             }
-            this.xmlDoc = reader.getXMLDoc();
+            this.xmlDoc = NexmlDocument.Factory.newInstance();
             this.charactersBlockID = reader.getCharactersBlockID();
             this.dataSet.getCharacters().clear(); //TODO this is not well encapsulated
             this.dataSet.getCharacters().addAll(reader.getDataSet().getCharacters());
@@ -193,7 +227,7 @@ public class PhenexController extends DocumentController {
 
     @Override
     public void writeData(File aFile) throws IOException {
-        final NeXMLWriter_1_0 writer = new NeXMLWriter_1_0(this.charactersBlockID, this.xmlDoc);
+        final NeXMLWriter writer = new NeXMLWriter(this.charactersBlockID, this.xmlDoc);
         writer.setDataSet(this.dataSet);
         writer.setGenerator(this.getAppName() + " " + this.getAppVersion());
         writer.write(aFile);

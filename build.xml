@@ -15,7 +15,7 @@
 	<tstamp>
 		<format property="NOW" pattern="yyyy-MM-dd_HH:mm:ss"/>
 	</tstamp>
-	<property name="phenex.version" value="1.0"/>
+	<property name="phenex.version" value="1.0.1"/>
 	<property name="phenex.build" value="${NOW}"/>
 	<property name="java-minimum" value="1.5"/>
 	
@@ -188,9 +188,11 @@
 		</tar>
 		<gzip zipfile="tars/${dist}/phenote-${dist}-src.tar.gz" src="tars/${dist}/phenote-${dist}-src.tar"/>
 	</target>
+	
 	<target name="gzip-tar">
 		<gzip zipfile="tars/${dist}/phenote-${dist}.tar.gz" src="tars/${dist}/phenote-${dist}.tar"/>
 	</target>
+	
 	<taskdef name="xmlbean" classname="org.apache.xmlbeans.impl.tool.XMLBean" classpath="${lib}/xbean.jar"/>
 <!-- classgendir="${build.dir}" - if not doing jar but classes, schema is directory where xsd files are (conf) -->
 	<target name="xml-beans">
@@ -201,6 +203,7 @@
 	<target name="jar" depends="compile">
 		<jar destfile="${jarfile}">
 			<fileset dir="${classfiles}"/>
+			<fileset dir="${src}" includes="org/phenoscape/filters/"/>
 			<fileset dir="${src}" includes="org/phenoscape/view/layouts/"/>
 			<fileset dir="${src}" includes="org/phenoscape/view/images/"/>
 			<fileset file="log4j.xml"/>
@@ -255,7 +258,6 @@
 	</target>
 	
 <!-- Create a shell-script package for Unix in "dist/Phenex".  Jars are placed in a nested lib folder. -->
-	<!-- This isn't finished yet. -->
     <target name="dist-unix" depends="jar, dist-init">
     	<property name="unix-folder" value="${dist}/unix/Phenex"/>
         <mkdir dir="${unix-folder}/lib"/>

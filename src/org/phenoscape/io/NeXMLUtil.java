@@ -424,7 +424,7 @@ public class NeXMLUtil {
     }
 
     /**
-     * This method is useful when DOM Level 3 "getTextContent" is not implemented
+     * This method is useful when DOM Level 3 "setTextContent" is not implemented
      */
     public static void setTextContent(Element node, String text) {
         final NodeList children = node.getChildNodes();

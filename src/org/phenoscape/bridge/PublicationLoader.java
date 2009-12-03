@@ -56,7 +56,8 @@ public class PublicationLoader {
     private static final String PUBLICATION_STRING = "publication";
     private static final String YEAR_STRING = "year";
     
-    private String publicationName, authors, pubType, title, secondaryTitle, pubAbstract, volume, pages, year, keywords;
+    private String publicationName, authors, pubType, title, secondaryTitle, 
+    				pubAbstract, volume, pages, year, keywords;
     
     private Connection conn;
     private Document doc;
@@ -172,13 +173,28 @@ public class PublicationLoader {
     }
     
     private String getFullPublicationName(String title) {
+    	String publicationNameNameWithoutFormattingCharacters;
     	for(String fullPublicationName : this.listOfFullPublicationNames){
-    		if(fullPublicationName.contains(title))
+    		publicationNameNameWithoutFormattingCharacters =
+    			this.stripPublicationNameOfFormattingCharacters(fullPublicationName);
+    		if(publicationNameNameWithoutFormattingCharacters.contains(title))
     			return fullPublicationName;
     	}
 		return title;
 	}
 
+    private String stripPublicationNameOfFormattingCharacters(String pubName){
+    	String[] arrayOfFormattingCharacters = {"<i>","</i>","<b>","</b>"};
+    	String newPubName = pubName;
+    	for(String formattingCharacter : arrayOfFormattingCharacters){
+    		if(newPubName.contains(formattingCharacter)){
+    			newPubName = newPubName.replace(formattingCharacter, "");
+    		}
+    	}
+
+    	return newPubName;
+    }
+    
 	private String processAuthors(Node authorsNode){
     	String authorListing = "";
     	

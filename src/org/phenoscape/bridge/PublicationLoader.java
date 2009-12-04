@@ -173,11 +173,12 @@ public class PublicationLoader {
     }
     
     private String getFullPublicationName(String title) {
-    	String publicationNameNameWithoutFormattingCharacters;
+    	String publicationNameNameWithoutFormattingCharacters, pubNameInAllCaps;
     	for(String fullPublicationName : this.listOfFullPublicationNames){
     		publicationNameNameWithoutFormattingCharacters =
     			this.stripPublicationNameOfFormattingCharacters(fullPublicationName);
-    		if(publicationNameNameWithoutFormattingCharacters.contains(title))
+    		pubNameInAllCaps = publicationNameNameWithoutFormattingCharacters.toUpperCase();
+    		if(pubNameInAllCaps.contains(title.toUpperCase()))
     			return fullPublicationName;
     	}
 		return title;

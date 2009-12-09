@@ -118,9 +118,10 @@ public class OBDModelBridge {
 		LinkStatement ds2p = new LinkStatement(dsId, HAS_PUB_REL_ID, pubNode.getId());
 		graph.addStatement(ds2p);
 		
-		LiteralStatement ds2curators = new LiteralStatement(dsId, HAS_CURATORS_REL_ID, curators);
-		graph.addStatement(ds2curators);
-		
+		if(curators != null){
+			LiteralStatement ds2curators = new LiteralStatement(dsId, HAS_CURATORS_REL_ID, curators);
+			graph.addStatement(ds2curators);
+		}
 		for (Taxon t : ds.getTaxa()) {
 			// avoid uploading taxa without names; Cartik1.0
 			if (t.getValidName() != null && t.getValidName().getName() != null
@@ -172,13 +173,18 @@ public class OBDModelBridge {
 			int charNumber = ds.getCharacters().indexOf(character) + 1;
 			String cid = UUID.randomUUID().toString();
 			Node characterNode = createInstanceNode(cid, CHARACTER_TYPE_ID);
+			characterNode.setId(cid);
 			characterNode.setLabel(character.getLabel());
 			String charComment = character.getComment();
-			LiteralStatement chCommentStmt = new LiteralStatement(characterNode.getId(), HAS_COMMENT_REL_ID, charComment);
-			characterNode.addStatement(chCommentStmt);
-			LiteralStatement chNumberStmt = new LiteralStatement(characterNode.getId(), HAS_NUMBER_REL_ID, charNumber + "");
+			if(charComment != null){
+				LiteralStatement chCommentStmt = 
+					new LiteralStatement(characterNode.getId(), HAS_COMMENT_REL_ID, charComment);
+				characterNode.addStatement(chCommentStmt);
+			}
+			LiteralStatement chNumberStmt = 
+				new LiteralStatement(characterNode.getId(), HAS_NUMBER_REL_ID, charNumber + "");
 			characterNode.addStatement(chNumberStmt);
-			characterIdMap.put(character, cid);
+				characterIdMap.put(character, cid);
 			LinkStatement ds2c = new LinkStatement(dsId, HAS_CHARACTER_REL_ID,
 					cid);
 			graph.addStatement(ds2c);
@@ -187,9 +193,13 @@ public class OBDModelBridge {
 				String sid = UUID.randomUUID().toString();
 				Node stateNode = createInstanceNode(sid, STATE_TYPE_ID);
 				stateNode.setLabel(state.getLabel());
+				stateNode.setId(sid);
 				String stateComment = state.getComment();
-				LiteralStatement stCommStmt = new LiteralStatement(stateNode.getId(), HAS_COMMENT_REL_ID, stateComment);
-				stateNode.addStatement(stCommStmt);
+				if(stateComment != null){
+					LiteralStatement stCommStmt = 
+						new LiteralStatement(stateNode.getId(), HAS_COMMENT_REL_ID, stateComment);
+					stateNode.addStatement(stCommStmt);
+				}
 				stateIdMap.put(state, sid);
 				LinkStatement c2s = new LinkStatement(cid, HAS_STATE_REL_ID,
 						sid);

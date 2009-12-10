@@ -173,12 +173,16 @@ public class PublicationLoader {
     }
     
     private String getFullPublicationName(String title) {
-    	String publicationNameNameWithoutFormattingCharacters, pubNameInAllCaps;
+    	String publicationNameWithoutFormattingCharacters, pubNameInAllCaps, titleInAllCaps;
     	for(String fullPublicationName : this.listOfFullPublicationNames){
-    		publicationNameNameWithoutFormattingCharacters =
+    		publicationNameWithoutFormattingCharacters =
     			this.stripPublicationNameOfFormattingCharacters(fullPublicationName);
-    		pubNameInAllCaps = publicationNameNameWithoutFormattingCharacters.toUpperCase();
-    		if(pubNameInAllCaps.contains(title.toUpperCase()))
+    		pubNameInAllCaps = publicationNameWithoutFormattingCharacters.toUpperCase();
+    		titleInAllCaps = title.trim().toUpperCase();
+//    		if(pubNameInAllCaps.contains("BOWNE") && titleInAllCaps.contains("GASTEROSTEI"))
+    			log.fine("Does " + pubNameInAllCaps + " contain " + titleInAllCaps + "? " + 
+    					pubNameInAllCaps.contains(titleInAllCaps)); 
+    		if(pubNameInAllCaps.contains(titleInAllCaps))
     			return fullPublicationName;
     	}
 		return title;

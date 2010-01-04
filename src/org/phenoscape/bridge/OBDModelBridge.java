@@ -300,7 +300,7 @@ public class OBDModelBridge {
 		}
 		if (e2 != null)
 			cd.addArgument(relationVocabulary.towards(), translateOBOClass(e2));
-		if(count != null){
+		if(count != null && count.trim().length() > 0){
 			cd.addArgument(HAS_COUNT_REL_ID, count + "");
 		}
 		if(m != null && u != null){

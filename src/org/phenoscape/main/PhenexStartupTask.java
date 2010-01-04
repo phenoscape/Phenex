@@ -93,7 +93,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
     protected void configureUI() {
         try {
             final String lookAndFeelClassName = UIManager.getSystemLookAndFeelClassName();
-            if (lookAndFeelClassName.equals("apple.laf.AquaLookAndFeel")) {
+            if (CrossPlatform.getCurrentPlatform().equals(CrossPlatform.Platform.MAC)) {
                 // We are running on Mac OS X - use the Quaqua look and feel
                 System.setProperty("apple.laf.useScreenMenuBar", "true");
                 UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");

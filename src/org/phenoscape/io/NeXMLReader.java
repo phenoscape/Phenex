@@ -319,7 +319,7 @@ public class NeXMLReader {
             return null;
         } else {
             final String string = obj.toString();
-            if (string.trim().isEmpty()) {
+            if (string.length() < 1) {
                 return null;
             } else {
                 return string;

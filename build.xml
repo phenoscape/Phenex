@@ -15,7 +15,7 @@
 	<tstamp>
 		<format property="NOW" pattern="yyyy-MM-dd_HH:mm:ss"/>
 	</tstamp>
-	<property name="phenex.version" value="1.0.1"/>
+	<property name="phenex.version" value="1.0.2"/>
 	<property name="phenex.build" value="${NOW}"/>
 	<property name="java-minimum" value="1.5"/>
 	
@@ -83,6 +83,7 @@
 			<classpath>
 				<pathelement path="."/>
 				<pathelement path="${classfiles}"/>
+				<pathelement path="${src}"/> <!-- need to include src folder to find resource files such as filters -->
 				<fileset dir="${lib}">
 					<include name="*.jar"/>
 				</fileset>
@@ -99,6 +100,7 @@
 			<classpath>
 				<pathelement path="."/>
 				<pathelement path="${classfiles}"/>
+				<pathelement path="${src}"/> <!-- need to include src folder to find resource files such as filters -->
 				<fileset dir="${lib}">
 					<include name="*.jar"/>
 				</fileset>

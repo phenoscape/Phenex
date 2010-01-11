@@ -51,7 +51,9 @@ public class Labelmaker {
         POSTCOMP_RELATIONS.put("OBO_REL:connected_to", "on");
         POSTCOMP_RELATIONS.put("connected_to", "on");
         POSTCOMP_RELATIONS.put("anterior_to", "anterior to");
+        POSTCOMP_RELATIONS.put("BSPO:0000096", "anterior to");
         POSTCOMP_RELATIONS.put("posterior_to", "posterior to");
+        POSTCOMP_RELATIONS.put("BSPO:0000099", "posterior to");
         POSTCOMP_RELATIONS.put("adjacent_to", "adjacent to");
     }
     

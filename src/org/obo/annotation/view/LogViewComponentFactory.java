@@ -1,4 +1,4 @@
-package org.phenoscape.view;
+package org.obo.annotation.view;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;

@@ -25,6 +25,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
+import org.obo.annotation.view.PostCompositionEditor;
+import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
 import org.obo.app.swing.PopupListener;
@@ -196,7 +198,7 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
         if (!this.tableFormat.getColumnClass(column).equals(OBOObject.class)) return;
         final Phenotype phenotype = this.getController().getPhenotypesForCurrentStateSelection().get(row);
         final OBOClass term = (OBOClass)(this.tableFormat.getColumnValue(phenotype, column));
-        final PostCompositionEditor pce = new PostCompositionEditor(this.getController(), this.tableFormat.getColumnTermSet(column));
+        final PostCompositionEditor pce = new PostCompositionEditor(this.tableFormat.getColumnTermSet(column), this.getController().getOntologyController().getRelationsTermSet());
         pce.setTerm(term);
         final int result = pce.runPostCompositionDialog(this);
         if (result == JOptionPane.OK_OPTION) {

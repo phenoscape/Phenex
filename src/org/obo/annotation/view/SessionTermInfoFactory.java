@@ -1,4 +1,4 @@
-package org.phenoscape.view;
+package org.obo.annotation.view;
 
 import phenote.gui.TermInfo2;
 import phenote.gui.factories.TermInfoFactory;

@@ -29,6 +29,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import org.apache.log4j.Logger;
+import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
 import org.phenoscape.model.Character;

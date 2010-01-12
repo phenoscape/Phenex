@@ -1,4 +1,4 @@
-package org.phenoscape.view;
+package org.obo.annotation.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -14,8 +14,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 import org.bbop.framework.AbstractGUIComponent;
+import org.obo.annotation.view.LogViewComponentFactory.LogViewAppender;
 import org.obo.app.swing.BugWorkaroundTable;
-import org.phenoscape.view.LogViewComponentFactory.LogViewAppender;
 
 import phenote.gui.SortDisabler;
 import phenote.util.EverythingEqualComparator;

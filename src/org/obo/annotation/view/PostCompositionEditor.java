@@ -1,4 +1,4 @@
-package org.phenoscape.view;
+package org.obo.annotation.view;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -21,6 +21,7 @@ import javax.swing.JToolBar;
 import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
+import org.bbop.framework.AbstractGUIComponent;
 import org.obo.app.swing.AutocompleteField;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.TablePopupListener;
@@ -29,7 +30,6 @@ import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOProperty;
-import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.TermSet;
 
 import phenote.datamodel.OboUtil;
@@ -41,12 +41,13 @@ import ca.odell.glazedlists.gui.WritableTableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 
-public class PostCompositionEditor extends PhenoscapeGUIComponent {
+public class PostCompositionEditor extends AbstractGUIComponent {
 
     private OBOClass genus;
     private EventList<Differentium> diffs = new BasicEventList<Differentium>();
     private EventSelectionModel<Differentium> selectionModel = new EventSelectionModel<Differentium>(diffs);
     private final TermSet termSet;
+    private final TermSet relationsSet;
     private AutocompleteField<OBOObject> genusBox;
     private JButton addDifferentiaButton;
     private JButton deleteDifferentiaButton;
@@ -54,13 +55,14 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
     private DifferentiaTableFormat tableFormat;
     private TablePopupListener popupListener;
 
-    public PostCompositionEditor(String id, PhenexController controller, TermSet terms) {
-        super(id, controller);
+    public PostCompositionEditor(String id, TermSet terms, TermSet relations) {
+        super(id);
         this.termSet = terms;
+        this.relationsSet = relations;
     }
 
-    public PostCompositionEditor(PhenexController controller, TermSet terms) {
-        this("", controller, terms);
+    public PostCompositionEditor(TermSet terms, TermSet relations) {
+        this("", terms, relations);
         this.initializeInterface();
     }
 
@@ -137,7 +139,7 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
         if (!this.tableFormat.getColumnClass(column).equals(OBOObject.class)) return;
         final Differentium differentia = this.diffs.get(row);
         final OBOClass term = (OBOClass)(this.tableFormat.getColumnValue(differentia, column));
-        final PostCompositionEditor pce = new PostCompositionEditor(this.getController(), this.termSet);
+        final PostCompositionEditor pce = new PostCompositionEditor(this.termSet, this.relationsSet);
         pce.setTerm(term);
         final int result = pce.runPostCompositionDialog(this);
         if (result == JOptionPane.OK_OPTION) {
@@ -153,7 +155,7 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
         comboConstraints.gridx = 1;
         comboConstraints.fill = GridBagConstraints.HORIZONTAL;
         comboConstraints.weightx = 1.0;
-        this.genusBox = this.createAutocompleteBox(this.termSet.getTerms());
+        this.genusBox = AutocompleteFieldFactory.createAutocompleteBox(this.termSet.getTerms());
         this.genusBox.setAction(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 updateGenus();
@@ -252,8 +254,8 @@ public class PostCompositionEditor extends PhenoscapeGUIComponent {
 
         public TableCellEditor getColumnEditor(int column) {
             switch (column) {
-            case 0: return createAutocompleteEditor(getController().getOntologyController().getRelationsTermSet().getTerms());
-            case 1: return createAutocompleteEditor(termSet.getTerms());
+            case 0: return AutocompleteFieldFactory.createAutocompleteEditor(relationsSet.getTerms());
+            case 1: return AutocompleteFieldFactory.createAutocompleteEditor(termSet.getTerms());
             default: return null;
             }
         }

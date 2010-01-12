@@ -1,4 +1,4 @@
-package org.phenoscape.util;
+package org.obo.annotation.view;
 
 import java.util.ArrayList;
 import java.util.Collection;

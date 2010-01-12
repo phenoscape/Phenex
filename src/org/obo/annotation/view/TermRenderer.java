@@ -1,4 +1,4 @@
-package org.phenoscape.view;
+package org.obo.annotation.view;
 
 import java.awt.Color;
 import java.awt.Component;

@@ -1,4 +1,4 @@
-package org.phenoscape.util;
+package org.obo.annotation.view;
 
 import org.obo.app.swing.MatchType;
 import org.obo.app.swing.SearchHit;

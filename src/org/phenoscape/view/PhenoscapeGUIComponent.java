@@ -14,13 +14,13 @@ import javax.swing.table.TableCellEditor;
 import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
 import org.bbop.framework.ComponentManager;
+import org.obo.annotation.view.TermSearcher;
 import org.obo.app.swing.AutocompleteCellEditor;
 import org.obo.app.swing.AutocompleteField;
 import org.obo.app.swing.SearchHit;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.phenoscape.model.PhenexController;
-import org.phenoscape.util.TermSearcher;
 
 public class PhenoscapeGUIComponent extends AbstractGUIComponent {
 
@@ -53,10 +53,6 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
     protected void updatePanelTitle(String title) {
         ComponentManager.getManager().setLabel(this, title);
     }
-
-    //  protected JComboBox createAutocompleteBox(Collection<OBOObject> terms) {
-    //    return this.createAutocompleteBox(terms, false);
-    //  }
 
     protected AutocompleteField<OBOObject> createAutocompleteBox(Collection<OBOObject> terms) {
         final AutocompleteField<OBOObject> ac =  new AutocompleteField<OBOObject>(new TermSearcher(terms));

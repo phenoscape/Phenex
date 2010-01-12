@@ -1,7 +1,7 @@
 package org.phenoscape.view;
 
 import org.bbop.framework.AbstractComponentFactory;
-import org.phenoscape.model.UserOntologyConfiguration;
+import org.obo.annotation.base.UserOntologyConfiguration;
 
 public class OntologyPreferencesComponentFactory extends AbstractComponentFactory<OntologyPreferencesComponent> {
     

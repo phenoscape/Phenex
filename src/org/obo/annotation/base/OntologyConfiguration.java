@@ -1,4 +1,4 @@
-package org.phenoscape.model;
+package org.obo.annotation.base;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.phenoscape.model;
+package org.obo.annotation.base;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -38,6 +38,7 @@ public class UserOntologyConfiguration implements OntologyConfiguration {
     }
     
     public UserOntologyConfiguration() {
+        //TODO create a constructor which accepts the default sources as a list instead of hardcoding above
         super();
         final List<OntologySource> storedSources = this.getStoredSources();
         if ((storedSources == null) || (storedSources.isEmpty())) {

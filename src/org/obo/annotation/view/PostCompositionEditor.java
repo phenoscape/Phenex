@@ -22,6 +22,7 @@ import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
+import org.obo.annotation.base.TermSet;
 import org.obo.app.swing.AutocompleteField;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.TablePopupListener;
@@ -30,7 +31,6 @@ import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOProperty;
-import org.phenoscape.model.TermSet;
 
 import phenote.datamodel.OboUtil;
 import ca.odell.glazedlists.BasicEventList;

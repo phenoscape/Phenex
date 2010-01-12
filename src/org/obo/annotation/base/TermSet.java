@@ -1,4 +1,4 @@
-package org.phenoscape.model;
+package org.obo.annotation.base;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import org.obo.filters.Filter;
 import org.obo.query.QueryEngine;
 import org.obo.query.impl.FilterQuery;
 import org.obo.query.impl.SearchHit;
-import org.oboedit.controller.SessionManager;
+import org.obo.reasoner.ReasonedLinkDatabase;
 
 /**
  * A TermSet is used to define a collection of ontology terms.  Currently the collection 
@@ -22,8 +22,14 @@ import org.oboedit.controller.SessionManager;
 public class TermSet {
 
     private OBOSession session;
+    private ReasonedLinkDatabase reasoner;
     private Collection<OBOObject> cachedTerms = null;
     private Filter<IdentifiedObject> filter = null;
+    
+    public TermSet(OBOSession session, ReasonedLinkDatabase reasoner) {
+        this.session = session;
+        this.reasoner = reasoner;
+    }
 
     /**
      * @return The OBOSession from which this TermSet draws its terms.
@@ -37,6 +43,15 @@ public class TermSet {
      */
     public void setOBOSession(OBOSession oboSession) {
         this.session = oboSession;
+        this.invalidateTerms();
+    }
+    
+    public ReasonedLinkDatabase getReasoner() {
+        return this.reasoner;
+    }
+    
+    public void setReasoner(ReasonedLinkDatabase reasoner) {
+        this.reasoner = reasoner;
         this.invalidateTerms();
     }
 
@@ -56,7 +71,7 @@ public class TermSet {
             return this.cachedTerms;
         }
         final QueryEngine engine = new QueryEngine(this.getOBOSession());
-        final FilterQuery<IdentifiedObject> query = new FilterQuery<IdentifiedObject>(this.getTermFilter(), IdentifiedObject.class, SessionManager.getManager().getReasoner());
+        final FilterQuery<IdentifiedObject> query = new FilterQuery<IdentifiedObject>(this.getTermFilter(), IdentifiedObject.class, this.getReasoner());
         final Collection<SearchHit<IdentifiedObject>> termHits = engine.query(query);
         final List<OBOObject> terms = new ArrayList<OBOObject>(); 
         for (SearchHit<IdentifiedObject> hit : termHits) {

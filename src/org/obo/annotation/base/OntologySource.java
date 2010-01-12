@@ -1,4 +1,4 @@
-package org.phenoscape.model;
+package org.obo.annotation.base;
 
 import java.io.Serializable;
 import java.net.URL;

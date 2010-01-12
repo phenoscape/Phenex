@@ -25,6 +25,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
+import org.obo.annotation.base.TermSet;
 import org.obo.annotation.view.PostCompositionEditor;
 import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.BugWorkaroundTable;
@@ -35,7 +36,6 @@ import org.obo.datamodel.OBOObject;
 import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.State;
-import org.phenoscape.model.TermSet;
 import org.phenoscape.util.TermSelection;
 import org.phenoscape.util.TermTransferObject;
 

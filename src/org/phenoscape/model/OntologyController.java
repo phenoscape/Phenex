@@ -13,6 +13,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
 import org.bbop.framework.GUIManager;
+import org.obo.annotation.base.OntologyConfiguration;
+import org.obo.annotation.base.OntologySource;
+import org.obo.annotation.base.TermSet;
 import org.obo.app.util.URLProxy;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
@@ -82,8 +85,7 @@ public class OntologyController {
 
     public TermSet getTaxonTermSet() {
         if (this.taxonTermSet == null) {
-            final TermSet terms =  new TermSet();
-            terms.setOBOSession(this.getOBOSession());
+            final TermSet terms =  this.makeTermSet();
             terms.setTermFilter(this.loadFilterWithName(TAXON_FILTER));
             this.taxonTermSet = terms;
         }
@@ -92,8 +94,7 @@ public class OntologyController {
 
     public TermSet getCollectionTermSet() {
         if (this.collectionTermSet == null) {
-            final TermSet terms =  new TermSet();
-            terms.setOBOSession(this.getOBOSession());
+            final TermSet terms =  this.makeTermSet();
             terms.setTermFilter(this.loadFilterWithName(MUSEUM_FILTER));
             this.collectionTermSet = terms;
         }
@@ -102,8 +103,7 @@ public class OntologyController {
 
     public TermSet getEntityTermSet() {
         if (this.entityTermSet == null) {
-            final TermSet terms =  new TermSet();
-            terms.setOBOSession(this.getOBOSession());
+            final TermSet terms =  this.makeTermSet();
             terms.setTermFilter(this.loadFilterWithName(ENTITY_FILTER));
             this.entityTermSet = terms;
         }
@@ -112,8 +112,7 @@ public class OntologyController {
 
     public TermSet getQualityTermSet() {
         if (this.qualityTermSet == null) {
-            final TermSet terms =  new TermSet();
-            terms.setOBOSession(this.getOBOSession());
+            final TermSet terms =  this.makeTermSet();
             terms.setTermFilter(this.loadFilterWithName(QUALITY_FILTER));
             this.qualityTermSet = terms;
         }
@@ -126,8 +125,7 @@ public class OntologyController {
 
     public TermSet getUnitTermSet() {
         if (this.unitTermSet == null) {
-            final TermSet terms =  new TermSet();
-            terms.setOBOSession(this.getOBOSession());
+            final TermSet terms =  this.makeTermSet();
             terms.setTermFilter(this.loadFilterWithName(UNIT_FILTER));
             this.unitTermSet = terms;
         }
@@ -136,8 +134,7 @@ public class OntologyController {
 
     public TermSet getRelationsTermSet() {
         if (this.relationsTermSet == null) {;
-        final TermSet set =  new TermSet();
-        set.setOBOSession(this.getOBOSession());
+        final TermSet set =  this.makeTermSet();
         set.setTermFilter(this.loadFilterWithName(RELATION_FILTER));
         this.relationsTermSet = set;
         }
@@ -150,6 +147,10 @@ public class OntologyController {
 
     public void setOverridingFiltersFolder(File folder) {
         this.overridingFiltersFolder = folder;
+    }
+    
+    private TermSet makeTermSet() {
+        return new TermSet(this.getOBOSession(), SessionManager.getManager().getReasoner());
     }
 
     /**

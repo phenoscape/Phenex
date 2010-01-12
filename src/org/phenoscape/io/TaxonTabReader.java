@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.obo.annotation.base.TermSet;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOSession;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.Specimen;
 import org.phenoscape.model.Taxon;
-import org.phenoscape.model.TermSet;
 
 import phenote.util.Collections;
 

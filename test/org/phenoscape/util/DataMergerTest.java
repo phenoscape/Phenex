@@ -8,6 +8,7 @@ import org.apache.xmlbeans.XmlException;
 import org.biojava.bio.seq.io.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
+import org.obo.annotation.base.UserOntologyConfiguration;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.impl.OBOSessionImpl;
 import org.phenoscape.io.CharacterTabReader;
@@ -18,7 +19,6 @@ import org.phenoscape.model.OntologyController;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
-import org.phenoscape.model.UserOntologyConfiguration;
 
 public class DataMergerTest {
   

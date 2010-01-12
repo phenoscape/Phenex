@@ -1,8 +1,8 @@
 package org.phenoscape.model;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.obo.app.model.AbstractPropertyChangeObject;
 import org.obo.datamodel.OBOClass;
-import org.phenoscape.app.AbstractPropertyChangeObject;
 
 /**
  * An ontological description of a phenotype, using the EQ format.

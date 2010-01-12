@@ -14,12 +14,12 @@ import javax.swing.table.TableCellEditor;
 import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
 import org.bbop.framework.ComponentManager;
+import org.obo.app.swing.AutocompleteCellEditor;
+import org.obo.app.swing.AutocompleteField;
+import org.obo.app.swing.SearchHit;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.phenoscape.model.PhenexController;
-import org.phenoscape.swing.AutocompleteCellEditor;
-import org.phenoscape.swing.AutocompleteField;
-import org.phenoscape.swing.SearchHit;
 import org.phenoscape.util.TermSearcher;
 
 public class PhenoscapeGUIComponent extends AbstractGUIComponent {

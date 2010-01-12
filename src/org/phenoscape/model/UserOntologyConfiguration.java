@@ -9,7 +9,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.apache.log4j.Logger;
-import org.phenoscape.app.PrefObj;
+import org.obo.app.util.PrefObj;
 
 /**
  * An implementation of OntologyConfiguration which contains default ontology sources, and can also read and write a persistent 

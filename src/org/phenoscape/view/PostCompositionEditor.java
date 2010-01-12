@@ -21,6 +21,9 @@ import javax.swing.JToolBar;
 import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
+import org.obo.app.swing.AutocompleteField;
+import org.obo.app.swing.BugWorkaroundTable;
+import org.obo.app.swing.TablePopupListener;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
@@ -28,9 +31,6 @@ import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOProperty;
 import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.TermSet;
-import org.phenoscape.swing.AutocompleteField;
-import org.phenoscape.swing.BugWorkaroundTable;
-import org.phenoscape.swing.TablePopupListener;
 
 import phenote.datamodel.OboUtil;
 import ca.odell.glazedlists.BasicEventList;

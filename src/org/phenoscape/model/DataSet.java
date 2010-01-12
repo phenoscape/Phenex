@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.phenoscape.app.AbstractPropertyChangeObject;
-import org.phenoscape.app.ObservableEventList;
+import org.obo.app.model.AbstractPropertyChangeObject;
+import org.obo.app.model.ObservableEventList;
 
 import ca.odell.glazedlists.BasicEventList;
 

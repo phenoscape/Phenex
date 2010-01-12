@@ -1,4 +1,4 @@
-package org.phenoscape.swing;
+package org.obo.app.swing;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;

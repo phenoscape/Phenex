@@ -18,10 +18,10 @@ import javax.swing.JToolBar;
 
 import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
+import org.obo.app.swing.BugWorkaroundTable;
+import org.obo.app.swing.PlaceholderRenderer;
 import org.phenoscape.model.OntologySource;
 import org.phenoscape.model.UserOntologyConfiguration;
-import org.phenoscape.swing.BugWorkaroundTable;
-import org.phenoscape.swing.PlaceholderRenderer;
 
 import phenote.gui.TableColumnPrefsSaver;
 import ca.odell.glazedlists.BasicEventList;

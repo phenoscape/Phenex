@@ -1,4 +1,4 @@
-package org.phenoscape.swing;
+package org.obo.app.swing;
 
 import java.awt.Dimension;
 import java.awt.Point;

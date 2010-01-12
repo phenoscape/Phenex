@@ -1,4 +1,4 @@
-package org.phenoscape.swing;
+package org.obo.app.swing;
 
 import java.awt.Point;
 import java.awt.event.MouseAdapter;

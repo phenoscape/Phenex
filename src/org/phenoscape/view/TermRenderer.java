@@ -5,12 +5,12 @@ import java.awt.Component;
 
 import javax.swing.JTable;
 
+import org.obo.app.swing.PlaceholderRenderer;
 import org.obo.datamodel.DanglingObject;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
-import org.phenoscape.swing.PlaceholderRenderer;
 
 import phenote.datamodel.OboUtil;
 

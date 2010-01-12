@@ -1,4 +1,4 @@
-package org.phenoscape.app;
+package org.obo.app.util;
 
 import java.io.File;
 

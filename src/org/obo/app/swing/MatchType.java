@@ -1,4 +1,4 @@
-package org.phenoscape.swing;
+package org.obo.app.swing;
 
 public interface MatchType {
     

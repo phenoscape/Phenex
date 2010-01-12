@@ -1,4 +1,4 @@
-package org.phenoscape.io;
+package org.obo.app.util;
 
 import java.io.EOFException;
 import java.io.File;

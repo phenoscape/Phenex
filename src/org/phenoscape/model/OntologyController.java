@@ -13,13 +13,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
 import org.bbop.framework.GUIManager;
+import org.obo.app.util.URLProxy;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOSession;
 import org.obo.filters.Filter;
 import org.oboedit.controller.SessionManager;
-import org.phenoscape.io.URLProxy;
 
 /**
  * @author Jim Balhoff

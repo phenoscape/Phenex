@@ -1,4 +1,4 @@
-package org.phenoscape.app;
+package org.obo.app.controller;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -12,7 +12,8 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
-import org.phenoscape.app.UndoController.UnsavedChangesListener;
+import org.obo.app.controller.UndoController.UnsavedChangesListener;
+import org.obo.app.util.CrossPlatform;
 
 /**
  * A general class managing reading and writing of document files and the data loaded from those files.

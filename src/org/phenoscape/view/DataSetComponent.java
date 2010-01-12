@@ -18,9 +18,9 @@ import javax.swing.event.DocumentListener;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.jdesktop.xswingx.PromptSupport;
+import org.obo.app.swing.TabActionTextField;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.PhenexController;
-import org.phenoscape.swing.TabActionTextField;
 
 public class DataSetComponent extends PhenoscapeGUIComponent {
   

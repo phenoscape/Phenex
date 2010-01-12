@@ -1,4 +1,4 @@
-package org.phenoscape.app;
+package org.obo.app.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

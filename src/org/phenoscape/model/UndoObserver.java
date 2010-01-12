@@ -14,9 +14,9 @@ import javax.swing.undo.UndoableEdit;
 import org.apache.log4j.Logger;
 import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.observablecollections.ObservableListListener;
-import org.phenoscape.app.Observer;
-import org.phenoscape.app.PropertyChangeObject;
-import org.phenoscape.app.UndoController;
+import org.obo.app.controller.UndoController;
+import org.obo.app.model.Observer;
+import org.obo.app.model.PropertyChangeObject;
 
 public class UndoObserver {
 

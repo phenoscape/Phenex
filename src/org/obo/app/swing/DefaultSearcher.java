@@ -1,4 +1,4 @@
-package org.phenoscape.swing;
+package org.obo.app.swing;
 
 import java.util.ArrayList;
 import java.util.Collection;

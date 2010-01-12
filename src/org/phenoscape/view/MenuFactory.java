@@ -16,7 +16,7 @@ import javax.swing.KeyStroke;
 import org.apache.log4j.Logger;
 import org.bbop.framework.GUIManager;
 import org.bbop.framework.ViewMenu;
-import org.phenoscape.app.CrossPlatform;
+import org.obo.app.util.CrossPlatform;
 import org.phenoscape.model.PhenexController;
 
 import phenote.gui.actions.ResponderChainAction;

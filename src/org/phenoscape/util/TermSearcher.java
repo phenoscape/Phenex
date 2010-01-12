@@ -6,14 +6,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.obo.app.swing.AutocompleteSearcher;
+import org.obo.app.swing.MatchType;
+import org.obo.app.swing.SearchHit;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.Synonym;
 import org.obo.util.TermUtil;
 import org.oboedit.controller.SessionManager;
-import org.phenoscape.swing.AutocompleteSearcher;
-import org.phenoscape.swing.MatchType;
-import org.phenoscape.swing.SearchHit;
 
 public class TermSearcher implements AutocompleteSearcher<OBOObject> {
 

@@ -15,6 +15,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.log4j.Logger;
+import org.obo.annotation.view.TermAutocompleteFieldFactory;
 import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
@@ -122,7 +123,7 @@ public class SpecimenTableComponent extends PhenoscapeGUIComponent {
         specimensTable.setSelectionModel(this.getController().getCurrentSpecimensSelectionModel());
         specimensTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
         specimensTable.setDefaultRenderer(OBOObject.class, new TermRenderer("None"));
-        specimensTable.getColumnModel().getColumn(0).setCellEditor(this.createAutocompleteEditor(this.getController().getOntologyController().getCollectionTermSet().getTerms()));
+        specimensTable.getColumnModel().getColumn(0).setCellEditor(TermAutocompleteFieldFactory.createAutocompleteEditor(this.getController().getOntologyController().getCollectionTermSet().getTerms(), getController().getOntologyCoordinator()));
         specimensTable.putClientProperty("Quaqua.Table.style", "striped");
         new TableColumnPrefsSaver(specimensTable, this.getClass().getName());
         final TableComparatorChooser<Specimen> sortChooser = new TableComparatorChooser<Specimen>(specimensTable, this.getController().getSpecimensForCurrentTaxonSelection(), false);

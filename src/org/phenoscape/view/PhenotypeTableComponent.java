@@ -27,6 +27,7 @@ import javax.swing.table.TableCellEditor;
 import org.apache.log4j.Logger;
 import org.obo.annotation.base.TermSet;
 import org.obo.annotation.view.PostCompositionEditor;
+import org.obo.annotation.view.TermAutocompleteFieldFactory;
 import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
@@ -336,12 +337,12 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
 
         public TableCellEditor getColumnEditor(int column) {
             switch (column) {
-            case 0: return createAutocompleteEditor(this.getColumnTermSet(column).getTerms());
-            case 1: return createAutocompleteEditor(this.getColumnTermSet(column).getTerms());
-            case 2: return createAutocompleteEditor(this.getColumnTermSet(column).getTerms());
+            case 0: return TermAutocompleteFieldFactory.createAutocompleteEditor(this.getColumnTermSet(column).getTerms(), getController().getOntologyCoordinator());
+            case 1: return TermAutocompleteFieldFactory.createAutocompleteEditor(this.getColumnTermSet(column).getTerms(), getController().getOntologyCoordinator());
+            case 2: return TermAutocompleteFieldFactory.createAutocompleteEditor(this.getColumnTermSet(column).getTerms(), getController().getOntologyCoordinator());
             case 3: return null;
             case 4: return null;
-            case 5: return createAutocompleteEditor(this.getColumnTermSet(column).getTerms());
+            case 5: return TermAutocompleteFieldFactory.createAutocompleteEditor(this.getColumnTermSet(column).getTerms(), getController().getOntologyCoordinator());
             case 6: return null;
             default: return null;
             }

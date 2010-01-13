@@ -18,6 +18,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.log4j.Logger;
+import org.obo.annotation.view.TermAutocompleteFieldFactory;
 import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
@@ -114,7 +115,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
         taxaTable.setSelectionModel(this.getController().getTaxaSelectionModel());
         taxaTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
         taxaTable.setDefaultRenderer(OBOObject.class, new TermRenderer("None"));
-        taxaTable.getColumnModel().getColumn(1).setCellEditor(this.createAutocompleteEditor(this.getController().getOntologyController().getTaxonTermSet().getTerms()));
+        taxaTable.getColumnModel().getColumn(1).setCellEditor(TermAutocompleteFieldFactory.createAutocompleteEditor(this.getController().getOntologyController().getTaxonTermSet().getTerms(), getController().getOntologyCoordinator()));
         taxaTable.putClientProperty("Quaqua.Table.style", "striped");
         taxaTable.getActionMap().getParent().remove("copy");
         taxaTable.getActionMap().getParent().remove("paste");

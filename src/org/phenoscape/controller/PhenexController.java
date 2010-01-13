@@ -24,13 +24,13 @@ import org.apache.xmlbeans.XmlException;
 import org.bbop.framework.GUIManager;
 import org.biojava.bio.seq.io.ParseException;
 import org.nexml.schema_2009.NexmlDocument;
+import org.obo.annotation.view.DefaultOntologyCoordinator;
 import org.obo.annotation.view.OntologyCoordinator;
 import org.obo.annotation.view.SelectionManager;
 import org.obo.app.controller.DocumentController;
 import org.obo.app.controller.UserCancelledReadException;
 import org.obo.app.swing.ListSelectionMaintainer;
 import org.obo.app.util.EverythingEqualComparator;
-import org.obo.datamodel.OBOSession;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
 import org.phenoscape.io.NeXMLReader;
@@ -316,16 +316,7 @@ public class PhenexController extends DocumentController {
     }
     
     public OntologyCoordinator getOntologyCoordinator() {
-        return new OntologyCoordinator() {
-            
-            public SelectionManager getSelectionManager() {
-                return getPhenoteSelectionManager();
-            }
-            
-            public OBOSession getOBOSession() {
-                return getOntologyController().getOBOSession();
-            }
-        };
+        return new DefaultOntologyCoordinator(this.getOntologyController().getOBOSession(), this.getPhenoteSelectionManager());
     }
 
     public void addNewDataListener(NewDataListener listener) {

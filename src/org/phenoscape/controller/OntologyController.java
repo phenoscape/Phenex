@@ -1,4 +1,4 @@
-package org.phenoscape.model;
+package org.phenoscape.controller;
 
 import java.beans.XMLDecoder;
 import java.io.File;

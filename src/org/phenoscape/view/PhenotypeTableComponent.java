@@ -33,7 +33,7 @@ import org.obo.app.swing.PlaceholderRenderer;
 import org.obo.app.swing.PopupListener;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
-import org.phenoscape.model.PhenexController;
+import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.State;
 import org.phenoscape.util.TermSelection;

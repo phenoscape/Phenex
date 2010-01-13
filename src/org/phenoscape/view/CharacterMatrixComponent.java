@@ -32,9 +32,9 @@ import org.apache.log4j.Logger;
 import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
+import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
-import org.phenoscape.model.PhenexController;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 

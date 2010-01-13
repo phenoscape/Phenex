@@ -17,8 +17,8 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
+import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Character;
-import org.phenoscape.model.PhenexController;
 
 import phenote.gui.SortDisabler;
 import phenote.gui.TableColumnPrefsSaver;

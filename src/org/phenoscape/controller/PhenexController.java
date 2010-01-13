@@ -1,4 +1,4 @@
-package org.phenoscape.model;
+package org.phenoscape.controller;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -34,6 +34,14 @@ import org.phenoscape.io.NeXMLWriter;
 import org.phenoscape.io.TabDelimitedWriter;
 import org.phenoscape.io.TaxonTabReader;
 import org.phenoscape.io.nexml_1_0.NeXMLReader_1_0;
+import org.phenoscape.model.Character;
+import org.phenoscape.model.DataSet;
+import org.phenoscape.model.NewDataListener;
+import org.phenoscape.model.Phenotype;
+import org.phenoscape.model.Specimen;
+import org.phenoscape.model.State;
+import org.phenoscape.model.Taxon;
+import org.phenoscape.model.UndoObserver;
 import org.phenoscape.util.DataMerger;
 
 import phenote.gui.selection.SelectionManager;

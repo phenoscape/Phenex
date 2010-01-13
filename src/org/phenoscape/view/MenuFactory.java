@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import org.bbop.framework.GUIManager;
 import org.bbop.framework.ViewMenu;
 import org.obo.app.util.CrossPlatform;
-import org.phenoscape.model.PhenexController;
+import org.phenoscape.controller.PhenexController;
 
 import phenote.gui.actions.ResponderChainAction;
 import edu.stanford.ejalbert.BrowserLauncher;

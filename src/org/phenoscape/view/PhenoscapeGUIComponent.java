@@ -20,7 +20,7 @@ import org.obo.app.swing.AutocompleteField;
 import org.obo.app.swing.SearchHit;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
-import org.phenoscape.model.PhenexController;
+import org.phenoscape.controller.PhenexController;
 
 public class PhenoscapeGUIComponent extends AbstractGUIComponent {
 

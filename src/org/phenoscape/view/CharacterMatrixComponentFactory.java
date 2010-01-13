@@ -1,7 +1,7 @@
 package org.phenoscape.view;
 
 import org.bbop.framework.AbstractComponentFactory;
-import org.phenoscape.model.PhenexController;
+import org.phenoscape.controller.PhenexController;
 
 public class CharacterMatrixComponentFactory extends AbstractComponentFactory<CharacterMatrixComponent> {
 

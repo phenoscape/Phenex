@@ -18,12 +18,12 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.log4j.Logger;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
+import org.obo.app.swing.SortDisabler;
+import org.obo.app.swing.TableColumnPrefsSaver;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.State;
 
-import phenote.gui.SortDisabler;
-import phenote.gui.TableColumnPrefsSaver;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.gui.WritableTableFormat;

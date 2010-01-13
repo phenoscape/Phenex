@@ -24,9 +24,13 @@ import org.apache.xmlbeans.XmlException;
 import org.bbop.framework.GUIManager;
 import org.biojava.bio.seq.io.ParseException;
 import org.nexml.schema_2009.NexmlDocument;
+import org.obo.annotation.view.OntologyCoordinator;
+import org.obo.annotation.view.SelectionManager;
 import org.obo.app.controller.DocumentController;
 import org.obo.app.controller.UserCancelledReadException;
 import org.obo.app.swing.ListSelectionMaintainer;
+import org.obo.app.util.EverythingEqualComparator;
+import org.obo.datamodel.OBOSession;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
 import org.phenoscape.io.NeXMLReader;
@@ -44,8 +48,6 @@ import org.phenoscape.model.Taxon;
 import org.phenoscape.model.UndoObserver;
 import org.phenoscape.util.DataMerger;
 
-import phenote.gui.selection.SelectionManager;
-import phenote.util.EverythingEqualComparator;
 import ca.odell.glazedlists.CollectionList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.swing.EventSelectionModel;
@@ -69,9 +71,11 @@ public class PhenexController extends DocumentController {
     private String appName;
     private final List<NewDataListener> newDataListeners = new ArrayList<NewDataListener>();
     private final UndoObserver undoObserver;
+    private final SelectionManager phenoteSelectionManager;
 
     public PhenexController(OntologyController ontologyController) {
         super();
+        this.phenoteSelectionManager = new org.obo.annotation.view.SelectionManager();
         this.ontologyController = ontologyController;
         this.sortedCharacters = new SortedList<Character>(this.dataSet.getCharacters(), new EverythingEqualComparator<Character>());
         this.charactersSelectionModel = new EventSelectionModel<Character>(this.sortedCharacters);
@@ -307,8 +311,21 @@ public class PhenexController extends DocumentController {
         return "xml";
     }
 
-    public SelectionManager getPhenoteSelectionManager() {
-        return SelectionManager.inst();
+    private SelectionManager getPhenoteSelectionManager() {
+        return this.phenoteSelectionManager;
+    }
+    
+    public OntologyCoordinator getOntologyCoordinator() {
+        return new OntologyCoordinator() {
+            
+            public SelectionManager getSelectionManager() {
+                return getPhenoteSelectionManager();
+            }
+            
+            public OBOSession getOBOSession() {
+                return getOntologyController().getOBOSession();
+            }
+        };
     }
 
     public void addNewDataListener(NewDataListener listener) {

@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.obo.annotation.base.OBOUtil;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.TermSubset;
 import org.phenoscape.model.Character;
@@ -19,7 +20,6 @@ import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 
-import phenote.datamodel.OboUtil;
 import ca.odell.glazedlists.SortedList;
 
 import com.eekboom.utils.Strings;
@@ -74,7 +74,7 @@ public class TabDelimitedWriter {
                     this.writeState(state, writer);
                     writer.write("\t");
                     if (phenotype.getEntity() != null) {
-                        if (!OboUtil.isPostCompTerm(phenotype.getEntity())) {
+                        if (!OBOUtil.isPostCompTerm(phenotype.getEntity())) {
                             writer.write(String.format(LINK_FORMAT, TAO + phenotype.getEntity().getID(), phenotype.getEntity().getName()));
                         } else {
                             writer.write(phenotype.getEntity().getName());
@@ -82,7 +82,7 @@ public class TabDelimitedWriter {
                     }
                     writer.write("\t");
                     if (phenotype.getQuality() != null) {
-                        if (!OboUtil.isPostCompTerm(phenotype.getQuality())) {
+                        if (!OBOUtil.isPostCompTerm(phenotype.getQuality())) {
                             writer.write(String.format(LINK_FORMAT, PATO + phenotype.getQuality().getID(), phenotype.getQuality().getName()));
                         } else {
                             writer.write(phenotype.getQuality().getName());
@@ -91,7 +91,7 @@ public class TabDelimitedWriter {
                     writer.write("\t");
                     if (phenotype.getQuality() != null) {
                         final OBOClass characterAttribute = this.getCharacterAttributeForValue(phenotype.getQuality());
-                        if (!OboUtil.isPostCompTerm(characterAttribute)) {
+                        if (!OBOUtil.isPostCompTerm(characterAttribute)) {
                             writer.write(String.format(LINK_FORMAT, PATO + characterAttribute.getID(), characterAttribute.getName()));
                         } else {
                             writer.write(characterAttribute.getName());
@@ -99,7 +99,7 @@ public class TabDelimitedWriter {
                     }
                     writer.write("\t");
                     if (phenotype.getRelatedEntity() != null) {
-                        if (!OboUtil.isPostCompTerm(phenotype.getRelatedEntity())) {
+                        if (!OBOUtil.isPostCompTerm(phenotype.getRelatedEntity())) {
                             writer.write(String.format(LINK_FORMAT, TAO + phenotype.getRelatedEntity().getID(), phenotype.getRelatedEntity().getName()));
                         } else {
                             writer.write(phenotype.getRelatedEntity().getName());
@@ -200,7 +200,7 @@ public class TabDelimitedWriter {
         if (categoryNames.contains("character_slim")) {
             return valueTerm;
         } else {
-            final OBOClass parent = OboUtil.getIsaParentForTerm(valueTerm);
+            final OBOClass parent = OBOUtil.getIsaParentForTerm(valueTerm);
             if (parent != null) {
                 return getCharacterAttributeForValue(parent);
             } else {

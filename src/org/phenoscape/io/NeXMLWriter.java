@@ -47,8 +47,6 @@ import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 import org.w3c.dom.Attr;
 
-import phenote.dataadapter.phenoxml.PhenoXmlAdapter;
-
 public class NeXMLWriter {
 
     private final NexmlDocument xmlDoc;
@@ -75,7 +73,7 @@ public class NeXMLWriter {
         this.options.setSaveSuggestedPrefixes(suggestedPrefixes);
         this.options.setSaveNamespacesFirst();
         this.options.setUseDefaultNamespace();
-        
+
         final Map<String, String> implicitNamespaces = new HashMap<String, String>();
         implicitNamespaces.put("http://www.nexml.org/2009", "nex");
         //this.options.setSaveImplicitNamespaces(implicitNamespaces);
@@ -329,10 +327,10 @@ public class NeXMLWriter {
         } else {
             final List<PhenotypeCharacter> pcs = new ArrayList<PhenotypeCharacter>();
             for (Phenotype phenotype : state.getPhenotypes()) {
-                final PhenotypeCharacter pc = PhenoXmlAdapter.createPhenotypeCharacter(new PhenoXMLPhenotypeWrapper(phenotype));
+                final PhenotypeCharacter pc = PhenoXMLAdapter.createPhenotypeCharacter(phenotype);
                 if (pc != null) { pcs.add(pc); }
             }
-            final org.bioontologies.obd.schema.pheno.PhenotypeDocument.Phenotype phenoXML = PhenoXmlAdapter.createPhenotype(pcs);
+            final org.bioontologies.obd.schema.pheno.PhenotypeDocument.Phenotype phenoXML = PhenoXMLAdapter.createPhenotype(pcs);
             // for some reason the PhenoXML Phenotype appears only as a DocumentFragment instead of Element until it's stuck into a PhenotypeManifestation
             final PhenotypeManifestation scratchPM = PhenotypeManifestation.Factory.newInstance();
             scratchPM.setPhenotype(phenoXML);

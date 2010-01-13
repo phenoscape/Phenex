@@ -22,6 +22,7 @@ import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
+import org.obo.annotation.base.OBOUtil;
 import org.obo.annotation.base.TermSet;
 import org.obo.app.swing.AutocompleteField;
 import org.obo.app.swing.BugWorkaroundTable;
@@ -32,7 +33,6 @@ import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOProperty;
 
-import phenote.datamodel.OboUtil;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
@@ -48,6 +48,7 @@ public class PostCompositionEditor extends AbstractGUIComponent {
     private EventSelectionModel<Differentium> selectionModel = new EventSelectionModel<Differentium>(diffs);
     private final TermSet termSet;
     private final TermSet relationsSet;
+    private final OntologyCoordinator coordinator;
     private AutocompleteField<OBOObject> genusBox;
     private JButton addDifferentiaButton;
     private JButton deleteDifferentiaButton;
@@ -55,14 +56,15 @@ public class PostCompositionEditor extends AbstractGUIComponent {
     private DifferentiaTableFormat tableFormat;
     private TablePopupListener popupListener;
 
-    public PostCompositionEditor(String id, TermSet terms, TermSet relations) {
+    public PostCompositionEditor(String id, TermSet terms, TermSet relations, OntologyCoordinator coordinator) {
         super(id);
         this.termSet = terms;
         this.relationsSet = relations;
+        this.coordinator = coordinator;
     }
 
-    public PostCompositionEditor(TermSet terms, TermSet relations) {
-        this("", terms, relations);
+    public PostCompositionEditor(TermSet terms, TermSet relations, OntologyCoordinator coordinator) {
+        this("", terms, relations, coordinator);
         this.initializeInterface();
     }
 
@@ -93,7 +95,7 @@ public class PostCompositionEditor extends AbstractGUIComponent {
         if (this.diffs.isEmpty()) {
             return this.genus;
         } else {
-            final OboUtil util = OboUtil.initPostCompTerm(this.genus);
+            final OBOUtil util = OBOUtil.initPostCompTerm(this.genus);
             for (Differentium diff : this.diffs) {
                 util.addRelDiff(diff.getRelation(), diff.getTerm());
             }
@@ -103,9 +105,9 @@ public class PostCompositionEditor extends AbstractGUIComponent {
 
     public void setTerm(OBOClass aTerm) {
         this.diffs.clear();
-        if ((aTerm != null) && (OboUtil.isPostCompTerm(aTerm))) {
-            this.genus = OboUtil.getGenusTerm(aTerm);
-            for (Link link : OboUtil.getAllDifferentia(aTerm)) {
+        if ((aTerm != null) && (OBOUtil.isPostCompTerm(aTerm))) {
+            this.genus = OBOUtil.getGenusTerm(aTerm);
+            for (Link link : OBOUtil.getAllDifferentia(aTerm)) {
                 final Differentium diff = new Differentium();
                 diff.setRelation(link.getType());
                 final LinkedObject parent = link.getParent();
@@ -139,7 +141,7 @@ public class PostCompositionEditor extends AbstractGUIComponent {
         if (!this.tableFormat.getColumnClass(column).equals(OBOObject.class)) return;
         final Differentium differentia = this.diffs.get(row);
         final OBOClass term = (OBOClass)(this.tableFormat.getColumnValue(differentia, column));
-        final PostCompositionEditor pce = new PostCompositionEditor(this.termSet, this.relationsSet);
+        final PostCompositionEditor pce = new PostCompositionEditor(this.termSet, this.relationsSet, this.coordinator);
         pce.setTerm(term);
         final int result = pce.runPostCompositionDialog(this);
         if (result == JOptionPane.OK_OPTION) {
@@ -155,7 +157,7 @@ public class PostCompositionEditor extends AbstractGUIComponent {
         comboConstraints.gridx = 1;
         comboConstraints.fill = GridBagConstraints.HORIZONTAL;
         comboConstraints.weightx = 1.0;
-        this.genusBox = AutocompleteFieldFactory.createAutocompleteBox(this.termSet.getTerms());
+        this.genusBox = TermAutocompleteFieldFactory.createAutocompleteBox(this.termSet.getTerms(), this.coordinator);
         this.genusBox.setAction(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 updateGenus();
@@ -254,8 +256,8 @@ public class PostCompositionEditor extends AbstractGUIComponent {
 
         public TableCellEditor getColumnEditor(int column) {
             switch (column) {
-            case 0: return AutocompleteFieldFactory.createAutocompleteEditor(relationsSet.getTerms());
-            case 1: return AutocompleteFieldFactory.createAutocompleteEditor(termSet.getTerms());
+            case 0: return TermAutocompleteFieldFactory.createAutocompleteEditor(relationsSet.getTerms(), coordinator);
+            case 1: return TermAutocompleteFieldFactory.createAutocompleteEditor(termSet.getTerms(), coordinator);
             default: return null;
             }
         }

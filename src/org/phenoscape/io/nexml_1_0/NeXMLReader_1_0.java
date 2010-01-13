@@ -35,19 +35,16 @@ import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.impl.DanglingClassImpl;
-import org.phenoscape.io.PhenoXMLPhenotypeWrapper;
-import org.phenoscape.io.PhenoXMLPhenotypeWrapper.PhenotypeWrapperFactory;
+import org.phenoscape.io.PhenoXMLAdapter;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
+import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import phenote.dataadapter.phenoxml.PhenoXmlAdapter;
-import phenote.datamodel.PhenotypeCharacterI;
 
 public class NeXMLReader_1_0 {
 
@@ -158,10 +155,10 @@ public class NeXMLReader_1_0 {
                     if (phenoXML != null) {
                         try {
                             PhenotypeDocument xmlPhen = org.bioontologies.obd.schema.pheno.PhenotypeDocument.Factory.parse(phenoXML);
-                            PhenoXmlAdapter adapter = new PhenoXmlAdapter(this.session);
-                            List<PhenotypeCharacterI> phenotypes = adapter.parsePhenotype(xmlPhen.getPhenotype(), new PhenotypeWrapperFactory());
-                            for (PhenotypeCharacterI phenotype : phenotypes) {
-                                newState.addPhenotype(((PhenoXMLPhenotypeWrapper)phenotype).getPhenotype());
+                            PhenoXMLAdapter adapter = new PhenoXMLAdapter(this.session);
+                            List<Phenotype> phenotypes = adapter.parsePhenotype(xmlPhen.getPhenotype());
+                            for (Phenotype phenotype : phenotypes) {
+                                newState.addPhenotype(phenotype);
                             }
                             this.danglers.addAll(adapter.getDanglersList());
                             this.secondaryIDs.addAll(adapter.getMigratedSecondaryIDsList());

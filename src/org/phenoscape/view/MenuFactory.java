@@ -16,11 +16,12 @@ import javax.swing.KeyStroke;
 import org.apache.log4j.Logger;
 import org.bbop.framework.GUIManager;
 import org.bbop.framework.ViewMenu;
+import org.obo.app.swing.ResponderChainAction;
 import org.obo.app.util.CrossPlatform;
 import org.phenoscape.controller.PhenexController;
 
-import phenote.gui.actions.ResponderChainAction;
 import edu.stanford.ejalbert.BrowserLauncher;
+import edu.stanford.ejalbert.exception.BrowserLaunchingExecutionException;
 import edu.stanford.ejalbert.exception.BrowserLaunchingInitializingException;
 import edu.stanford.ejalbert.exception.UnsupportedOperatingSystemException;
 
@@ -54,24 +55,24 @@ public class MenuFactory {
         };
         openAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menu.add(new JMenuItem(openAction));
-//        final Action mergeTaxaAction = new AbstractAction("Tab-delimited Taxa...") {
-//            public void actionPerformed(ActionEvent e) { controller.openMergeTaxa(); }
-//        };
-//        final Action mergeCharactersAction = new AbstractAction("Tab-delimited Characters...") {
-//            public void actionPerformed(ActionEvent e) { controller.openMergeCharacters(); }
-//        };
+        //        final Action mergeTaxaAction = new AbstractAction("Tab-delimited Taxa...") {
+        //            public void actionPerformed(ActionEvent e) { controller.openMergeTaxa(); }
+        //        };
+        //        final Action mergeCharactersAction = new AbstractAction("Tab-delimited Characters...") {
+        //            public void actionPerformed(ActionEvent e) { controller.openMergeCharacters(); }
+        //        };
         final Action mergeNEXUSAction = new AbstractAction("NEXUS...") {
             //TODO use import methods instead
             public void actionPerformed(ActionEvent e) { controller.openMergeNEXUS(); }
         };
-//        final Action mergeNeXMLAction = new AbstractAction("NeXML Data...") {
-//            public void actionPerformed(ActionEvent e) { controller.openMergeNeXML(); }
-//        };
+        //        final Action mergeNeXMLAction = new AbstractAction("NeXML Data...") {
+        //            public void actionPerformed(ActionEvent e) { controller.openMergeNeXML(); }
+        //        };
         final JMenu mergeMenu = new JMenu("Import");
-//        mergeMenu.add(new JMenuItem(mergeTaxaAction));
-//        mergeMenu.add(new JMenuItem(mergeCharactersAction));
+        //        mergeMenu.add(new JMenuItem(mergeTaxaAction));
+        //        mergeMenu.add(new JMenuItem(mergeCharactersAction));
         mergeMenu.add(new JMenuItem(mergeNEXUSAction));
-//        mergeMenu.add(new JMenuItem(mergeNeXMLAction));
+        //        mergeMenu.add(new JMenuItem(mergeNeXMLAction));
         menu.add(mergeMenu);
         menu.addSeparator();
         final Action saveAction = new AbstractAction("Save") {
@@ -127,11 +128,13 @@ public class MenuFactory {
         final Action homepageAction = new AbstractAction("Phenex Homepage") {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    (new BrowserLauncher()).openURLinBrowser("http://www.phenoscape.org/wiki/Phenex");
+                    (new BrowserLauncher(null)).openURLinBrowser("http://www.phenoscape.org/wiki/Phenex");
                 } catch (BrowserLaunchingInitializingException e1) {
                     log().error("Unable to open URL in browser", e1);
                     e1.printStackTrace();
                 } catch (UnsupportedOperatingSystemException e1) {
+                    log().error("Unable to open URL in browser", e1);
+                } catch (BrowserLaunchingExecutionException e1) {
                     log().error("Unable to open URL in browser", e1);
                 }
             }
@@ -139,11 +142,13 @@ public class MenuFactory {
         final Action trackerAction = new AbstractAction("Submit Bug Report or Feature Request...") {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    (new BrowserLauncher()).openURLinBrowser("https://sourceforge.net/tracker/?func=add&group_id=76834&atid=1116214");
+                    (new BrowserLauncher(null)).openURLinBrowser("https://sourceforge.net/tracker/?func=add&group_id=76834&atid=1116214");
                 } catch (BrowserLaunchingInitializingException e1) {
                     log().error("Unable to open URL in browser", e1);
                     e1.printStackTrace();
                 } catch (UnsupportedOperatingSystemException e1) {
+                    log().error("Unable to open URL in browser", e1);
+                } catch (BrowserLaunchingExecutionException e1) {
                     log().error("Unable to open URL in browser", e1);
                 }
             }

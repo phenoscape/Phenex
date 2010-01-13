@@ -16,9 +16,9 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.bbop.framework.AbstractGUIComponent;
 import org.obo.annotation.view.LogViewComponentFactory.LogViewAppender;
 import org.obo.app.swing.BugWorkaroundTable;
+import org.obo.app.swing.SortDisabler;
+import org.obo.app.util.EverythingEqualComparator;
 
-import phenote.gui.SortDisabler;
-import phenote.util.EverythingEqualComparator;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;

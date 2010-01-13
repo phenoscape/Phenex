@@ -17,8 +17,8 @@ import org.obd.model.Node;
 import org.obd.query.Shard;
 import org.obd.query.impl.AbstractSQLShard;
 import org.obd.query.impl.OBDSQLShard;
+import org.obo.app.util.Collections;
 
-import phenote.util.Collections;
 
 
 /**
@@ -32,7 +32,7 @@ import phenote.util.Collections;
  */
 
 public class LabelMakerForPostComposedEntitiesInDataWarehouse {
-	/** The db-host system property should contain the name of the database server. */
+    /** The db-host system property should contain the name of the database server. */
     public static final String DB_HOST = "db-host";
     /** The db-name system property should contain the name of the database. */
     public static final String DB_NAME = "db-name";
@@ -41,49 +41,49 @@ public class LabelMakerForPostComposedEntitiesInDataWarehouse {
     /** The db-password system property should contain the database password. */
     public static final String DB_PASSWORD = "db-password";
     /** The ontology-dir system property should contain the path to a folder with ontologies to be loaded. */
-    
+
     /**
-	 * Mapping for how to represent relations used in post-comp differentia when generating a human-readable label.
-	 * If the relation is not in this map, use "of".
-	 */
-	private static final Map<String, String> POSTCOMP_RELATIONS = new HashMap<String, String>();
+     * Mapping for how to represent relations used in post-comp differentia when generating a human-readable label.
+     * If the relation is not in this map, use "of".
+     */
+    private static final Map<String, String> POSTCOMP_RELATIONS = new HashMap<String, String>();
     static {
-    	  POSTCOMP_RELATIONS.put("OBO_REL:connected_to", "on");
-          POSTCOMP_RELATIONS.put("connected_to", "on");
-          POSTCOMP_RELATIONS.put("anterior_to", "anterior to");
-          POSTCOMP_RELATIONS.put("BSPO:0000096", "anterior to");
-          POSTCOMP_RELATIONS.put("posterior_to", "posterior to");
-          POSTCOMP_RELATIONS.put("BSPO:0000099", "posterior to");
-          POSTCOMP_RELATIONS.put("adjacent_to", "adjacent to");
+        POSTCOMP_RELATIONS.put("OBO_REL:connected_to", "on");
+        POSTCOMP_RELATIONS.put("connected_to", "on");
+        POSTCOMP_RELATIONS.put("anterior_to", "anterior to");
+        POSTCOMP_RELATIONS.put("BSPO:0000096", "anterior to");
+        POSTCOMP_RELATIONS.put("posterior_to", "posterior to");
+        POSTCOMP_RELATIONS.put("BSPO:0000099", "posterior to");
+        POSTCOMP_RELATIONS.put("adjacent_to", "adjacent to");
     }
-    
+
     public final String sqlQueryForPostComposedEntities = 
-    	"SELECT DISTINCT " +
-    	"entity_uid " +
-    	"FROM " +
-    	"dw_entity_table " +
-    	"WHERE " +
-    	"entity_label IS NULL";
-    
+        "SELECT DISTINCT " +
+        "entity_uid " +
+        "FROM " +
+        "dw_entity_table " +
+        "WHERE " +
+        "entity_label IS NULL";
+
     public final String sqlUpdateToFillInGeneratedLabelsForPostComposedEntities = 
-    	"UPDATE dw_entity_table " +
-    	"SET entity_label = ? " +
-    	"WHERE entity_uid = ?";
-    
+        "UPDATE dw_entity_table " +
+        "SET entity_label = ? " +
+        "WHERE entity_uid = ?";
+
     private AbstractSQLShard shard;
     private Connection conn; 
-    
+
     /**
      * Constructor initializes the shard
      * @throws SQLException
      * @throws ClassNotFoundException
      */
     public LabelMakerForPostComposedEntitiesInDataWarehouse() throws SQLException, ClassNotFoundException{
-    	super();
-    	this.shard = (AbstractSQLShard)this.initializeShard();
-    	this.conn = shard.getConnection();
+        super();
+        this.shard = (AbstractSQLShard)this.initializeShard();
+        this.conn = shard.getConnection();
     }
-    
+
     /**
      * This method connects the shard to the database given the systems
      * parameters for DB location, name, DB username and DB password
@@ -135,12 +135,12 @@ public class LabelMakerForPostComposedEntitiesInDataWarehouse {
             return simpleLabel(desc.getGenus().getNodeId()) + Collections.join(differentia, ", ");
         }
     }
-    
+
     public String simpleLabel(String id) {
         final Node node = this.shard.getNode(id);
         return simpleLabel(node);
     }
-    
+
     /**
      * @PURPOSE This method finds all the rows with NULL values
      * for entity and updates these with a String value, which is
@@ -148,24 +148,24 @@ public class LabelMakerForPostComposedEntitiesInDataWarehouse {
      * @throws SQLException
      */
     public void makeLabel() throws SQLException{
-    	Statement stmt = conn.createStatement();
-    	ResultSet rs = stmt.executeQuery(sqlQueryForPostComposedEntities);
-    	
-    	PreparedStatement ps = conn.prepareStatement(sqlUpdateToFillInGeneratedLabelsForPostComposedEntities);
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sqlQueryForPostComposedEntities);
 
-    	String id, label; 
-    	while(rs.next()){
-    		id = rs.getString(1);
-    		label = simpleLabel(id);
-    		ps.setString(1, label);
-    		ps.setString(2, id);
-    		ps.execute();
-    	}
+        PreparedStatement ps = conn.prepareStatement(sqlUpdateToFillInGeneratedLabelsForPostComposedEntities);
+
+        String id, label; 
+        while(rs.next()){
+            id = rs.getString(1);
+            label = simpleLabel(id);
+            ps.setString(1, label);
+            ps.setString(2, id);
+            ps.execute();
+        }
     }
-    
+
     public static void main(String[] args) throws SQLException, ClassNotFoundException{
-    	LabelMakerForPostComposedEntitiesInDataWarehouse lm = new LabelMakerForPostComposedEntitiesInDataWarehouse();
-    	lm.makeLabel();
+        LabelMakerForPostComposedEntitiesInDataWarehouse lm = new LabelMakerForPostComposedEntitiesInDataWarehouse();
+        lm.makeLabel();
     }
 
 }

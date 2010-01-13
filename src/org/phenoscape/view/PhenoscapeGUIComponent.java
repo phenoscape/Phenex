@@ -26,6 +26,7 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
 
     private final PhenexController controller;
 
+    //TODO make use of TermAutocompleteFactory
     public PhenoscapeGUIComponent(String id, PhenexController controller) {
         super(id);
         this.controller = controller;
@@ -44,7 +45,7 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
      * like the Term Info panel to display information about the term.
      */
     protected void updateGlobalTermSelection(OBOClass term) {
-        this.getController().getPhenoteSelectionManager().selectTerm(this, term, false);
+        this.getController().getOntologyCoordinator().getSelectionManager().selectTerm(this, term, false);
     }
 
     /**

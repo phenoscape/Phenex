@@ -40,17 +40,14 @@ import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.impl.DanglingClassImpl;
 import org.phenoscape.io.NeXMLUtil.LiteralContents;
 import org.phenoscape.io.NeXMLUtil.OBOURISyntaxException;
-import org.phenoscape.io.PhenoXMLPhenotypeWrapper.PhenotypeWrapperFactory;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
+import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-
-import phenote.dataadapter.phenoxml.PhenoXmlAdapter;
-import phenote.datamodel.PhenotypeCharacterI;
 
 public class NeXMLReader {
 
@@ -161,10 +158,10 @@ public class NeXMLReader {
                         if (phenoXML != null) {
                             try {
                                 PhenotypeDocument xmlPhen = org.bioontologies.obd.schema.pheno.PhenotypeDocument.Factory.parse(phenoXML);
-                                final PhenoXmlAdapter adapter = new PhenoXmlAdapter(this.session);
-                                final List<PhenotypeCharacterI> phenotypes = adapter.parsePhenotype(xmlPhen.getPhenotype(), new PhenotypeWrapperFactory());
-                                for (PhenotypeCharacterI phenotype : phenotypes) {
-                                    newState.addPhenotype(((PhenoXMLPhenotypeWrapper)phenotype).getPhenotype());
+                                final PhenoXMLAdapter adapter = new PhenoXMLAdapter(this.session);
+                                final List<Phenotype> phenotypes = adapter.parsePhenotype(xmlPhen.getPhenotype());
+                                for (Phenotype phenotype : phenotypes) {
+                                    newState.addPhenotype(phenotype);
                                 }
                                 this.danglers.addAll(adapter.getDanglersList());
                                 this.secondaryIDs.addAll(adapter.getMigratedSecondaryIDsList());
@@ -313,7 +310,7 @@ public class NeXMLReader {
         }
         return null;
     }
-    
+
     private String stringOrNull(Object obj) {
         if (obj == null) {
             return null;

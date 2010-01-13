@@ -25,7 +25,11 @@ import org.bbop.framework.dock.idw.IDWDriver;
 import org.jdesktop.swingworker.SwingWorker;
 import org.obo.annotation.base.UserOntologyConfiguration;
 import org.obo.annotation.view.LogViewComponentFactory;
-import org.obo.annotation.view.SessionTermInfoFactory;
+import org.obo.annotation.view.NativeDockingTheme;
+import org.obo.annotation.view.PhenoteGraphViewFactory;
+import org.obo.annotation.view.PhenoteOntologyTreeEditorFactory;
+import org.obo.annotation.view.SelectionBridge;
+import org.obo.annotation.view.TermInfoComponentFactory;
 import org.obo.app.swing.BlockingProgressDialog;
 import org.obo.app.swing.WindowSizePrefsSaver;
 import org.obo.app.util.CrossPlatform;
@@ -43,11 +47,6 @@ import org.phenoscape.view.PhenotypeTableComponentFactory;
 import org.phenoscape.view.SpecimenTableComponentFactory;
 import org.phenoscape.view.StateTableComponentFactory;
 import org.phenoscape.view.TaxonTableComponentFactory;
-
-import phenote.gui.PhenoteDockingTheme;
-import phenote.gui.factories.PhenoteGraphViewFactory;
-import phenote.gui.factories.PhenoteOntologyTreeEditorFactory;
-import phenote.gui.selection.SelectionBridge;
 
 /**
  * This startup task does all the work of starting up Phenex.
@@ -69,7 +68,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
         factories.add(new SpecimenTableComponentFactory(this.controller));
         factories.add(new CharacterMatrixComponentFactory(this.controller));
         factories.add(new OntologyPreferencesComponentFactory(this.ontologyConfiguration));
-        factories.add(new SessionTermInfoFactory());
+        factories.add(new TermInfoComponentFactory(this.controller.getOntologyCoordinator()));
         factories.add(new PhenoteOntologyTreeEditorFactory());
         factories.add(new PhenoteGraphViewFactory());
         factories.add(new SearchComponentFactory() {
@@ -179,7 +178,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
     protected LayoutDriver createLayoutDriver() {
         final LayoutDriver driver = super.createLayoutDriver();
         if (driver instanceof IDWDriver) {
-            ((IDWDriver)driver).setCustomTheme(new PhenoteDockingTheme());
+            ((IDWDriver)driver).setCustomTheme(new NativeDockingTheme());
         }
         driver.setSaveLayoutOnExit(false);
         return driver;
@@ -215,7 +214,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
     @Override
     protected void doOtherInstallations() {
         super.doOtherInstallations();
-        new SelectionBridge().install();
+        new SelectionBridge(this.controller.getOntologyCoordinator().getSelectionManager()).install();
     }
 
     @Override

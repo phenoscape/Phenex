@@ -22,8 +22,8 @@ import org.obo.annotation.base.OntologySource;
 import org.obo.annotation.base.UserOntologyConfiguration;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
+import org.obo.app.swing.TableColumnPrefsSaver;
 
-import phenote.gui.TableColumnPrefsSaver;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;

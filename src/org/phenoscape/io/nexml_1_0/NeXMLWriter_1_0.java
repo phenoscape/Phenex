@@ -37,7 +37,7 @@ import org.nexml.x10.StandardObs;
 import org.nexml.x10.StandardState;
 import org.nexml.x10.StandardStates;
 import org.nexml.x10.Taxa;
-import org.phenoscape.io.PhenoXMLPhenotypeWrapper;
+import org.phenoscape.io.PhenoXMLAdapter;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.Phenotype;
@@ -47,8 +47,6 @@ import org.phenoscape.model.Taxon;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import phenote.dataadapter.phenoxml.PhenoXmlAdapter;
 
 public class NeXMLWriter_1_0 {
 
@@ -335,10 +333,10 @@ public class NeXMLWriter_1_0 {
         NeXMLUtil_1_0.clearChildren(any);
         final List<PhenotypeCharacter> pcs = new ArrayList<PhenotypeCharacter>();
         for (Phenotype phenotype : state.getPhenotypes()) {
-            final PhenotypeCharacter pc = PhenoXmlAdapter.createPhenotypeCharacter(new PhenoXMLPhenotypeWrapper(phenotype));
+            final PhenotypeCharacter pc = PhenoXMLAdapter.createPhenotypeCharacter(phenotype);
             if (pc != null) { pcs.add(pc); }
         }
-        final org.bioontologies.obd.schema.pheno.PhenotypeDocument.Phenotype phenoXML = PhenoXmlAdapter.createPhenotype(pcs);
+        final org.bioontologies.obd.schema.pheno.PhenotypeDocument.Phenotype phenoXML = PhenoXMLAdapter.createPhenotype(pcs);
         // for some reason the PhenoXML Phenotype appears only as a DocumentFragment instead of Element until it's stuck into a PhenotypeManifestation
         final PhenotypeManifestation scratchPM = PhenotypeManifestation.Factory.newInstance();
         scratchPM.setPhenotype(phenoXML);

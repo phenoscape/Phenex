@@ -31,6 +31,8 @@ import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
 import org.obo.app.swing.PopupListener;
+import org.obo.app.swing.SortDisabler;
+import org.obo.app.swing.TableColumnPrefsSaver;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.phenoscape.controller.PhenexController;
@@ -39,8 +41,6 @@ import org.phenoscape.model.State;
 import org.phenoscape.util.TermSelection;
 import org.phenoscape.util.TermTransferObject;
 
-import phenote.gui.SortDisabler;
-import phenote.gui.TableColumnPrefsSaver;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
@@ -198,7 +198,7 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
         if (!this.tableFormat.getColumnClass(column).equals(OBOObject.class)) return;
         final Phenotype phenotype = this.getController().getPhenotypesForCurrentStateSelection().get(row);
         final OBOClass term = (OBOClass)(this.tableFormat.getColumnValue(phenotype, column));
-        final PostCompositionEditor pce = new PostCompositionEditor(this.tableFormat.getColumnTermSet(column), this.getController().getOntologyController().getRelationsTermSet());
+        final PostCompositionEditor pce = new PostCompositionEditor(this.tableFormat.getColumnTermSet(column), this.getController().getOntologyController().getRelationsTermSet(), this.getController().getOntologyCoordinator());
         pce.setTerm(term);
         final int result = pce.runPostCompositionDialog(this);
         if (result == JOptionPane.OK_OPTION) {

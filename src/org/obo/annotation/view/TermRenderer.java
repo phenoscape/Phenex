@@ -5,14 +5,13 @@ import java.awt.Component;
 
 import javax.swing.JTable;
 
+import org.obo.annotation.base.OBOUtil;
 import org.obo.app.swing.PlaceholderRenderer;
 import org.obo.datamodel.DanglingObject;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
-
-import phenote.datamodel.OboUtil;
 
 /**
  * A table cell renderer for displaying cell values which are ontology terms (OBOClass).
@@ -47,11 +46,11 @@ public class TermRenderer extends PlaceholderRenderer {
   }
   
   private boolean isDangling(OBOObject term) {
-      if (OboUtil.isPostCompTerm(term)) {
-          if (this.isDangling(OboUtil.getGenusTerm((OBOClass)term))) {
+      if (OBOUtil.isPostCompTerm(term)) {
+          if (this.isDangling(OBOUtil.getGenusTerm((OBOClass)term))) {
               return true;
           } else {
-              for (Link link : OboUtil.getAllDifferentia((OBOClass)term)) {
+              for (Link link : OBOUtil.getAllDifferentia((OBOClass)term)) {
                   final LinkedObject parent = link.getParent();
                   if (!(parent instanceof OBOClass)) continue;
                   final OBOClass differentium = (OBOClass)parent;

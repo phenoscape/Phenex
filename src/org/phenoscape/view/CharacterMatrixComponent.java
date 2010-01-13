@@ -32,14 +32,14 @@ import org.apache.log4j.Logger;
 import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
+import org.obo.app.swing.SortDisabler;
+import org.obo.app.util.EverythingEqualComparator;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 
-import phenote.gui.SortDisabler;
-import phenote.util.EverythingEqualComparator;
 import ca.odell.glazedlists.CollectionList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;

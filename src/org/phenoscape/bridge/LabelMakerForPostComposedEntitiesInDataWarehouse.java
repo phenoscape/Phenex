@@ -55,6 +55,7 @@ public class LabelMakerForPostComposedEntitiesInDataWarehouse {
         POSTCOMP_RELATIONS.put("posterior_to", "posterior to");
         POSTCOMP_RELATIONS.put("BSPO:0000099", "posterior to");
         POSTCOMP_RELATIONS.put("adjacent_to", "adjacent to");
+        POSTCOMP_RELATIONS.put("OBO_REL:adjacent_to", "adjacent to");
     }
 
     public final String sqlQueryForPostComposedEntities = 

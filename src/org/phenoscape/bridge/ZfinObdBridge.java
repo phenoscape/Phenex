@@ -361,6 +361,10 @@ public class ZfinObdBridge {
         BufferedReader br1 = new BufferedReader(new InputStreamReader(phenotypeURL.openStream()));
         while ((phenoFileLine = br1.readLine()) != null) {
             String[] pComps = phenoFileLine.split("\\t");
+            if(pComps.length < 10){ 
+            	log().info("Skipping line because of inadequate number of tab delimited components: " + phenoFileLine);
+            	continue;
+            }
             genotypeId = pComps[0];
             genotype = pComps[1];
             qualityId = pComps[6];

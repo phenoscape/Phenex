@@ -3,7 +3,7 @@ package org.obo.app.model;
 import java.util.Collection;
 
 /**
- * An object which observes properties of another class of object.
+ * An object which observes properties of some other class of object.
  * @author Jim Balhoff
  *
  * @param <T> The class of objects to be observed.

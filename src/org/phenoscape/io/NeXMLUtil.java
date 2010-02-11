@@ -104,6 +104,11 @@ public class NeXMLUtil {
         final NodeList elements = parent.getElementsByTagNameNS(namespaceURI, localName);
         return (elements.getLength() > 0) ? (Element)(elements.item(0)) : null;
     }
+    
+    public static Element getLastChildWithTagNameNS(Element parent, String namespaceURI, String localName) {
+        final NodeList elements = parent.getElementsByTagNameNS(namespaceURI, localName);
+        return (elements.getLength() > 0) ? (Element)(elements.item(elements.getLength() - 1)) : null;
+    }
 
     public static List<Meta> findMetadata(Annotatable node, QName predicate) {
         final List<Meta> metas = new ArrayList<Meta>();
@@ -198,6 +203,7 @@ public class NeXMLUtil {
             literalMeta.unsetContent();    
         }
         final Node importedNode = literalMeta.getDomNode().getOwnerDocument().importNode(value, true);
+        clearChildren((Element)(literalMeta.getDomNode()));
         literalMeta.getDomNode().appendChild(importedNode);
     }
     

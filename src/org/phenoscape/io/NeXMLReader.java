@@ -154,7 +154,9 @@ public class NeXMLReader {
                     final Object phenotypeObj = NeXMLUtil.getFirstMetadataValue(abstractState, NeXMLUtil.PHENOTYPE_PREDICATE);
                     if (phenotypeObj instanceof LiteralContents) {
                         final LiteralContents literal = (LiteralContents)phenotypeObj;
-                        final Element phenoXML = NeXMLUtil.getFirstChildWithTagNameNS(literal.getElement(), NeXMLUtil.PHENOXML_NAMESPACE, "phenotype");
+                        // we need to get the last element, due to a now fixed bug which caused phenotypes to be appended in files, instead of replaced
+                        // this will allow it to read in the latest work before destroying the unnecessary elements upon save
+                        final Element phenoXML = NeXMLUtil.getLastChildWithTagNameNS(literal.getElement(), NeXMLUtil.PHENOXML_NAMESPACE, "phenotype");
                         if (phenoXML != null) {
                             try {
                                 PhenotypeDocument xmlPhen = org.bioontologies.obd.schema.pheno.PhenotypeDocument.Factory.parse(phenoXML);

@@ -15,6 +15,9 @@ import ca.odell.glazedlists.ObservableElementList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 
+/**
+ * @author Jim Balhoff
+ */
 public class ObservableEventList<T extends PropertyChangeObject> extends ObservableElementList<T> implements ObservableList<T> {
     
     private final List<T> observedElements;

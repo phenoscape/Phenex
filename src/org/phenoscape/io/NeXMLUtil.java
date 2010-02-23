@@ -356,7 +356,7 @@ public class NeXMLUtil {
     }
 
     /**
-     * Value could be String, Map<QName, List<Object>>, or NodeList
+     * Value could be String, Map<QName, List<Object>, or LiteralContents
      */
     public static Object getFirstMetadataValue(Annotated node, QName predicate) {
         final List<Object> values = getMetadataValues(node, predicate);
@@ -368,7 +368,7 @@ public class NeXMLUtil {
     }
     
     /**
-     * Objects in list could be String, Map<QName, List<Object>>, or LiteralContents
+     * Objects in list could be String, Map<QName, List<Object>, or LiteralContents
      */
     public static Map<QName, List<Object>> translate(List<Meta> metas) {
         final Map<QName, List<Object>> map = new HashMap<QName, List<Object>>();
@@ -593,6 +593,9 @@ public class NeXMLUtil {
             return getTextContent(element);
         }
         
+        /**
+         * This returns the meta element itself
+         */
         public Element getElement() {
             return this.element;
         }

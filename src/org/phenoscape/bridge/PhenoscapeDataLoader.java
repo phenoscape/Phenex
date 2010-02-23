@@ -74,7 +74,7 @@ public class PhenoscapeDataLoader {
         }
     }
 
-    private void processDataFile(File file, BufferedWriter bw) throws Exception {
+    private void processDataFile(File file, BufferedWriter bw) throws IOException, XmlException {
         log().info("Started work with " + file.getAbsolutePath());
         DataSet ds ;
         try{

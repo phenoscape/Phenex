@@ -48,6 +48,7 @@ import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class NeXMLReader {
 
@@ -154,16 +155,27 @@ public class NeXMLReader {
                     final Object phenotypeObj = NeXMLUtil.getFirstMetadataValue(abstractState, NeXMLUtil.PHENOTYPE_PREDICATE);
                     if (phenotypeObj instanceof LiteralContents) {
                         final LiteralContents literal = (LiteralContents)phenotypeObj;
-                        // we need to get the last element, due to a now fixed bug which caused phenotypes to be appended in files, instead of replaced
+                        // we need to get the last PhenoXML element that is different from the first, due to a now fixed bug which caused 
+                        // phenotypes to be appended in files, instead of replaced
                         // this will allow it to read in the latest work before destroying the unnecessary elements upon save
-                        final Element phenoXML = NeXMLUtil.getLastChildWithTagNameNS(literal.getElement(), NeXMLUtil.PHENOXML_NAMESPACE, "phenotype");
-                        if (phenoXML != null) {
+                        final NodeList phenotypeElements = literal.getElement().getElementsByTagNameNS(NeXMLUtil.PHENOXML_NAMESPACE, "phenotype");
+                        boolean first = true;
+                        List<Phenotype> firstPhenotypeList = null;
+                        List<Phenotype> newestPhenotypeList = null;
+                        for (int i = 0; i < phenotypeElements.getLength(); i++) {
+                            final Element phenoXML = (Element)(phenotypeElements.item(i));
                             try {
-                                PhenotypeDocument xmlPhen = org.bioontologies.obd.schema.pheno.PhenotypeDocument.Factory.parse(phenoXML);
+                                final PhenotypeDocument xmlPhen = org.bioontologies.obd.schema.pheno.PhenotypeDocument.Factory.parse(phenoXML);
                                 final PhenoXMLAdapter adapter = new PhenoXMLAdapter(this.session);
                                 final List<Phenotype> phenotypes = adapter.parsePhenotype(xmlPhen.getPhenotype());
-                                for (Phenotype phenotype : phenotypes) {
-                                    newState.addPhenotype(phenotype);
+                                if (first) {
+                                    first = false;
+                                    firstPhenotypeList = phenotypes;
+                                    newestPhenotypeList = phenotypes;
+                                } else {
+                                    if (!phenotypes.equals(firstPhenotypeList)) {
+                                        newestPhenotypeList = phenotypes;
+                                    }
                                 }
                                 this.danglers.addAll(adapter.getDanglersList());
                                 this.secondaryIDs.addAll(adapter.getMigratedSecondaryIDsList());
@@ -171,6 +183,11 @@ public class NeXMLReader {
                                 log().error("Failed to parse OBO phenotype", e);
                             }
                         }
+                        if (newestPhenotypeList != null) {
+                            for (Phenotype phenotype : newestPhenotypeList) {
+                                newState.addPhenotype(phenotype);
+                            }
+                        }   
                     }
                     newCharacter.addState(newState);
                 }

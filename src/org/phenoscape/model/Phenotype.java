@@ -122,5 +122,35 @@ public class Phenotype extends AbstractPropertyChangeObject {
             return super.getClass(propertyKey);
         }
     }
+    
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof Phenotype) {
+            final Phenotype otherPhenotype = (Phenotype)other;
+            return 
+            ObjectUtils.equals(this.entity, otherPhenotype.entity) && 
+            ObjectUtils.equals(this.quality, otherPhenotype.quality) && 
+            ObjectUtils.equals(this.relatedEntity, otherPhenotype.relatedEntity) && 
+            ObjectUtils.equals(this.count, otherPhenotype.count) && 
+            ObjectUtils.equals(this.measurement, otherPhenotype.measurement) && 
+            ObjectUtils.equals(this.unit, otherPhenotype.unit) && 
+            ObjectUtils.equals(this.comment, otherPhenotype.comment);
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        int hash = 17;
+        hash = (37 * hash) + (this.entity == null ? 0 : this.entity.hashCode());
+        hash = (37 * hash) + (this.quality == null ? 0 : this.quality.hashCode());
+        hash = (37 * hash) + (this.relatedEntity == null ? 0 : this.relatedEntity.hashCode());
+        hash = (37 * hash) + (this.count == null ? 0 : this.count);
+        hash = (37 * hash) + (this.measurement == null ? 0 : Float.floatToIntBits(this.measurement));
+        hash = (37 * hash) + (this.unit == null ? 0 : this.unit.hashCode());
+        hash = (37 * hash) + (this.comment == null ? 0 : this.comment.hashCode());
+        return hash;
+    }
 
 }

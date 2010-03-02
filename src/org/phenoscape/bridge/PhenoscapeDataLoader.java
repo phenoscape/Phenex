@@ -66,10 +66,7 @@ public class PhenoscapeDataLoader {
                     log().error("Failed parsing " + file, e);
                 } catch (IOException e) {
                     log().error("Failed reading " + file, e);
-                }catch (Exception e){ //Adding this so loading doesnt stop if one file has a problem; Cartik
-                	log().error("Failed reading " + file, e);
-                }
-                
+                }                
             }
         }
     }

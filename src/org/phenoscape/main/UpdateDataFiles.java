@@ -23,7 +23,10 @@ import org.phenoscape.model.DataSet;
  */
 public class UpdateDataFiles {
 
-    private static final String PATH_TO_DATA_FOLDER = "/Users/jim/Work/Phenoscape/phenex-files";
+    /**
+     * Set this to the correct value before running.
+     */
+    private static final String PATH_TO_DATA_FOLDER = "/Users/jim/Work/Phenoscape/phenex-incomplete-files";
     private final OBOSession session = new OntologyController(new UserOntologyConfiguration()).getOBOSession();
 
 

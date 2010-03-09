@@ -55,6 +55,7 @@ public class PublicationLoader {
     private static final String SECONDARY_TITLE_STRING = "secondary-title";
     private static final String PUBLICATION_STRING = "publication";
     private static final String YEAR_STRING = "year";
+    private static final String ACCESSION_NUMBER_STRING = "accession-num";
     
     private String publicationName, authors, pubType, title, secondaryTitle, 
     				pubAbstract, volume, pages, year, keywords;
@@ -137,12 +138,14 @@ public class PublicationLoader {
     				Node secondaryTitleNode = child.getChildNodes().item(1);
     				title = titleNode.getTextContent();
     				mapOfFieldsToValuesForEachRecord.put(TITLE_STRING, title);
-    				publicationName = getFullPublicationName(title);
-    				mapOfFieldsToValuesForEachRecord.put(PUBLICATION_STRING, publicationName);
     				if(secondaryTitleNode != null){
     					secondaryTitle = secondaryTitleNode.getTextContent();
     					mapOfFieldsToValuesForEachRecord.put(SECONDARY_TITLE_STRING, secondaryTitle);
     				}
+    			}
+    			else if(nodeName.equals(ACCESSION_NUMBER_STRING)){
+    				publicationName = child.getTextContent();
+    				mapOfFieldsToValuesForEachRecord.put(PUBLICATION_STRING, publicationName);
     			}
     			else if(nodeName.equals(PAGES_STRING)){
     				pages = child.getTextContent();
@@ -170,34 +173,6 @@ public class PublicationLoader {
     		log.fine(this.publicationName);
     		listOfRecords.add(mapOfFieldsToValuesForEachRecord);
     	}
-    }
-    
-    private String getFullPublicationName(String title) {
-    	String publicationNameWithoutFormattingCharacters, pubNameInAllCaps, titleInAllCaps;
-    	for(String fullPublicationName : this.listOfFullPublicationNames){
-    		publicationNameWithoutFormattingCharacters =
-    			this.stripPublicationNameOfFormattingCharacters(fullPublicationName);
-    		pubNameInAllCaps = publicationNameWithoutFormattingCharacters.toUpperCase();
-    		titleInAllCaps = title.trim().toUpperCase();
-//    		if(pubNameInAllCaps.contains("BOWNE") && titleInAllCaps.contains("GASTEROSTEI"))
-    			log.fine("Does " + pubNameInAllCaps + " contain " + titleInAllCaps + "? " + 
-    					pubNameInAllCaps.contains(titleInAllCaps)); 
-    		if(pubNameInAllCaps.contains(titleInAllCaps))
-    			return fullPublicationName;
-    	}
-		return title;
-	}
-
-    private String stripPublicationNameOfFormattingCharacters(String pubName){
-    	String[] arrayOfFormattingCharacters = {"<i>","</i>","<b>","</b>"};
-    	String newPubName = pubName;
-    	for(String formattingCharacter : arrayOfFormattingCharacters){
-    		if(newPubName.contains(formattingCharacter)){
-    			newPubName = newPubName.replace(formattingCharacter, "");
-    		}
-    	}
-
-    	return newPubName;
     }
     
 	private String processAuthors(Node authorsNode){

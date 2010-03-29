@@ -1,0 +1,6 @@
+Publication	Character Number	State Number	Textual Description	Entity ID	Entity Name	Quality ID	Quality Name	Additional Entity ID	Additional Entity Name	Count	Measurement	Unit ID	Unit Name	Curator Notes	
+Malabarba 1998	1	0	pseudotympanum between the first and second pleural ribs; 0 absent; 1 present envolves different muscle or rib limts	TAO:0009057	pseudounipolar neuron	PATO:0000462	absent							need to complete 	
+Malabarba 1998	1	1	pseudotympanum between the first and second pleural ribs; 0 absent; 1 present envolves different muscle or rib limts			PATO:0000467	present							need to complete 	
+Malabarba 1998	2	0	Pseudotympanum anterior to the first pleural rib; 0 absent; 1 present, involve different muscle or rib limits			PATO:0000462	absent							need to complete	
+Malabarba 1998	2	1	Pseudotympanum anterior to the first pleural rib; 0 absent; 1 present, involve different muscle or rib limits			PATO:0000467	present							need to complete	
+Malabarba 1998	3	0	Caudal peduncle of mature males; 0 aligned with main body axis; 1 deeply arched ventrally, the last vertebrae reaching a 45 degrees position relative to the first caudal vertebrae	TAO:0000178	caudal peduncle	PATO:0001653	aligned with	TAO:0001559	vertebral column		

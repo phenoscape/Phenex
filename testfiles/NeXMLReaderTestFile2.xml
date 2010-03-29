@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nexml xmlns="http://www.nexml.org/2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:phen="http://www.bioontologies.org/obd/schema/pheno" generator="Phenex null" version="0.9">
+  <meta xmlns:ns="http://www.nexml.org/2009" xmlns:ter="http://purl.org/dc/terms/" xsi:type="ns:LiteralMeta" property="ter:creator"/>
+  <meta xmlns:ns="http://www.nexml.org/2009" xmlns:ter="http://purl.org/dc/terms/" xsi:type="ns:LiteralMeta" property="ter:references"/>
+  <meta xmlns:ns="http://www.nexml.org/2009" xmlns:ter="http://purl.org/dc/terms/" xsi:type="ns:LiteralMeta" property="ter:description"/>
+  <otus id="41c4dc32-6bc7-49e6-8309-cbff290efb4f">
+    <otu id="08c5bb9d-f815-414c-832f-e51808b13d5d" label="" about="#08c5bb9d-f815-414c-832f-e51808b13d5d">
+      <meta xmlns:ns="http://www.nexml.org/2009" xmlns:ter="http://rs.tdwg.org/dwc/terms/" xsi:type="ns:ResourceMeta" rel="ter:taxonID" href="http://purl.obolibrary.org/obo/TTO_1052189"/>
+      <meta xmlns:ns="http://www.nexml.org/2009" xmlns:ter="http://rs.tdwg.org/dwc/terms/" xsi:type="ns:ResourceMeta" rel="ter:individualID">
+        <meta xsi:type="ns:ResourceMeta" rel="ter:collectionID" href="http://purl.obolibrary.org/obo/COLLECTION_0000194"/>
+        <meta xsi:type="ns:LiteralMeta" property="ter:catalogNumber">1234</meta>
+      </meta>
+    </otu>
+  </otus>
+  <characters xmlns:ns="http://www.nexml.org/2009" id="3e93347b-39a7-40e6-8602-34b77e329a22" xsi:type="ns:StandardCells" otus="41c4dc32-6bc7-49e6-8309-cbff290efb4f">
+    <format>
+      <states id="12d63611-51ec-4ae4-9a1e-af2ec941ab9c">
+        <state id="45a896db-d1a2-47f3-9d59-163dfcfe1f96" label="" symbol="0" about="#45a896db-d1a2-47f3-9d59-163dfcfe1f96">
+          <meta xmlns:voc="http://vocab.phenoscape.org/" xsi:type="ns:LiteralMeta" property="voc:describesPhenotype">
+            <phen:phenotype>
+              <phen:phenotype_character>
+                <phen:bearer>
+                  <phen:typeref about="TAO:0001173"/>
+                </phen:bearer>
+                <phen:quality>
+                  <phen:typeref about="PATO:0000318"/>
+                </phen:quality>
+              </phen:phenotype_character>
+            </phen:phenotype>
+          </meta>
+        </state>
+      </states>
+      <char id="f9c2f63f-13f5-4f1c-9e7c-6681ca71a499" label="" states="12d63611-51ec-4ae4-9a1e-af2ec941ab9c"/>
+    </format>
+    <matrix>
+      <row id="0427b83e-548e-4182-84f6-006f6e2114c7" otu="08c5bb9d-f815-414c-832f-e51808b13d5d"/>
+    </matrix>
+  </characters>
+</nexml>

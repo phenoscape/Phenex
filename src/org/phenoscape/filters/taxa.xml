@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.6.0_15" class="java.beans.XMLDecoder"> 
+ <object class="org.obo.filters.CompoundFilterImpl"> 
+  <void property="filters"> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="criterion"> 
+      <object class="org.obo.filters.NamespaceSearchCriterion"/> 
+     </void> 
+     <void property="value"> 
+      <string>teleost-taxonomy</string> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="criterion"> 
+      <object class="org.obo.filters.IsClassCriterion"/> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="criterion"> 
+      <object class="org.obo.filters.IsObsoleteCriterion"/> 
+     </void> 
+     <void property="negate"> 
+      <boolean>true</boolean> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="aspect"> 
+      <object class="org.obo.filters.ParentSearchAspect"/> 
+     </void> 
+     <void property="comparison"> 
+      <object id="EqualsComparison0" class="org.obo.filters.EqualsComparison"/> 
+     </void> 
+     <void property="criterion"> 
+      <object id="IDSearchCriterion0" class="org.obo.filters.IDSearchCriterion"/> 
+     </void> 
+     <void property="negate"> 
+      <boolean>true</boolean> 
+     </void> 
+     <void property="traversalFilter"> 
+      <object class="org.obo.filters.LinkFilterImpl"> 
+       <void property="filter"> 
+        <void property="comparison"> 
+         <object class="org.obo.filters.EqualsComparison"/> 
+        </void> 
+        <void property="criterion"> 
+         <object class="org.obo.filters.IDSearchCriterion"/> 
+        </void> 
+        <void property="value"> 
+         <string>OBO_REL:is_a</string> 
+        </void> 
+       </void> 
+      </object> 
+     </void> 
+     <void property="value"> 
+      <string>TTO:taxonomic_rank</string> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="comparison"> 
+      <object idref="EqualsComparison0"/> 
+     </void> 
+     <void property="criterion"> 
+      <object idref="IDSearchCriterion0"/> 
+     </void> 
+     <void property="negate"> 
+      <boolean>true</boolean> 
+     </void> 
+     <void property="value"> 
+      <string>TTO:taxonomic_rank</string> 
+     </void> 
+    </object> 
+   </void> 
+  </void> 
+ </object> 
+</java> 

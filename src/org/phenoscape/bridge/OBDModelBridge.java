@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.obd.model.CompositionalDescription;
 import org.obd.model.Graph;
 import org.obd.model.LinkStatement;
@@ -122,16 +123,16 @@ public class OBDModelBridge {
 			LiteralStatement ds2curators = new LiteralStatement(dsId, HAS_CURATORS_REL_ID, curators);
 			graph.addStatement(ds2curators);
 		}
-		for (Taxon t : ds.getTaxa()) {
+		for (Taxon taxon : ds.getTaxa()) {
 			// avoid uploading taxa without names; Cartik1.0
-			if (t.getValidName() != null && t.getValidName().getName() != null
-					&& t.getValidName().getName().length() > 0) {
-				Node tn = translate(t);
+			if (taxon.getValidName() != null && taxon.getValidName().getName() != null
+					&& taxon.getValidName().getName().length() > 0) {
+				Node tn = translate(taxon);
 				if (tn.getId() != null) {
-					taxonIdMap.put(t, tn.getId());
+					taxonIdMap.put(taxon, tn.getId());
 					String otuId = UUID.randomUUID().toString();
 					Node otuNode = createInstanceNode(otuId, OTU_TYPE_ID);
-					otuNode.setLabel(t.getValidName().getName());
+					otuNode.setLabel(taxon.getValidName().getName());
 					// link dataset to taxa
 					LinkStatement ds2otu = new LinkStatement(dsId, HAS_TU_REL_ID, otuNode.getId());
 					graph.addStatement(ds2otu);
@@ -140,21 +141,20 @@ public class OBDModelBridge {
 							REFERS_TO_TAXON_REL_ID, tn.getId());
 					graph.addStatement(otu2t);
 					
-					String publicationName = t.getPublicationName();
-					if(publicationName != null){
+					final String publicationName = taxon.getPublicationName();
+					if (!StringUtils.isBlank(publicationName)) {
 						LiteralStatement otu2pubName = new LiteralStatement(otuId, HAS_PUBLICATION_NAME, publicationName);
 						graph.addStatement(otu2pubName);
 					}
 					
 					//link otu to specimens
-					for(Specimen s : t.getSpecimens()){
-						//System.out.println(s.toString());
-						if(s.getCollectionCode() != null){
+					for (Specimen s : taxon.getSpecimens()) {
+						if ((s.getCollectionCode() != null) && (!StringUtils.isBlank(s.getCatalogID()))) {
 						    //FIXME should not be relying on toString of Specimen to generate a useful ID for OBD
 							Node specimenNode = createInstanceNode(s.toString(), SPECIMEN_TYPE_ID);
 							LinkStatement otu2specimen = new LinkStatement(otuId, HAS_SPECIMEN_REL_ID, specimenNode.getId());
 							graph.addStatement(otu2specimen);
-						//link speciment to collection 
+						//link specimen to collection 
 							LinkStatement specimen2collection = new LinkStatement(s.toString(), SPECIMEN_TO_COLLECTION_REL_ID, 
 									s.getCollectionCode().getID());
 							graph.addStatement(specimen2collection);
@@ -228,8 +228,7 @@ public class OBDModelBridge {
 				for (Phenotype p : state.getPhenotypes()) {
 					// taxon to phenotype
 					LinkStatement annotLink = new LinkStatement();
-					if (phenotypeIdMap.get(p) != null
-							&& taxonIdMap.get(t) != null) {
+					if (phenotypeIdMap.get(p) != null && taxonIdMap.get(t) != null) {
 						annotLink.setNodeId(taxonIdMap.get(t));
 						annotLink.setTargetId(phenotypeIdMap.get(p));
 						annotLink.setRelationId(TAXON_PHENOTYPE_REL_ID);

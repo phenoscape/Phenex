@@ -44,7 +44,6 @@ public class OBDModelBridgeTest {
 		NeXMLReader_1_0 reader;
 		DataSet ds;
 		Graph g;
-		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("problemLog.txt")));
 		String basePath = "/home/cartik/Desktop/PerlScripts/trunk/data";
 		File baseDataDir = new File(basePath);
 		int i = 0;
@@ -75,7 +74,7 @@ public class OBDModelBridgeTest {
 								+ dataFile.getAbsolutePath());
 						reader = new NeXMLReader_1_0(dataFile, oc.getOBOSession());
 						ds = reader.getDataSet();
-						bridge.translate(ds, dataFile, bw);
+						bridge.translate(ds);
 						g = bridge.getGraph();
 						obdsql.putGraph(g);
 						// s.putGraph(g);
@@ -98,7 +97,7 @@ public class OBDModelBridgeTest {
 		NeXMLReader_1_0 reader = new NeXMLReader_1_0(new File("?"), oc.getOBOSession());
 		DataSet ds = reader.getDataSet();
 		OBDModelBridge bridge = new OBDModelBridge();
-		bridge.translate(ds, new File("?"), bw);
+		bridge.translate(ds);
 		Graph g = bridge.getGraph();
 
 		Shard shard = new OBDSQLShard();

@@ -72,7 +72,9 @@ public class PhenoscapeDataLoader {
             ds = reader.getDataSet();
         }
         final OBDModelBridge bridge = new OBDModelBridge();
+        log().info("Beginning graph construction");
         final Graph g = bridge.translate(ds);
+        log().info("Putting graph into database");
         this.shard.putGraph(g);
         log().info(g.getStatements().size() + " records added");
     }

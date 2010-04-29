@@ -2,29 +2,25 @@ package org.phenoscape.bridge;
 
 import java.io.File;
 import java.io.IOException;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.obd.query.impl.OBDSQLShard;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import org.xml.sax.SAXException;
 
 public class PublicationLoader {
@@ -65,7 +61,6 @@ public class PublicationLoader {
     private NodeList pubRecordNodes; 
     private List<String> listOfFullPublicationNames;
     private List<Map<String, String>> listOfRecords;
-    private Logger log; 
     
     public PublicationLoader() throws SQLException, ClassNotFoundException{
     	super();
@@ -73,7 +68,6 @@ public class PublicationLoader {
     	listOfRecords = new ArrayList<Map<String, String>>();
     	conn = this.connectToDatabase();
     	this.compilePublicationNamesInAnnotationMetadataTable();
-    	log = Logger.getLogger("PublicationLoaderLog");
     }
     
     private Connection connectToDatabase() throws SQLException, ClassNotFoundException {
@@ -116,7 +110,7 @@ public class PublicationLoader {
     	
     	pubRecordNodes = doc.getElementsByTagName(RECORD_STRING);
     	for(int i = 0; i < pubRecordNodes.getLength(); i++){
-    		log.fine("Publication " + i);
+    		log().info("Publication " + i);
     		mapOfFieldsToValuesForEachRecord = new HashMap<String, String>();
     		Node recordNode = pubRecordNodes.item(i);
     		NodeList children = recordNode.getChildNodes();
@@ -170,7 +164,7 @@ public class PublicationLoader {
     				mapOfFieldsToValuesForEachRecord.put(ABSTRACT_STRING, pubAbstract);
     			}
     		}
-    		log.fine(this.publicationName);
+    		log().info(this.publicationName);
     		listOfRecords.add(mapOfFieldsToValuesForEachRecord);
     	}
     }
@@ -226,7 +220,7 @@ public class PublicationLoader {
 			pStmt.setString(9, record.get(YEAR_STRING));
 			pStmt.setString(10, record.get(ABSTRACT_STRING));
 			
-			log.fine(pStmt.toString());
+			log().debug(pStmt.toString());
 			pStmt.execute();
 		}
 	}
@@ -242,6 +236,10 @@ public class PublicationLoader {
     	catch(Exception e){
     		e.printStackTrace();
     	}
+    }
+    
+    private Logger log()  {
+        return Logger.getLogger(this.getClass());
     }
 
 }

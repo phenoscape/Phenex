@@ -1,6 +1,5 @@
 package org.phenoscape.bridge;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -50,44 +49,38 @@ public class OBDModelBridge {
 
     protected Graph graph;
 
-    public static String DATASET_TYPE_ID = "cdao:CharacterStateDataMatrix";
-    public static String STATE_TYPE_ID = "cdao:CharacterStateDomain";
-    public static String CELL_TYPE_ID = "cdao:CharacterStateDatum";
-    public static String CHARACTER_TYPE_ID = "cdao:Character";
-    public static String PUBLICATION_TYPE_ID = "PHENOSCAPE:Publication"; 
-    public static String OTU_TYPE_ID = "cdao:TU";
-    public static String SPECIMEN_TYPE_ID = "PHENOSCAPE:Specimen";
+    public static final String DATASET_TYPE_ID = "cdao:CharacterStateDataMatrix";
+    public static final String STATE_TYPE_ID = "cdao:CharacterStateDomain";
+    public static final String CELL_TYPE_ID = "cdao:CharacterStateDatum";
+    public static final String CHARACTER_TYPE_ID = "cdao:Character";
+    public static final String PUBLICATION_TYPE_ID = "PHENOSCAPE:Publication"; 
+    public static final String OTU_TYPE_ID = "cdao:TU";
+    public static final String SPECIMEN_TYPE_ID = "PHENOSCAPE:Specimen";
+    public static final String HAS_PUB_REL_ID = "PHENOSCAPE:has_publication";
+    public static final String HAS_SPECIMEN_REL_ID = "PHENOSCAPE:has_specimen";
+    public static final String HAS_STATE_REL_ID = "cdao:has_Datum";
+    public static final String REFERS_TO_TAXON_REL_ID = "PHENOSCAPE:has_taxon";
+    public static final String HAS_TU_REL_ID = "cdao:has_TU";
+    public static final String HAS_CHARACTER_REL_ID = "cdao:has_Character"; 
+    public static final String HAS_PHENOTYPE_REL_ID = "cdao:has_Phenotype"; 
+    public static final String TAXON_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits"; 
+    public static final String CELL_TO_STATE_REL_ID = "cdao:has_State"; 
+    public static final String ANNOT_TO_CELL_REL_ID = "PHENOSCAPE:has_source"; 
+    public static final String SPECIMEN_TO_COLLECTION_REL_ID = "PHENOSCAPE:belongs_to_collection";
+    public static final String SPECIMEN_TO_CATALOG_ID_REL_ID = "PHENOSCAPE:has_catalog_id";
+    public static final String HAS_CURATORS_REL_ID = "PHENOSCAPE:has_curators";
+    public static final String HAS_COMMENT_REL_ID = "PHENOSCAPE:has_comment";
+    public static final String HAS_NUMBER_REL_ID = "PHENOSCAPE:has_number";
+    public static final String HAS_COUNT_REL_ID = "PHENOSCAPE:has_count";
+    public static final String HAS_MSRMNT_REL_ID = "PHENOSCAPE:has_measurement";
+    public static final String HAS_UNIT_REL_ID = "PHENOSCAPE:has_unit";
+    public static final String HAS_PUBLICATION_NAME = "PHENOSCAPE:has_publication_name";
 
-    public static String HAS_PUB_REL_ID = "PHENOSCAPE:has_publication";
-    public static String HAS_SPECIMEN_REL_ID = "PHENOSCAPE:has_specimen";
-    public static String HAS_STATE_REL_ID = "cdao:has_Datum";
-    public static String REFERS_TO_TAXON_REL_ID = "PHENOSCAPE:has_taxon";
-    public static String HAS_TU_REL_ID = "cdao:has_TU";
-
-    public static String HAS_CHARACTER_REL_ID = "cdao:has_Character"; 
-    public static String HAS_PHENOTYPE_REL_ID = "cdao:has_Phenotype"; 
-    public static String TAXON_PHENOTYPE_REL_ID = "PHENOSCAPE:exhibits"; 
-    public static String CELL_TO_STATE_REL_ID = "cdao:has_State"; 
-    public static String ANNOT_TO_CELL_REL_ID = "PHENOSCAPE:has_source"; 
-    public static String SPECIMEN_TO_COLLECTION_REL_ID = "PHENOSCAPE:belongs_to_collection";
-    public static String SPECIMEN_TO_CATALOG_ID_REL_ID = "PHENOSCAPE:has_catalog_id";
-
-    public static String HAS_CURATORS_REL_ID = "PHENOSCAPE:has_curators";
-    public static String HAS_COMMENT_REL_ID = "PHENOSCAPE:has_comment";
-    private static final String HAS_NUMBER_REL_ID = "PHENOSCAPE:has_number";
-    private static final String HAS_COUNT_REL_ID = "PHENOSCAPE:has_count";
-    private static final String HAS_MSRMNT_REL_ID = "PHENOSCAPE:has_measurement";
-    private static final String HAS_UNIT_REL_ID = "PHENOSCAPE:has_unit";
-
-    public static String HAS_PUBLICATION_NAME = "PHENOSCAPE:has_publication_name";
-
-    private static RelationVocabulary relationVocabulary = new RelationVocabulary();
+    private static final RelationVocabulary relationVocabulary = new RelationVocabulary();
     private Map<Character, String> characterIdMap;
     private Map<State, String> stateIdMap;
     private Map<Taxon, String> taxonIdMap;
     private Map<Phenotype, String> phenotypeIdMap;
-    protected BufferedWriter problemLog;
-
     protected Set<LinkStatement> phenotypes;
 
     public Graph getGraph() {
@@ -98,7 +91,7 @@ public class OBDModelBridge {
         this.graph = graph;
     }
 
-    public Graph translate(DataSet ds) throws IOException{
+    public Graph translate(DataSet ds) throws IOException {
         String dsId = UUID.randomUUID().toString();
         graph = new Graph();
         phenotypes = new HashSet<LinkStatement>();
@@ -242,7 +235,7 @@ public class OBDModelBridge {
                 }
             }
         }
-        for(Statement stmt : phenotypes){
+        for (Statement stmt : phenotypes) {
             graph.addStatement(stmt);
         }
         return graph;
@@ -326,4 +319,5 @@ public class OBDModelBridge {
         graph.addNode(n);
         return n;
     }
+    
 }

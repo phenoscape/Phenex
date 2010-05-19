@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.obo.annotation.base.OBOUtil;
+import org.obo.annotation.base.OBOUtil.Differentium;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
@@ -18,7 +19,7 @@ import org.obo.datamodel.OBOSession;
 public class TermTransferObject implements Serializable {
 
     private final Object genus;
-    private final List<SerializableDifferentium> differentia = new ArrayList<SerializableDifferentium>();
+    private final List<SerializableDifferentium> serializableDifferentia = new ArrayList<SerializableDifferentium>();
 
     public TermTransferObject(OBOClass term) {
         if ((term != null) && (OBOUtil.isPostCompTerm(term))) {
@@ -37,7 +38,7 @@ public class TermTransferObject implements Serializable {
                 } else {
                     log().error("Differentia is not an OBOClass: " + parent);
                 }
-                this.differentia.add(diff);
+                this.serializableDifferentia.add(diff);
             }
         } else {
             this.genus = term.getID();
@@ -45,11 +46,14 @@ public class TermTransferObject implements Serializable {
     }
 
     public OBOClass getTerm(OBOSession session) {
-        if (this.differentia.isEmpty()) {
+        if (this.serializableDifferentia.isEmpty()) {
             return this.getGenus(session);
         } else {
             final OBOUtil util = OBOUtil.initPostCompTerm(this.getGenus(session));
-            for (SerializableDifferentium diff : this.differentia) {
+            final List<Differentium> differentia = new ArrayList<Differentium>();
+            for (SerializableDifferentium diff : this.serializableDifferentia) {
+                final Differentium differentium = new Differentium();
+                differentium.setRelation(diff.g)
                 util.addRelDiff((OBOProperty)(session.getObject(diff.getRelation())), diff.getTerm().getTerm(session));
             }
             return util.getPostCompTerm();

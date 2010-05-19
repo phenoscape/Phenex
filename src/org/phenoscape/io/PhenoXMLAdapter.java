@@ -19,6 +19,7 @@ import org.bioontologies.obd.schema.pheno.RelatedEntityDocument.RelatedEntity;
 import org.bioontologies.obd.schema.pheno.TyperefDocument.Typeref;
 import org.bioontologies.obd.schema.pheno.UnitDocument.Unit;
 import org.obo.annotation.base.OBOUtil;
+import org.obo.annotation.base.OBOUtil.Differentium;
 import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.LinkedObject;
@@ -163,13 +164,16 @@ public class PhenoXMLAdapter {
         final OBOClass genus = this.getTerm(tr.getAbout());
         if (tr.sizeOfQualifierArray() > 0) {
             // need to create post-comp
-            final OBOUtil postCompUtil = OBOUtil.initPostCompTerm(genus);
+            final List<Differentium> differentia = new ArrayList<Differentium>();
             for (Qualifier qualifier : tr.getQualifierList()) {
                 final OBOProperty relation = this.getRelation(qualifier.getRelation());
-                final OBOClass differentia = this.getTermForTyperef(qualifier.getHoldsInRelationTo().getTyperef());
-                postCompUtil.addRelDiff(relation, differentia);
+                final OBOClass term = this.getTermForTyperef(qualifier.getHoldsInRelationTo().getTyperef());
+                final Differentium differentium = new Differentium();
+                differentium.setRelation(relation);
+                differentium.setTerm(term);
+                differentia.add(differentium);
             }
-            return postCompUtil.getPostCompTerm();
+            return OBOUtil.createPostComposition(genus, differentia);
         } else {
             return genus;
         }

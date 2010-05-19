@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
 import org.obo.annotation.base.OBOUtil;
 import org.obo.annotation.base.TermSet;
+import org.obo.annotation.base.OBOUtil.Differentium;
 import org.obo.app.swing.AutocompleteField;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.TablePopupListener;
@@ -95,11 +96,7 @@ public class PostCompositionEditor extends AbstractGUIComponent {
         if (this.diffs.isEmpty()) {
             return this.genus;
         } else {
-            final OBOUtil util = OBOUtil.initPostCompTerm(this.genus);
-            for (Differentium diff : this.diffs) {
-                util.addRelDiff(diff.getRelation(), diff.getTerm());
-            }
-            return util.getPostCompTerm();
+            return OBOUtil.createPostComposition(this.genus, this.diffs);
         }
     }
 
@@ -219,33 +216,6 @@ public class PostCompositionEditor extends AbstractGUIComponent {
             }
         });
         return menu;
-    }
-
-    private static class Differentium {
-
-        private OBOProperty relation;
-        private OBOClass term;
-
-        public OBOProperty getRelation() {
-            return this.relation;
-        }
-
-        public void setRelation(OBOProperty relation) {
-            this.relation = relation;
-        }
-
-        public OBOClass getTerm() {
-            return this.term;
-        }
-
-        public void setTerm(OBOClass term) {
-            this.term = term;
-        }
-
-        public boolean isComplete() {
-            return (this.relation != null) && (this.term != null);
-        }
-
     }
 
     private class DifferentiaTableFormat implements WritableTableFormat<Differentium>, AdvancedTableFormat<Differentium> {

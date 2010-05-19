@@ -18,7 +18,7 @@ import org.obo.datamodel.OBOSession;
 public class TermTransferObject implements Serializable {
 
     private final Object genus;
-    private final List<Differentium> differentia = new ArrayList<Differentium>();
+    private final List<SerializableDifferentium> differentia = new ArrayList<SerializableDifferentium>();
 
     public TermTransferObject(OBOClass term) {
         if ((term != null) && (OBOUtil.isPostCompTerm(term))) {
@@ -29,7 +29,7 @@ public class TermTransferObject implements Serializable {
                 this.genus = genusTerm.getID();
             }
             for (Link link : OBOUtil.getAllDifferentia(term)) {
-                final Differentium diff = new Differentium();
+                final SerializableDifferentium diff = new SerializableDifferentium();
                 diff.setRelation(link.getType().getID());
                 final LinkedObject parent = link.getParent();
                 if (parent instanceof OBOClass) {
@@ -49,7 +49,7 @@ public class TermTransferObject implements Serializable {
             return this.getGenus(session);
         } else {
             final OBOUtil util = OBOUtil.initPostCompTerm(this.getGenus(session));
-            for (Differentium diff : this.differentia) {
+            for (SerializableDifferentium diff : this.differentia) {
                 util.addRelDiff((OBOProperty)(session.getObject(diff.getRelation())), diff.getTerm().getTerm(session));
             }
             return util.getPostCompTerm();
@@ -64,7 +64,7 @@ public class TermTransferObject implements Serializable {
         }
     }
 
-    private static class Differentium implements Serializable {
+    private static class SerializableDifferentium implements Serializable {
 
         private String relation;
         private TermTransferObject term;

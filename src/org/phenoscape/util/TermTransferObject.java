@@ -36,7 +36,7 @@ public class TermTransferObject implements Serializable {
                 if (parent instanceof OBOClass) {
                     diff.setTerm(new TermTransferObject((OBOClass)parent));
                 } else {
-                    log().error("Differentia is not an OBOClass: " + parent);
+                    log().error("Differentium is not an OBOClass: " + parent);
                 }
                 this.serializableDifferentia.add(diff);
             }
@@ -49,14 +49,12 @@ public class TermTransferObject implements Serializable {
         if (this.serializableDifferentia.isEmpty()) {
             return this.getGenus(session);
         } else {
-            final OBOUtil util = OBOUtil.initPostCompTerm(this.getGenus(session));
+            final OBOClass genusTerm = this.getGenus(session);
             final List<Differentium> differentia = new ArrayList<Differentium>();
             for (SerializableDifferentium diff : this.serializableDifferentia) {
-                final Differentium differentium = new Differentium();
-                differentium.setRelation(diff.g)
-                util.addRelDiff((OBOProperty)(session.getObject(diff.getRelation())), diff.getTerm().getTerm(session));
+                differentia.add(this.convert(diff, session));
             }
-            return util.getPostCompTerm();
+            return OBOUtil.createPostComposition(genusTerm, differentia);
         }
     }
 
@@ -64,8 +62,15 @@ public class TermTransferObject implements Serializable {
         if (this.genus instanceof String) {
             return (OBOClass)(session.getObject((String)this.genus));
         } else {
-            return ((TermTransferObject)this.genus).getGenus(session);
+            return ((TermTransferObject)this.genus).getTerm(session);
         }
+    }
+
+    private Differentium convert(SerializableDifferentium diff, OBOSession session) {
+        final Differentium differentium = new Differentium();
+        differentium.setRelation((OBOProperty)(session.getObject(diff.getRelation())));
+        differentium.setTerm(diff.getTerm().getTerm(session));
+        return differentium;
     }
 
     private static class SerializableDifferentium implements Serializable {

@@ -15,10 +15,6 @@ import org.obo.datamodel.TermSubset;
 import org.obo.datamodel.impl.OBOClassImpl;
 import org.obo.datamodel.impl.OBORestrictionImpl;
 
-
-/** changing this from static to non-static so can build post comp object from
-    multiple rel-diffs */
-
 public class OBOUtil {
 
     public static OBOClass createPostComposition(OBOClass genus, List<Differentium> differentia) {

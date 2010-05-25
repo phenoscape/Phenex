@@ -34,6 +34,7 @@ public class AutocompleteCellEditor<T> extends AbstractCellEditor implements Tab
         return this.acField.getComboBox();
     }
 
+    @Override
     public void cancelCellEditing() {
         this.value = this.originalValue;
         super.cancelCellEditing();
@@ -43,6 +44,7 @@ public class AutocompleteCellEditor<T> extends AbstractCellEditor implements Tab
         return this.value;
     }
 
+    @Override
     public boolean isCellEditable(EventObject anEvent) {
         if (anEvent instanceof MouseEvent) { 
             return ((MouseEvent)anEvent).getClickCount() >= this.clickCountToStart;
@@ -50,6 +52,7 @@ public class AutocompleteCellEditor<T> extends AbstractCellEditor implements Tab
         return true;
     }
 
+    @Override
     public boolean shouldSelectCell(EventObject anEvent) {
         return true;
     }

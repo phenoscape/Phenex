@@ -72,6 +72,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
         factories.add(new PhenoteOntologyTreeEditorFactory());
         factories.add(new PhenoteGraphViewFactory());
         factories.add(new SearchComponentFactory() {
+            @Override
             public FactoryCategory getCategory() {
                 return FactoryCategory.ONTOLOGY;
             }

@@ -10,7 +10,7 @@ public class Specimen extends AbstractPropertyChangeObject {
     private String catalogID;
     public static String COLLECTION_CODE = "collectionCode";
     public static String CATALOG_ID  = "catalogID";
-    
+
     public Specimen() {
         super();
     }
@@ -27,18 +27,18 @@ public class Specimen extends AbstractPropertyChangeObject {
     public OBOClass getCollectionCode() {
         return this.collectionCode;
     }
-    
+
     public void setCollectionCode(OBOClass collectionCode) {
         if (ObjectUtils.equals(this.collectionCode, collectionCode)) return;
         final OBOClass oldValue = this.collectionCode;
         this.collectionCode = collectionCode;
         this.firePropertyChange("collectionCode", oldValue, collectionCode);
     }
-    
+
     public String getCatalogID() {
         return this.catalogID;
     }
-    
+
     public void setCatalogID(String catalogID) {
         if (ObjectUtils.equals(this.catalogID, catalogID)) return;
         final String oldValue = this.catalogID;
@@ -46,6 +46,7 @@ public class Specimen extends AbstractPropertyChangeObject {
         this.firePropertyChange("catalogID", oldValue, catalogID);
     }
 
+    @Override
     public String toString() {
         final StringBuffer buffer = new StringBuffer();
         if (this.collectionCode != null) {
@@ -55,7 +56,8 @@ public class Specimen extends AbstractPropertyChangeObject {
         if (this.catalogID != null) { buffer.append(this.catalogID); }
         return buffer.toString();
     }
-    
+
+    @Override
     public Class<?> getClass(String propertyKey) throws UndefinedKeyException {
         if (propertyKey.equals(COLLECTION_CODE)) {
             return OBOClass.class;

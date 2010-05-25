@@ -28,6 +28,7 @@ public class TermHit implements SearchHit<OBOObject> {
         return this.type;
     }
 
+    @Override
     public String toString() {
         return this.getMatchText() + ": {" + this.getMatchType().getName() + "}";
     }

@@ -109,6 +109,7 @@ public class Taxon extends AbstractPropertyChangeObject {
         return this.specimens;
     }
 
+    @Override
     public String toString() {
         return this.getValidName() != null ? this.getValidName().toString() : "untitled";
     }
@@ -134,6 +135,7 @@ public class Taxon extends AbstractPropertyChangeObject {
     	return false;
     }
     */
+    @Override
     public Class<?> getClass(String propertyKey) throws UndefinedKeyException {
         if (propertyKey.equals(VALID_NAME)) {
             return OBOClass.class;

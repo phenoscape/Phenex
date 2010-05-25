@@ -97,6 +97,7 @@ public class Character extends AbstractPropertyChangeObject {
         this.firePropertyChange(FIGURE, oldValue, aFigure);
     }
 
+    @Override
     public String toString() {
         return this.getLabel() != null ? this.getLabel() : "untitled";
     }

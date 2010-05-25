@@ -5,29 +5,31 @@ import org.oboedit.gui.factory.GraphViewFactory;
 
 public class PhenoteGraphViewFactory extends GraphViewFactory {
 
-	public PhenoteGraphViewFactory() {
-	}
-	
-	public String getID() {
-//		return "GRAPH_DAG_VIEW";
-		return "GRAPH_VIEW";
-	}
-	
-	public GraphViewCanvas doCreateComponent(String id) {
-		return new GraphViewCanvas(id);
-	}
+    public PhenoteGraphViewFactory() {
+    }
 
-	public String getName() {
-		return "Graph View";
-	}
-	
-	
-	public FactoryCategory getCategory() {
-		return FactoryCategory.ONTOLOGY;
-	}
+    @Override
+    public String getID() {
+        return "GRAPH_VIEW";
+    }
 
-	@Override
-	public String getHelpTopicID() {
-		return "Graph_Viewer";
-	}
+    @Override
+    public GraphViewCanvas doCreateComponent(String id) {
+        return new GraphViewCanvas(id);
+    }
+
+    @Override
+    public String getName() {
+        return "Graph View";
+    }
+
+    @Override
+    public FactoryCategory getCategory() {
+        return FactoryCategory.ONTOLOGY;
+    }
+
+    @Override
+    public String getHelpTopicID() {
+        return "Graph_Viewer";
+    }
 }

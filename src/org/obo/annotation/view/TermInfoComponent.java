@@ -308,6 +308,7 @@ public class TermInfoComponent extends AbstractGUIComponent {
                 isIncludeExternalDatabaseAnnotations());
     }
 
+    @Override
     public void setConfiguration(ComponentConfiguration config) {
         if (config instanceof TermInfo2Config) {
             setIncludeImplicitAnnotations(((TermInfo2Config) config)
@@ -1534,6 +1535,7 @@ public class TermInfoComponent extends AbstractGUIComponent {
     }
 
     class HTMLEditorKit2 extends HTMLEditorKit {
+        @Override
         public Document createDefaultDocument() {
             HTMLDocument doc = (HTMLDocument) (super.createDefaultDocument());
             doc.setAsynchronousLoadPriority(-1); // load synchronously
@@ -1571,6 +1573,7 @@ public class TermInfoComponent extends AbstractGUIComponent {
     private class InfoTransferHandler extends TransferHandler {
 
         /** does a copy operation */
+        @Override
         public int getSourceActions(JComponent c) {
             return COPY;
         }

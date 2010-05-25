@@ -63,17 +63,17 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
     private final SortedList<Taxon> sortedTaxa = new SortedList<Taxon>(this.getController().getDataSet().getTaxa(), new EverythingEqualComparator<Taxon>());
     private final EventList<State> allStates;
     private static enum TaxonDisplay {
-        PUBLICATION_NAME { public String toString() { return "Display Publication Name"; }},
-        VALID_NAME { public String toString() { return "Display Valid Name"; }},
-        MATRIX_NAME { public String toString() { return "Display Matrix Name"; }}
+        PUBLICATION_NAME { @Override public String toString() { return "Display Publication Name"; }},
+        VALID_NAME { @Override public String toString() { return "Display Valid Name"; }},
+        MATRIX_NAME { @Override public String toString() { return "Display Matrix Name"; }}
     }
     private static enum CharacterDisplay {
-        CHARACTER_NUMBER { public String toString() { return "Display Character Number"; }},
-        CHARACTER_DESCRIPTION { public String toString() { return "Display Character Description"; }}
+        CHARACTER_NUMBER { @Override public String toString() { return "Display Character Number"; }},
+        CHARACTER_DESCRIPTION { @Override public String toString() { return "Display Character Description"; }}
     }
     private static enum StateDisplay {
-        STATE_SYMBOL { public String toString() { return "Display State Symbol"; }},
-        STATE_DESCRIPTION { public String toString() { return "Display State Description"; }}
+        STATE_SYMBOL { @Override public String toString() { return "Display State Symbol"; }},
+        STATE_DESCRIPTION { @Override public String toString() { return "Display State Description"; }}
     }
     private TaxonDisplay taxonOption = TaxonDisplay.VALID_NAME;
     private CharacterDisplay characterOption = CharacterDisplay.CHARACTER_NUMBER;
@@ -338,9 +338,9 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
         }
 
     }
-    
+
     private class QuickStateCellEditor extends DefaultCellEditor {
-        
+
         private List<State> states = new ArrayList<State>();
         private State originalValue;
         private State currentValue;
@@ -353,7 +353,7 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
             this.field.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             textField.getDocument().addDocumentListener(new FieldListener());
         }
-        
+
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
             final Character character = getController().getDataSet().getCharacters().get(column);
@@ -385,11 +385,11 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
             }
             return super.stopCellEditing();
         }
-        
+
         private boolean getInvalid() {
             return this.invalid;
         }
-        
+
         private void setInvalid(boolean value) {
             this.invalid = value;
             if (this.invalid) {
@@ -398,15 +398,15 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
                 field.setForeground(Color.BLACK);
             }
         }
-        
+
         private class FieldListener implements DocumentListener {
 
             public void changedUpdate(DocumentEvent e) { this.documentChanged(); }
 
             public void insertUpdate(DocumentEvent e) { this.documentChanged(); }
-           
+
             public void removeUpdate(DocumentEvent e) { this.documentChanged(); }
-            
+
             private void documentChanged() {
                 final String text = field.getText();
                 if ((text == null) || (text.equals(""))) {
@@ -428,9 +428,9 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
                     }
                 }
             }
-            
+
         }
-        
+
     }
 
     private class TaxonRenderer extends TermRenderer {

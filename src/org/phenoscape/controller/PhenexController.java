@@ -176,7 +176,7 @@ public class PhenexController extends DocumentController {
             //TODO should warn user that file format will be upgraded upon save
         }
     }
-    
+
     private void readNeXML(File aFile) throws XmlException, IOException {
         final NeXMLReader reader = new NeXMLReader(aFile, this.getOntologyController().getOBOSession());
         if (reader.didCreateDanglers()) {
@@ -280,7 +280,7 @@ public class PhenexController extends DocumentController {
             this.mergeNeXML(file);
         }
     }
-    
+
     public void exportToExcel() {
         final JFileChooser fileChooser = this.createFileChooser();
         final int result = fileChooser.showSaveDialog(GUIManager.getManager().getFrame());
@@ -290,6 +290,7 @@ public class PhenexController extends DocumentController {
         }
     }
 
+    @Override
     public JFrame getWindow() {
         return GUIManager.getManager().getFrame();
     }
@@ -306,7 +307,8 @@ public class PhenexController extends DocumentController {
     public String getAppVersion() {
         return System.getProperty("phenex.version");
     }
-    
+
+    @Override
     public String getDefaultFileExtension() {
         return "xml";
     }
@@ -314,7 +316,7 @@ public class PhenexController extends DocumentController {
     private SelectionManager getPhenoteSelectionManager() {
         return this.phenoteSelectionManager;
     }
-    
+
     public OntologyCoordinator getOntologyCoordinator() {
         return new DefaultOntologyCoordinator(this.getOntologyController().getOBOSession(), this.getPhenoteSelectionManager());
     }
@@ -375,7 +377,7 @@ public class PhenexController extends DocumentController {
             log().error("Error reading NeXML file", e);
         }
     }
-    
+
     private void writeForExcel(File aFile) {
         final TabDelimitedWriter writer = new TabDelimitedWriter();
         writer.setDataSet(this.getDataSet());
@@ -385,7 +387,7 @@ public class PhenexController extends DocumentController {
             log().error("Error writing to tab-delimited file", e);
         }
     }
-    
+
     private boolean runDanglerAlert(File file, Collection<String> danglerIDs) {
         final String[] options = {"Continue Opening", "Cancel"};
         final String message = "The file \"" + file.getName() + "\" contains references to ontology term IDs which could not be found. You can safely edit other values in the file, but fields referring to \"dangling\" terms should not be edited. Proceed with caution.";
@@ -412,10 +414,11 @@ public class PhenexController extends DocumentController {
                 return ids.get(rowIndex);
             }
 
+            @Override
             public String getColumnName(int column) {
                 return "Referenced ID";
             }
-            
+
         };
         panel.setPreferredSize(new Dimension(400, 200));
         panel.add(new JLabel("<HTML>" + message + "</HTML"), BorderLayout.NORTH);

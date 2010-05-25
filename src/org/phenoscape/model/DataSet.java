@@ -132,6 +132,7 @@ public class DataSet extends AbstractPropertyChangeObject {
         this.firePropertyChange(MATRIX_CELL, oldValue, new MatrixCellValue(taxon, character, state));
     }
     
+    @Override
     public Class<?> getClass(String propertyKey) throws UndefinedKeyException {
         if (propertyKey.equals(CURATORS)) {
             return String.class;

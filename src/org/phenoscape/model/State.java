@@ -109,6 +109,7 @@ public class State extends AbstractPropertyChangeObject {
         this.firePropertyChange(FIGURE, oldValue, aFigure);
     }
 
+    @Override
     public String toString() {
         final String prefix = this.getSymbol() != null ? this.getSymbol() + " - " : "";
         final String suffix = this.getLabel() != null ? this.getLabel() : "untitled";

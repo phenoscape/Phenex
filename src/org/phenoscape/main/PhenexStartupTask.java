@@ -13,8 +13,6 @@ import javax.swing.JMenuItem;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.bbop.framework.GUIComponentFactory;
 import org.bbop.framework.GUIManager;
@@ -84,9 +82,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
 
     @Override
     protected void configureLogging() {
-        //TODO should the desired level be set in the configuration file?
-        final Logger rl = LogManager.getRootLogger();
-        rl.setLevel(Level.DEBUG);
+        //logging is configured via the log4j config file in the classpath
     }
 
     @Override

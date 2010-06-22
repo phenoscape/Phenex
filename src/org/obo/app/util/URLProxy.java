@@ -66,11 +66,11 @@ public class URLProxy {
             return lastModified.after(cacheDate);
         }
         final String eTag = connection.getHeaderField("ETag");
-        final String cacheETag = this.getCacheETag(connection.getURL());
+        final String cacheETag = this.getCacheETag(url);
         if ((eTag != null) && (cacheETag != null)) {
             return !eTag.equals(cacheETag);
         }
-        return false;
+        return true;
     }
 
     /**

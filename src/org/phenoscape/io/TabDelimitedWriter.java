@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.obo.annotation.base.OBOUtil;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.TermSubset;
@@ -77,7 +78,7 @@ public class TabDelimitedWriter {
                         if (!OBOUtil.isPostCompTerm(phenotype.getEntity())) {
                             writer.write(String.format(LINK_FORMAT, TAO + phenotype.getEntity().getID(), phenotype.getEntity().getName()));
                         } else {
-                            writer.write(phenotype.getEntity().getName());
+                            writer.write(StringUtils.defaultString(phenotype.getEntity().getName()));
                         }
                     }
                     writer.write("\t");
@@ -85,7 +86,7 @@ public class TabDelimitedWriter {
                         if (!OBOUtil.isPostCompTerm(phenotype.getQuality())) {
                             writer.write(String.format(LINK_FORMAT, PATO + phenotype.getQuality().getID(), phenotype.getQuality().getName()));
                         } else {
-                            writer.write(phenotype.getQuality().getName());
+                            writer.write(StringUtils.defaultString(phenotype.getQuality().getName()));
                         }
                     }
                     writer.write("\t");
@@ -94,7 +95,7 @@ public class TabDelimitedWriter {
                         if (!OBOUtil.isPostCompTerm(characterAttribute)) {
                             writer.write(String.format(LINK_FORMAT, PATO + characterAttribute.getID(), characterAttribute.getName()));
                         } else {
-                            writer.write(characterAttribute.getName());
+                            writer.write(StringUtils.defaultString(characterAttribute.getName()));
                         }
                     }
                     writer.write("\t");
@@ -102,13 +103,13 @@ public class TabDelimitedWriter {
                         if (!OBOUtil.isPostCompTerm(phenotype.getRelatedEntity())) {
                             writer.write(String.format(LINK_FORMAT, TAO + phenotype.getRelatedEntity().getID(), phenotype.getRelatedEntity().getName()));
                         } else {
-                            writer.write(phenotype.getRelatedEntity().getName());
+                            writer.write(StringUtils.defaultString(phenotype.getRelatedEntity().getName()));
                         }
                     }
                     writer.write("\t");
                     writer.write(phenotype.getCount() != null ? phenotype.getCount().toString() : "");
                     writer.write("\t");
-                    writer.write(phenotype.getComment() != null ? phenotype.getComment() : "");
+                    writer.write(StringUtils.defaultString(phenotype.getComment()));
                     writer.newLine();
                 }
             }
@@ -119,17 +120,17 @@ public class TabDelimitedWriter {
     private void writeCharacter(Character character, int index, Writer writer) throws IOException {
         writer.write(index + "");
         writer.write("\t");
-        writer.write(character.getLabel());
+        writer.write(StringUtils.defaultString(character.getLabel()));
         writer.write("\t");
-        writer.write(character.getComment());
+        writer.write(StringUtils.defaultString(character.getComment()));
     }
     
     private void writeState(State state, Writer writer) throws IOException {
-        writer.write(state.getSymbol());
+        writer.write(StringUtils.defaultString(state.getSymbol()));
         writer.write("\t");
-        writer.write(state.getLabel());
+        writer.write(StringUtils.defaultString(state.getLabel()));
         writer.write("\t");
-        writer.write(state.getComment());
+        writer.write(StringUtils.defaultString(state.getComment()));
     }
 
     private String getTaxonHeader() {

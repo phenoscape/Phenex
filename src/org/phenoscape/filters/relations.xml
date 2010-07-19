@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_15" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_20" class="java.beans.XMLDecoder"> 
  <object class="org.obo.filters.CompoundFilterImpl"> 
   <void property="filters"> 
    <void method="add"> 
     <object class="org.obo.filters.ObjectFilterImpl"> 
      <void property="comparison"> 
-      <object id="EqualsComparison0" class="org.obo.filters.EqualsComparison"/> 
+      <object class="org.obo.filters.EqualsComparison"/> 
      </void> 
      <void property="criterion"> 
       <object class="org.obo.filters.IsPropertyCriterion"/> 
@@ -22,22 +22,6 @@
      </void> 
      <void property="negate"> 
       <boolean>true</boolean> 
-     </void> 
-    </object> 
-   </void> 
-   <void method="add"> 
-    <object class="org.obo.filters.ObjectFilterImpl"> 
-     <void property="comparison"> 
-      <object idref="EqualsComparison0"/> 
-     </void> 
-     <void property="criterion"> 
-      <object class="org.obo.filters.IDSearchCriterion"/> 
-     </void> 
-     <void property="negate"> 
-      <boolean>true</boolean> 
-     </void> 
-     <void property="value"> 
-      <string>part_of</string> 
      </void> 
     </object> 
    </void> 

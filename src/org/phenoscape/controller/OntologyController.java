@@ -20,7 +20,9 @@ import org.obo.app.util.URLProxy;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.IdentifiedObject;
+import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
+import org.obo.datamodel.impl.OBOPropertyImpl;
 import org.obo.filters.Filter;
 import org.oboedit.controller.SessionManager;
 
@@ -60,6 +62,7 @@ public class OntologyController {
             //TODO alert user?
             log().fatal("Failed to load ontologies", e);
         }
+        this.addVisibleBuiltinTerms();
         this.prefetchTermSets();
     }
 
@@ -198,6 +201,12 @@ public class OntologyController {
         final Filter<IdentifiedObject> result = (Filter<IdentifiedObject>) d.readObject();
         d.close();
         return result;
+    }
+    
+    private void addVisibleBuiltinTerms() {
+        final OBOProperty newDisjointFrom = new OBOPropertyImpl("disjoint_from");
+        newDisjointFrom.setName("disjoint from");
+        this.getOBOSession().addObject(newDisjointFrom);
     }
 
     private Logger log() {

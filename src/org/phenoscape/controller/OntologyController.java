@@ -37,6 +37,7 @@ public class OntologyController {
     private static final String UNIT_FILTER = "units";
     private static final String TAXON_FILTER = "taxa";
     private static final String MUSEUM_FILTER = "museums";
+    private static final String ALL_TERMS = "allterms";
     private File overridingFiltersFolder = new File(GUIManager.getPrefsDir(), "Filters");
 
     private TermSet entityTermSet = null;
@@ -45,7 +46,8 @@ public class OntologyController {
     private TermSet collectionTermSet = null;
     private TermSet unitTermSet = null;
     private TermSet relationsTermSet = null;
-    
+    private TermSet allTermsSet = null;
+
     private final OntologyConfiguration config;
 
     public OntologyController(OntologyConfiguration configuration) {
@@ -136,81 +138,91 @@ public class OntologyController {
     }
 
     public TermSet getRelationsTermSet() {
-        if (this.relationsTermSet == null) {;
-        final TermSet set =  this.makeTermSet();
-        set.setTermFilter(this.loadFilterWithName(RELATION_FILTER));
-        this.relationsTermSet = set;
+        if (this.relationsTermSet == null) {
+            final TermSet set =  this.makeTermSet();
+            set.setTermFilter(this.loadFilterWithName(RELATION_FILTER));
+            this.relationsTermSet = set;
         }
         return this.relationsTermSet;
     }
 
-    public File getOverridingFiltersFolder() {
-        return this.overridingFiltersFolder;
-    }
-
-    public void setOverridingFiltersFolder(File folder) {
-        this.overridingFiltersFolder = folder;
-    }
-    
-    private TermSet makeTermSet() {
-        return new TermSet(this.getOBOSession(), SessionManager.getManager().getReasoner());
-    }
-
-    /**
-     * This is just a startup "optimization" - it makes the term searches
-     * happen while the ontology loading panel is displayed.  This reduces
-     * the blank time between that panel disappearing and the interface being
-     * displayed.
-     */
-    private void prefetchTermSets() {
-        this.getEntityTermSet().getTerms();
-        this.getTaxonTermSet().getTerms();
-        this.getCollectionTermSet().getTerms();
-        this.getUnitTermSet().getTerms();
-        this.getRelationsTermSet().getTerms();
-        this.getQualityTermSet().getTerms();
-        this.getRelatedEntityTermSet().getTerms();
-    }
-
-    private Filter<IdentifiedObject> loadFilterWithName(String filterName) {
-        final String filename = filterName + ".xml";
-        final File filterFile = new File(this.getOverridingFiltersFolder(), filename);
-        if (filterFile.exists()) {
-            return this.loadFilter(filterFile);
-        } else {
-            return this.loadFilterFromResource("/org/phenoscape/filters/" + filename);
+    public TermSet getAllTermsSet() {
+        if (this.allTermsSet == null) {
+            final TermSet set =  this.makeTermSet();
+            set.setTermFilter(this.loadFilterWithName(ALL_TERMS));
+            this.allTermsSet = set;
         }
-    }
+        return this.allTermsSet;
+}
 
-    private Filter<IdentifiedObject> loadFilterFromResource(String resourcePath) {
-        return this.loadFilter(this.getClass().getResourceAsStream(resourcePath));
-    }
+public File getOverridingFiltersFolder() {
+    return this.overridingFiltersFolder;
+}
 
-    private Filter<IdentifiedObject> loadFilter(File xmlFile) {
-        try {
-            return this.loadFilter(new FileInputStream(xmlFile));
-        } catch (FileNotFoundException e) {
-            log().error("Could not find specified filter file", e);
-        }
-        return null;
-    }
+public void setOverridingFiltersFolder(File folder) {
+    this.overridingFiltersFolder = folder;
+}
 
-    @SuppressWarnings("unchecked")
-    private Filter<IdentifiedObject> loadFilter(InputStream stream) {
-        final XMLDecoder d = new XMLDecoder(stream);
-        final Filter<IdentifiedObject> result = (Filter<IdentifiedObject>) d.readObject();
-        d.close();
-        return result;
-    }
-    
-    private void addVisibleBuiltinTerms() {
-        final OBOProperty newDisjointFrom = new OBOPropertyImpl("disjoint_from");
-        newDisjointFrom.setName("disjoint from");
-        this.getOBOSession().addObject(newDisjointFrom);
-    }
+private TermSet makeTermSet() {
+    return new TermSet(this.getOBOSession(), SessionManager.getManager().getReasoner());
+}
 
-    private Logger log() {
-        return Logger.getLogger(this.getClass());
+/**
+ * This is just a startup "optimization" - it makes the term searches
+ * happen while the ontology loading panel is displayed.  This reduces
+ * the blank time between that panel disappearing and the interface being
+ * displayed.
+ */
+private void prefetchTermSets() {
+    this.getEntityTermSet().getTerms();
+    this.getTaxonTermSet().getTerms();
+    this.getCollectionTermSet().getTerms();
+    this.getUnitTermSet().getTerms();
+    this.getRelationsTermSet().getTerms();
+    this.getQualityTermSet().getTerms();
+    this.getRelatedEntityTermSet().getTerms();
+    this.getAllTermsSet().getTerms();
+}
+
+private Filter<IdentifiedObject> loadFilterWithName(String filterName) {
+    final String filename = filterName + ".xml";
+    final File filterFile = new File(this.getOverridingFiltersFolder(), filename);
+    if (filterFile.exists()) {
+        return this.loadFilter(filterFile);
+    } else {
+        return this.loadFilterFromResource("/org/phenoscape/filters/" + filename);
     }
+}
+
+private Filter<IdentifiedObject> loadFilterFromResource(String resourcePath) {
+    return this.loadFilter(this.getClass().getResourceAsStream(resourcePath));
+}
+
+private Filter<IdentifiedObject> loadFilter(File xmlFile) {
+    try {
+        return this.loadFilter(new FileInputStream(xmlFile));
+    } catch (FileNotFoundException e) {
+        log().error("Could not find specified filter file", e);
+    }
+    return null;
+}
+
+@SuppressWarnings("unchecked")
+private Filter<IdentifiedObject> loadFilter(InputStream stream) {
+    final XMLDecoder d = new XMLDecoder(stream);
+    final Filter<IdentifiedObject> result = (Filter<IdentifiedObject>) d.readObject();
+    d.close();
+    return result;
+}
+
+private void addVisibleBuiltinTerms() {
+    final OBOProperty newDisjointFrom = new OBOPropertyImpl("disjoint_from");
+    newDisjointFrom.setName("disjoint from");
+    this.getOBOSession().addObject(newDisjointFrom);
+}
+
+private Logger log() {
+    return Logger.getLogger(this.getClass());
+}
 
 }

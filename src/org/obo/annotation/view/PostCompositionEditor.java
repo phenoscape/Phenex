@@ -49,6 +49,7 @@ public class PostCompositionEditor extends AbstractGUIComponent {
     private EventSelectionModel<Differentium> selectionModel = new EventSelectionModel<Differentium>(diffs);
     private final TermSet termSet;
     private final TermSet relationsSet;
+    private final TermSet differentiaTermSet;
     private final OntologyCoordinator coordinator;
     private AutocompleteField<OBOObject> genusBox;
     private JButton addDifferentiaButton;
@@ -57,11 +58,21 @@ public class PostCompositionEditor extends AbstractGUIComponent {
     private DifferentiaTableFormat tableFormat;
     private TablePopupListener popupListener;
 
-    public PostCompositionEditor(String id, TermSet terms, TermSet relations, OntologyCoordinator coordinator) {
+    public PostCompositionEditor(String id, TermSet genusTerms, TermSet relations, TermSet differentiaTerms, OntologyCoordinator coordinator) {
         super(id);
-        this.termSet = terms;
+        this.termSet = genusTerms;
         this.relationsSet = relations;
+        this.differentiaTermSet = differentiaTerms;
         this.coordinator = coordinator;
+    }
+    
+    public PostCompositionEditor(String id, TermSet terms, TermSet relations, OntologyCoordinator coordinator) {
+        this(id, terms, relations, terms, coordinator);
+    }
+    
+    public PostCompositionEditor(TermSet terms, TermSet relations, TermSet differentiaTerms, OntologyCoordinator coordinator) {
+        this("", terms, relations, differentiaTerms, coordinator);
+        this.initializeInterface();
     }
 
     public PostCompositionEditor(TermSet terms, TermSet relations, OntologyCoordinator coordinator) {
@@ -138,7 +149,7 @@ public class PostCompositionEditor extends AbstractGUIComponent {
         if (!this.tableFormat.getColumnClass(column).equals(OBOObject.class)) return;
         final Differentium differentia = this.diffs.get(row);
         final OBOClass term = (OBOClass)(this.tableFormat.getColumnValue(differentia, column));
-        final PostCompositionEditor pce = new PostCompositionEditor(this.termSet, this.relationsSet, this.coordinator);
+        final PostCompositionEditor pce = new PostCompositionEditor(this.termSet, this.relationsSet, this.differentiaTermSet, this.coordinator);
         pce.setTerm(term);
         final int result = pce.runPostCompositionDialog(this);
         if (result == JOptionPane.OK_OPTION) {
@@ -227,7 +238,7 @@ public class PostCompositionEditor extends AbstractGUIComponent {
         public TableCellEditor getColumnEditor(int column) {
             switch (column) {
             case 0: return TermAutocompleteFieldFactory.createAutocompleteEditor(relationsSet.getTerms(), coordinator);
-            case 1: return TermAutocompleteFieldFactory.createAutocompleteEditor(termSet.getTerms(), coordinator);
+            case 1: return TermAutocompleteFieldFactory.createAutocompleteEditor(differentiaTermSet.getTerms(), coordinator);
             default: return null;
             }
         }

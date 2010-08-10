@@ -328,6 +328,10 @@ public class PhenexController extends DocumentController {
     public void removeNewDataListener(NewDataListener listener) {
         this.newDataListeners.remove(listener);
     }
+    
+    public void runORBTermRequest() {
+        
+    }
 
     private void fireDataChanged() {
         for (NewDataListener listener : this.newDataListeners) {

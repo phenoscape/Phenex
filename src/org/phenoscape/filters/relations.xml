@@ -5,7 +5,7 @@
    <void method="add"> 
     <object class="org.obo.filters.ObjectFilterImpl"> 
      <void property="comparison"> 
-      <object class="org.obo.filters.EqualsComparison"/> 
+      <object id="EqualsComparison0" class="org.obo.filters.EqualsComparison"/> 
      </void> 
      <void property="criterion"> 
       <object class="org.obo.filters.IsPropertyCriterion"/> 
@@ -22,6 +22,86 @@
      </void> 
      <void property="negate"> 
       <boolean>true</boolean> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="add"> 
+    <object class="org.obo.filters.CompoundFilterImpl"> 
+     <void property="booleanOperation"> 
+      <int>1</int> 
+     </void> 
+     <void property="filters"> 
+      <void method="add"> 
+       <object class="org.obo.filters.ObjectFilterImpl"> 
+        <void property="comparison"> 
+         <object idref="EqualsComparison0"/> 
+        </void> 
+        <void property="criterion"> 
+         <object id="NamespaceSearchCriterion0" class="org.obo.filters.NamespaceSearchCriterion"/> 
+        </void> 
+        <void property="value"> 
+         <string>relationship</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.obo.filters.ObjectFilterImpl"> 
+        <void property="comparison"> 
+         <object idref="EqualsComparison0"/> 
+        </void> 
+        <void property="criterion"> 
+         <object idref="NamespaceSearchCriterion0"/> 
+        </void> 
+        <void property="value"> 
+         <string>quality</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.obo.filters.ObjectFilterImpl"> 
+        <void property="comparison"> 
+         <object idref="EqualsComparison0"/> 
+        </void> 
+        <void property="criterion"> 
+         <object idref="NamespaceSearchCriterion0"/> 
+        </void> 
+        <void property="value"> 
+         <string>spatial</string> 
+        </void> 
+       </object> 
+      </void> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="comparison"> 
+      <object idref="EqualsComparison0"/> 
+     </void> 
+     <void property="criterion"> 
+      <object id="IDSearchCriterion0" class="org.obo.filters.IDSearchCriterion"/> 
+     </void> 
+     <void property="negate"> 
+      <boolean>true</boolean> 
+     </void> 
+     <void property="value"> 
+      <string>part_of</string> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="comparison"> 
+      <object idref="EqualsComparison0"/> 
+     </void> 
+     <void property="criterion"> 
+      <object idref="IDSearchCriterion0"/> 
+     </void> 
+     <void property="negate"> 
+      <boolean>true</boolean> 
+     </void> 
+     <void property="value"> 
+      <string>towards</string> 
      </void> 
     </object> 
    </void> 

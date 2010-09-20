@@ -153,76 +153,77 @@ public class OntologyController {
             this.allTermsSet = set;
         }
         return this.allTermsSet;
-}
-
-public File getOverridingFiltersFolder() {
-    return this.overridingFiltersFolder;
-}
-
-public void setOverridingFiltersFolder(File folder) {
-    this.overridingFiltersFolder = folder;
-}
-
-private TermSet makeTermSet() {
-    return new TermSet(this.getOBOSession(), SessionManager.getManager().getReasoner());
-}
-
-/**
- * This is just a startup "optimization" - it makes the term searches
- * happen while the ontology loading panel is displayed.  This reduces
- * the blank time between that panel disappearing and the interface being
- * displayed.
- */
-private void prefetchTermSets() {
-    this.getEntityTermSet().getTerms();
-    this.getTaxonTermSet().getTerms();
-    this.getCollectionTermSet().getTerms();
-    this.getUnitTermSet().getTerms();
-    this.getRelationsTermSet().getTerms();
-    this.getQualityTermSet().getTerms();
-    this.getRelatedEntityTermSet().getTerms();
-    this.getAllTermsSet().getTerms();
-}
-
-private Filter<IdentifiedObject> loadFilterWithName(String filterName) {
-    final String filename = filterName + ".xml";
-    final File filterFile = new File(this.getOverridingFiltersFolder(), filename);
-    if (filterFile.exists()) {
-        return this.loadFilter(filterFile);
-    } else {
-        return this.loadFilterFromResource("/org/phenoscape/filters/" + filename);
     }
-}
 
-private Filter<IdentifiedObject> loadFilterFromResource(String resourcePath) {
-    return this.loadFilter(this.getClass().getResourceAsStream(resourcePath));
-}
-
-private Filter<IdentifiedObject> loadFilter(File xmlFile) {
-    try {
-        return this.loadFilter(new FileInputStream(xmlFile));
-    } catch (FileNotFoundException e) {
-        log().error("Could not find specified filter file", e);
+    public File getOverridingFiltersFolder() {
+        return this.overridingFiltersFolder;
     }
-    return null;
-}
 
-@SuppressWarnings("unchecked")
-private Filter<IdentifiedObject> loadFilter(InputStream stream) {
-    final XMLDecoder d = new XMLDecoder(stream);
-    final Filter<IdentifiedObject> result = (Filter<IdentifiedObject>) d.readObject();
-    d.close();
-    return result;
-}
+    public void setOverridingFiltersFolder(File folder) {
+        this.overridingFiltersFolder = folder;
+    }
 
-private void addVisibleBuiltinTerms() {
-    final OBOProperty newDisjointFrom = new OBOPropertyImpl("disjoint_from");
-    newDisjointFrom.setName("disjoint from");
-    this.getOBOSession().addObject(newDisjointFrom);
-}
+    private TermSet makeTermSet() {
+        return new TermSet(this.getOBOSession(), SessionManager.getManager().getReasoner());
+    }
 
-private Logger log() {
-    return Logger.getLogger(this.getClass());
-}
+    /**
+     * This is just a startup "optimization" - it makes the term searches
+     * happen while the ontology loading panel is displayed.  This reduces
+     * the blank time between that panel disappearing and the interface being
+     * displayed.
+     */
+    private void prefetchTermSets() {
+        this.getEntityTermSet().getTerms();
+        this.getTaxonTermSet().getTerms();
+        this.getCollectionTermSet().getTerms();
+        this.getUnitTermSet().getTerms();
+        this.getRelationsTermSet().getTerms();
+        this.getQualityTermSet().getTerms();
+        this.getRelatedEntityTermSet().getTerms();
+        this.getAllTermsSet().getTerms();
+    }
+
+    private Filter<IdentifiedObject> loadFilterWithName(String filterName) {
+        final String filename = filterName + ".xml";
+        final File filterFile = new File(this.getOverridingFiltersFolder(), filename);
+        if (filterFile.exists()) {
+            return this.loadFilter(filterFile);
+        } else {
+            return this.loadFilterFromResource("/org/phenoscape/filters/" + filename);
+        }
+    }
+
+    private Filter<IdentifiedObject> loadFilterFromResource(String resourcePath) {
+        return this.loadFilter(this.getClass().getResourceAsStream(resourcePath));
+    }
+
+    private Filter<IdentifiedObject> loadFilter(File xmlFile) {
+        try {
+            return this.loadFilter(new FileInputStream(xmlFile));
+        } catch (FileNotFoundException e) {
+            log().error("Could not find specified filter file", e);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Filter<IdentifiedObject> loadFilter(InputStream stream) {
+        final XMLDecoder d = new XMLDecoder(stream);
+        final Filter<IdentifiedObject> result = (Filter<IdentifiedObject>) d.readObject();
+        d.close();
+        return result;
+    }
+
+    private void addVisibleBuiltinTerms() {
+        final OBOProperty newDisjointFrom = new OBOPropertyImpl("disjoint_from");
+        newDisjointFrom.setName("disjoint from");
+        newDisjointFrom.setNamespace(this.getOBOSession().getNamespace("relationship"));
+        this.getOBOSession().addObject(newDisjointFrom);
+    }
+
+    private Logger log() {
+        return Logger.getLogger(this.getClass());
+    }
 
 }

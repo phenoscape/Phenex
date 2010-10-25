@@ -216,8 +216,8 @@ public class OntologyController {
     }
 
     private void addVisibleBuiltinTerms() {
-        final OBOProperty newDisjointFrom = new OBOPropertyImpl("disjoint_from");
-        newDisjointFrom.setName("disjoint from");
+        final OBOProperty newDisjointFrom = new OBOPropertyImpl("PHENOSCAPE:complement_of");
+        newDisjointFrom.setName("not");
         newDisjointFrom.setNamespace(this.getOBOSession().getNamespace("relationship"));
         this.getOBOSession().addObject(newDisjointFrom);
     }

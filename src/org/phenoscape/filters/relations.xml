@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_20" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_26" class="java.beans.XMLDecoder"> 
  <object class="org.obo.filters.CompoundFilterImpl"> 
   <void property="filters"> 
    <void method="add"> 
@@ -70,6 +70,19 @@
         </void> 
        </object> 
       </void> 
+      <void method="add"> 
+       <object class="org.obo.filters.ObjectFilterImpl"> 
+        <void property="comparison"> 
+         <object idref="EqualsComparison0"/> 
+        </void> 
+        <void property="criterion"> 
+         <object id="IDSearchCriterion0" class="org.obo.filters.IDSearchCriterion"/> 
+        </void> 
+        <void property="value"> 
+         <string>OBO_REL:part_of</string> 
+        </void> 
+       </object> 
+      </void> 
      </void> 
     </object> 
    </void> 
@@ -79,7 +92,7 @@
       <object idref="EqualsComparison0"/> 
      </void> 
      <void property="criterion"> 
-      <object id="IDSearchCriterion0" class="org.obo.filters.IDSearchCriterion"/> 
+      <object idref="IDSearchCriterion0"/> 
      </void> 
      <void property="negate"> 
       <boolean>true</boolean> 

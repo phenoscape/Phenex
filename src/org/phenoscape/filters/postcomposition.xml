@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.6.0_26" class="java.beans.XMLDecoder"> 
+ <object class="org.obo.filters.CompoundFilterImpl"> 
+  <void property="filters"> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="comparison"> 
+      <object id="EqualsComparison0" class="org.obo.filters.EqualsComparison"/> 
+     </void> 
+     <void property="criterion"> 
+      <object class="org.obo.filters.IsClassCriterion"/> 
+     </void> 
+     <void property="value"> 
+      <string>quality</string> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="criterion"> 
+      <object class="org.obo.filters.IsObsoleteCriterion"/> 
+     </void> 
+     <void property="negate"> 
+      <boolean>true</boolean> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="comparison"> 
+      <object idref="EqualsComparison0"/> 
+     </void> 
+     <void property="criterion"> 
+      <object class="org.obo.filters.NamespaceSearchCriterion"/> 
+     </void> 
+     <void property="negate"> 
+      <boolean>true</boolean> 
+     </void> 
+     <void property="value"> 
+      <string>teleost-taxonomy</string> 
+     </void> 
+    </object> 
+   </void> 
+  </void> 
+ </object> 
+</java> 

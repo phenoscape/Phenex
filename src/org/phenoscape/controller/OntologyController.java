@@ -37,6 +37,7 @@ public class OntologyController {
     private static final String UNIT_FILTER = "units";
     private static final String TAXON_FILTER = "taxa";
     private static final String MUSEUM_FILTER = "museums";
+    private static final String PC_FILLERS_FILTER = "postcomposition";
     private static final String ALL_TERMS = "allterms";
     private File overridingFiltersFolder = new File(GUIManager.getPrefsDir(), "Filters");
 
@@ -46,6 +47,7 @@ public class OntologyController {
     private TermSet collectionTermSet = null;
     private TermSet unitTermSet = null;
     private TermSet relationsTermSet = null;
+    private TermSet pcFillersTermSet = null;
     private TermSet allTermsSet = null;
 
     private final OntologyConfiguration config;
@@ -145,6 +147,15 @@ public class OntologyController {
         }
         return this.relationsTermSet;
     }
+    
+    public TermSet getPostCompositionFillersTermSet() {
+        if (this.pcFillersTermSet == null) {
+            final TermSet set =  this.makeTermSet();
+            set.setTermFilter(this.loadFilterWithName(PC_FILLERS_FILTER));
+            this.pcFillersTermSet = set;
+        }
+        return this.pcFillersTermSet;
+    }
 
     public TermSet getAllTermsSet() {
         if (this.allTermsSet == null) {
@@ -181,6 +192,7 @@ public class OntologyController {
         this.getRelationsTermSet().getTerms();
         this.getQualityTermSet().getTerms();
         this.getRelatedEntityTermSet().getTerms();
+        this.getPostCompositionFillersTermSet();
         this.getAllTermsSet().getTerms();
     }
 

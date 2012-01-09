@@ -19,10 +19,20 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+import name.pachler.nio.file.ClosedWatchServiceException;
+import name.pachler.nio.file.FileSystems;
+import name.pachler.nio.file.Path;
+import name.pachler.nio.file.Paths;
+import name.pachler.nio.file.StandardWatchEventKind;
+import name.pachler.nio.file.WatchEvent;
+import name.pachler.nio.file.WatchKey;
+import name.pachler.nio.file.WatchService;
+
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.bbop.framework.GUIManager;
 import org.biojava.bio.seq.io.ParseException;
+import org.jdesktop.swingworker.SwingWorker;
 import org.nexml.schema_2009.NexmlDocument;
 import org.obo.annotation.view.DefaultOntologyCoordinator;
 import org.obo.annotation.view.OntologyCoordinator;
@@ -72,6 +82,7 @@ public class PhenexController extends DocumentController {
     private final List<NewDataListener> newDataListeners = new ArrayList<NewDataListener>();
     private final UndoObserver undoObserver;
     private final SelectionManager phenoteSelectionManager;
+    private SwingWorker<WatchEvent<?>, Void> fileMonitor;
 
     public PhenexController(OntologyController ontologyController) {
         super();
@@ -87,6 +98,7 @@ public class PhenexController extends DocumentController {
         this.taxaSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         this.currentSpecimens = new SortedList<Specimen>(new CollectionList<Taxon, Specimen>(this.taxaSelectionModel.getSelected(),
                 new CollectionList.Model<Taxon, Specimen>(){
+            @Override
             public List<Specimen> getChildren(Taxon parent) {
                 return parent.getSpecimens();
             }
@@ -96,6 +108,7 @@ public class PhenexController extends DocumentController {
         new ListSelectionMaintainer<Specimen>(this.currentSpecimens, this.currentSpecimensSelectionModel);
         this.currentStates = new SortedList<State>(new CollectionList<Character, State>(this.charactersSelectionModel.getSelected(),
                 new CollectionList.Model<Character, State>() {
+            @Override
             public List<State> getChildren(Character parent) {
                 return parent.getStates();
             }
@@ -106,6 +119,7 @@ public class PhenexController extends DocumentController {
         this.currentStatesSelectionModel.setSelectionMode(EventSelectionModel.SINGLE_SELECTION);
         this.currentPhenotypes = new SortedList<Phenotype>(new CollectionList<State, Phenotype>(this.currentStatesSelectionModel.getSelected(),
                 new CollectionList.Model<State, Phenotype>() {
+            @Override
             public List<Phenotype> getChildren(State parent) {
                 return parent.getPhenotypes();
             }
@@ -281,6 +295,12 @@ public class PhenexController extends DocumentController {
         }
     }
 
+    public void openMergeModifiedFile() {
+        log().debug("Data has changed - ask the user if we should merge.");
+        JOptionPane.showConfirmDialog(this.getWindow(), "Your data changed! Do you want to merge???");
+        this.monitorFileForChanges(this.getCurrentFile());
+    }
+
     public void exportToExcel() {
         final JFileChooser fileChooser = this.createFileChooser();
         final int result = fileChooser.showSaveDialog(GUIManager.getManager().getFrame());
@@ -402,14 +422,17 @@ public class PhenexController extends DocumentController {
         final List<String> ids = new ArrayList<String>(secondaryIDs);
         final TableModel model = new AbstractTableModel() {
 
+            @Override
             public int getColumnCount() {
                 return 1;
             }
 
+            @Override
             public int getRowCount() {
                 return ids.size();
             }
 
+            @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
                 return ids.get(rowIndex);
             }
@@ -425,6 +448,69 @@ public class PhenexController extends DocumentController {
         panel.add(new JScrollPane(new JTable(model)), BorderLayout.CENTER);
         final int result = JOptionPane.showOptionDialog(null, panel, "Secondary Identifiers", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         return result == JOptionPane.YES_OPTION;
+    }
+
+    private void monitorFileForChanges(final File aFile) {
+        final Path watchedPath = Paths.get(aFile.getParentFile().getAbsolutePath());
+        if (this.fileMonitor != null) {
+            this.fileMonitor.cancel(true);
+        }
+        this.fileMonitor = new SwingWorker<WatchEvent<?>, Void>() {
+            @Override
+            protected WatchEvent<?> doInBackground() {
+                try {
+                    final WatchService watchService = FileSystems.getDefault().newWatchService();
+                    watchedPath.register(watchService, StandardWatchEventKind.ENTRY_MODIFY);
+                    while (!this.isCancelled()) {
+                        // take() will block until a file has been modified
+                        final WatchKey signalledKey = watchService.take();
+                        log().debug("Take returned - got an event.");
+                        // get list of events from key
+                        final List<WatchEvent<?>> events = signalledKey.pollEvents();
+                        // VERY IMPORTANT! call reset() AFTER pollEvents() to allow the
+                        // key to be reported again by the watch service
+                        signalledKey.reset();
+                        for (WatchEvent<?> event : events) {
+                            log().debug("Event: " + event);
+                            if (event.kind().equals(StandardWatchEventKind.ENTRY_MODIFY)) {
+                                final Path modifiedPath = (Path)(event.context());
+                                log().debug("Modified path: " + event.context());
+                                final File modifiedFile = new File(modifiedPath.toString());
+                                log().debug("Modified file: " + modifiedFile);
+                                if (modifiedPath.toString().equals(aFile.getName())) {
+                                    return event;
+                                }
+                            }
+                        }
+                    }
+                } catch (ClosedWatchServiceException e) {
+                    log().error("Can't monitor file, watch service closed.", e);
+                } catch (IOException e) {
+                    log().error("Can't monitor file.", e);
+                } catch (InterruptedException e) {
+                    log().error("Watch service interrupted.");
+                } 
+                return null;
+            }
+            /* (non-Javadoc)
+             * This method runs on the Event Dispatch Thread
+             */
+            @Override
+            protected void done() {
+                super.done();
+                if (!this.isCancelled()) {
+                    openMergeModifiedFile();                    
+                }
+            }
+
+        };
+        this.fileMonitor.execute();
+    }
+
+    @Override
+    public void setCurrentFile(final File aFile) {
+        super.setCurrentFile(aFile);
+        this.monitorFileForChanges(aFile);
     }
 
     private Logger log() {

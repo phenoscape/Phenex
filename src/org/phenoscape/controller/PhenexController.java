@@ -2,6 +2,9 @@ package org.phenoscape.controller;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,11 +12,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -299,21 +304,53 @@ public class PhenexController extends DocumentController {
 
     public void openMergeModifiedFile() {
         log().debug("Data has changed - ask the user if we should merge.");
-        final int result = JOptionPane.showOptionDialog(this.getWindow(), String.format("The file for the document at %s has been modified by another application. Do you want to replace your copy with the newly edited version, or instead save your copy to another file?", this.getCurrentFile()), "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"Replace with new data", "Save as a copy of this version"}, "Replace with new data");
-        if (result == JOptionPane.OK_OPTION) {
-            try {
-                this.getUndoController().beginIgnoringEdits();
-                this.readData(this.getCurrentFile());
-                this.getUndoController().endIgnoringEdits();
-                this.getUndoController().discardAllEdits();
-                this.getUndoController().markChangesSaved();
-            } catch (IOException e) {
-                log().error("Failed to read file", e);
+        if (this.getUndoController().hasUnsavedChanges()) {
+            final int result = JOptionPane.showOptionDialog(this.getWindow(), String.format("The file for the document at %s has been modified by another application. Do you want to discard your unsaved changes and replace with the newly edited version, or instead save your copy to another file?", this.getCurrentFile()), "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"Replace with new data", "Save as a copy of this version"}, "Replace with new data");
+            if (result == JOptionPane.OK_OPTION) {
+                this.loadModifiedFile();
+            } else {
+                this.saveAs(); //TODO if cancel this need to go back to previous dialog
             }
         } else {
-            this.saveAs(); //TODO if cancel this need to go back to previous dialog
+            final JDialog dialog = new JDialog(this.getWindow(), false);
+            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            dialog.setResizable(false);
+            dialog.setLayout(new GridBagLayout());
+            // surrounding with html tags makes the JLabel wrap its text
+            final JLabel label = new JLabel("<HTML>" + String.format("The file for the document at %s has been modified by another application.", this.getCurrentFile()) + "</HTML>");
+            final GridBagConstraints labelConstraints = new GridBagConstraints();
+            labelConstraints.insets = new Insets(11, 11, 11, 11);
+            labelConstraints.fill = GridBagConstraints.BOTH;
+            labelConstraints.weightx = 1.0;
+            labelConstraints.weighty = 1.0;
+            dialog.add(label, labelConstraints);
+            final GridBagConstraints progressConstraints = new GridBagConstraints();
+            progressConstraints.gridy = 1;
+            progressConstraints.fill = GridBagConstraints.HORIZONTAL;
+            progressConstraints.insets = new Insets(11, 11, 11, 11);
+            final JProgressBar progress = new JProgressBar();
+            progress.setIndeterminate(true);
+            dialog.add(progress, progressConstraints);
+            dialog.setTitle("Reloading modified file...");
+            dialog.setSize(400, 150);
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            this.loadModifiedFile();
+            dialog.setVisible(false);
         }
         this.monitorFileForChanges(this.getCurrentFile());
+    }
+    
+    private void loadModifiedFile() {
+        try {
+            this.getUndoController().beginIgnoringEdits();
+            this.readData(this.getCurrentFile());
+            this.getUndoController().endIgnoringEdits();
+            this.getUndoController().discardAllEdits();
+            this.getUndoController().markChangesSaved();
+        } catch (IOException e) {
+            log().error("Failed to read file", e);
+        }
     }
 
     public void exportToExcel() {

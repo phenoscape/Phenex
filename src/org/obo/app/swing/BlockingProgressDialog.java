@@ -46,7 +46,7 @@ public class BlockingProgressDialog<T, V> extends JDialog {
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         this.setResizable(false);
         this.setLayout(new GridBagLayout());
-        // surrounding with html tags makes the JLable wrap its text
+        // surrounding with html tags makes the JLabel wrap its text
         final JLabel label = new JLabel("<HTML>" + this.message + "</HTML>");
         final GridBagConstraints labelConstraints = new GridBagConstraints();
         labelConstraints.insets = new Insets(11, 11, 11, 11);

@@ -256,7 +256,9 @@ public class PhenexController extends DocumentController {
         final NeXMLWriter writer = new NeXMLWriter(this.charactersBlockID, this.xmlDoc);
         writer.setDataSet(this.dataSet);
         writer.setGenerator(this.getAppName() + " " + this.getAppVersion());
+        this.monitorFileForChanges(null);
         writer.write(aFile);
+        this.monitorFileForChanges(this.getCurrentFile());
     }
 
     public void openMergeTaxa() {
@@ -297,7 +299,20 @@ public class PhenexController extends DocumentController {
 
     public void openMergeModifiedFile() {
         log().debug("Data has changed - ask the user if we should merge.");
-        JOptionPane.showConfirmDialog(this.getWindow(), "Your data changed! Do you want to merge???");
+        final int result = JOptionPane.showOptionDialog(this.getWindow(), String.format("The file for the document at %s has been modified by another application. Do you want to replace your copy with the newly edited version, or instead save your copy to another file?", this.getCurrentFile()), "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"Replace with new data", "Save as a copy of this version"}, "Replace with new data");
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                this.getUndoController().beginIgnoringEdits();
+                this.readData(this.getCurrentFile());
+                this.getUndoController().endIgnoringEdits();
+                this.getUndoController().discardAllEdits();
+                this.getUndoController().markChangesSaved();
+            } catch (IOException e) {
+                log().error("Failed to read file", e);
+            }
+        } else {
+            this.saveAs(); //TODO if cancel this need to go back to previous dialog
+        }
         this.monitorFileForChanges(this.getCurrentFile());
     }
 
@@ -451,10 +466,13 @@ public class PhenexController extends DocumentController {
     }
 
     private void monitorFileForChanges(final File aFile) {
-        final Path watchedPath = Paths.get(aFile.getParentFile().getAbsolutePath());
         if (this.fileMonitor != null) {
             this.fileMonitor.cancel(true);
         }
+        if (aFile == null) {
+            return;
+        }
+        final Path watchedPath = Paths.get(aFile.getParentFile().getAbsolutePath());
         this.fileMonitor = new SwingWorker<WatchEvent<?>, Void>() {
             @Override
             protected WatchEvent<?> doInBackground() {

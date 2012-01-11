@@ -1,5 +1,6 @@
 package org.phenoscape.view;
 
+import java.awt.CheckboxMenuItem;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -9,6 +10,7 @@ import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
@@ -96,6 +98,14 @@ public class MenuFactory {
             };
             menu.add(new JMenuItem(exitAction));
         }
+        menu.addSeparator();
+        final Action enableAutosaveAction = new AbstractAction("Enable Autosave") {
+          public void actionPerformed(ActionEvent e) { controller.toggleAutosave(); }  
+          
+        };
+        final JCheckBoxMenuItem autosave = new JCheckBoxMenuItem(enableAutosaveAction);
+        autosave.setSelected(controller.getShouldAutosave());
+        menu.add(autosave);
         return menu;
     }
 

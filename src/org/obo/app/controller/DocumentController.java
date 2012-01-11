@@ -25,10 +25,13 @@ public abstract class DocumentController {
     private File currentFile;
     private final UndoController undo = new UndoController();
     private final DirtyDocumentIndicator dirtyIndicator = new DirtyDocumentIndicator();
+    private boolean shouldAutosave = true;
+    private final Autosaver autosaver = new Autosaver();
 
     public DocumentController() {
         this.setWindowTitle(null);
         this.undo.addUnsavedChangesListener(this.dirtyIndicator);
+        this.undo.addUnsavedChangesListener(this.autosaver);
     }
 
     public void open() {
@@ -51,10 +54,12 @@ public abstract class DocumentController {
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
             try {
+                this.getUndoController().beginIgnoringEdits();
                 this.readData(file);
                 this.setCurrentFile(file);
-                this.getUndoController().discardAllEdits();
-                this.getUndoController().markChangesSaved();
+                //this.getUndoController().discardAllEdits();
+                //this.getUndoController().markChangesSaved();
+                this.getUndoController().endIgnoringEdits();
             } catch (IOException e) {
                 if (e instanceof UserCancelledReadException) {
                     // user cancelled file load, don't show an error message
@@ -165,6 +170,21 @@ public abstract class DocumentController {
         }
     }
     
+    public void setShouldAutosave(boolean autosave) {
+        this.shouldAutosave = autosave;
+        if (autosave && this.getUndoController().hasUnsavedChanges()) {
+            save();
+        }
+    }
+    
+    public boolean getShouldAutosave() {
+        return this.shouldAutosave;
+    }
+    
+    public void toggleAutosave() {
+        this.setShouldAutosave(!this.getShouldAutosave());
+    }
+    
     private void setWindowTitle(File aFile) {
         final JFrame window = this.getWindow();
         if (window != null) {
@@ -225,6 +245,16 @@ public abstract class DocumentController {
 
         public void setUnsavedChanges(boolean unsaved) {
             CrossPlatform.setWindowModified(getWindow(), unsaved);
+        }
+
+    }
+    
+    private class Autosaver implements UnsavedChangesListener {
+
+        public void setUnsavedChanges(boolean unsaved) {
+            if (unsaved && shouldAutosave) {
+                save();                
+            }
         }
 
     }

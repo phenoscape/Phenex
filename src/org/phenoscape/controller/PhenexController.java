@@ -345,11 +345,12 @@ public class PhenexController extends DocumentController {
         try {
             this.getUndoController().beginIgnoringEdits();
             this.readData(this.getCurrentFile());
-            this.getUndoController().endIgnoringEdits();
             this.getUndoController().discardAllEdits();
             this.getUndoController().markChangesSaved();
         } catch (IOException e) {
             log().error("Failed to read file", e);
+        } finally {
+        	this.getUndoController().endIgnoringEdits();
         }
     }
 

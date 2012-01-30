@@ -62,7 +62,6 @@ public abstract class DocumentController {
 				this.setCurrentFile(file);
 				//this.getUndoController().discardAllEdits();
 				//this.getUndoController().markChangesSaved();
-				this.getUndoController().endIgnoringEdits();
 			} catch (IOException e) {
 				if (e instanceof UserCancelledReadException) {
 					// user cancelled file load, don't show an error message
@@ -71,6 +70,8 @@ public abstract class DocumentController {
 					log().error("Failed to load file data", e);
 					this.runFileReadErrorMessage(file, e.getLocalizedMessage());
 				}
+			} finally {
+				this.getUndoController().endIgnoringEdits();
 			}
 		}
 	}

@@ -1,10 +1,15 @@
 package org.phenoscape.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.obo.annotation.base.OBOUtil;
+import org.obo.annotation.base.OBOUtil.Differentium;
 import org.obo.app.model.AbstractPropertyChangeObject;
 import org.obo.datamodel.OBOClass;
+import org.obo.datamodel.OBOProperty;
+import org.obo.datamodel.OBOSession;
 
 public class PhenotypeProposal extends AbstractPropertyChangeObject {
 
@@ -94,6 +99,21 @@ public class PhenotypeProposal extends AbstractPropertyChangeObject {
 
 	public List<OBOClass> getQualities() {
 		return qualities;
+	}
+	
+	public List<OBOClass> getProcessedQualities(OBOSession session) {
+		final List<OBOClass> negatedQualities = new ArrayList<OBOClass>();
+		if (this.qualityIsNegated && (!this.qualities.isEmpty()) && (this.getNegatedQualityParent() != null)) {
+			for (OBOClass quality : this.getQualities()) {
+				final Differentium diff = new Differentium();
+				diff.setRelation((OBOProperty)(session.getObject("PHENOSCAPE:complement_of")));
+				diff.setTerm(quality);
+				negatedQualities.add(OBOUtil.createPostComposition(this.getNegatedQualityParent(), Collections.singletonList(diff)));
+			}
+			return negatedQualities;
+		} else {
+			return this.getQualities();
+		}
 	}
 
 	public List<OBOClass> getQualityModifiers() {

@@ -26,6 +26,7 @@ public class State extends AbstractPropertyChangeObject {
     private String symbol;
     private String comment;
     private String figure;
+    private PhenotypeProposal proposal;
 
     public State() {
         this(UUID.randomUUID().toString()); 
@@ -107,6 +108,14 @@ public class State extends AbstractPropertyChangeObject {
         final String oldValue = this.figure;
         this.figure = aFigure;
         this.firePropertyChange(FIGURE, oldValue, aFigure);
+    }
+    
+    public PhenotypeProposal getProposal() {
+    	return this.proposal;
+    }
+    
+    public void setProposal(PhenotypeProposal proposal) {
+    	this.proposal = proposal;
     }
 
     @Override

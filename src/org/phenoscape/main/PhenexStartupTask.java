@@ -41,6 +41,7 @@ import org.phenoscape.view.CharacterTableComponentFactory;
 import org.phenoscape.view.DataSetComponentFactory;
 import org.phenoscape.view.MenuFactory;
 import org.phenoscape.view.OntologyPreferencesComponentFactory;
+import org.phenoscape.view.PhenotypeProposalComponentFactory;
 import org.phenoscape.view.PhenotypeTableComponentFactory;
 import org.phenoscape.view.SpecimenTableComponentFactory;
 import org.phenoscape.view.StateTableComponentFactory;
@@ -62,6 +63,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
         factories.add(new CharacterTableComponentFactory(this.controller));
         factories.add(new StateTableComponentFactory(this.controller));
         factories.add(new PhenotypeTableComponentFactory(this.controller));
+        factories.add(new PhenotypeProposalComponentFactory(this.controller));
         factories.add(new TaxonTableComponentFactory(this.controller));
         factories.add(new SpecimenTableComponentFactory(this.controller));
         factories.add(new CharacterMatrixComponentFactory(this.controller));

@@ -29,8 +29,7 @@ public class PhenoscapeGUIComponent extends AbstractGUIComponent {
         ComponentManager.getManager().setLabel(this, title);
     }
 
-    @SuppressWarnings("unused")
-    private Logger log() {
+	protected Logger log() {
         return Logger.getLogger(this.getClass());
     }
 

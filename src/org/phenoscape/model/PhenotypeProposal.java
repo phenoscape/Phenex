@@ -13,7 +13,10 @@ import org.obo.datamodel.OBOSession;
 
 public class PhenotypeProposal extends AbstractPropertyChangeObject {
 
-	private boolean resolved;
+	public static enum ResolvedStatus {
+		PROPOSED, ACCEPTED, REJECTED
+	}
+	private ResolvedStatus status = ResolvedStatus.PROPOSED;
 	private final String characterID;
 	private final String stateID;
 	private String entityText;
@@ -33,12 +36,12 @@ public class PhenotypeProposal extends AbstractPropertyChangeObject {
 		this.stateID = stateID;
 	}
 
-	public boolean isResolved() {
-		return this.resolved;
+	public ResolvedStatus getStatus() {
+		return this.status;
 	}
 
-	public void setResolved(boolean resolved) {
-		this.resolved = resolved;
+	public void setStatus(ResolvedStatus status) {
+		this.status = status;
 	}
 
 	public String getEntityText() {

@@ -189,7 +189,7 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
     }
 
     @SuppressWarnings("unused")
-    private Logger log() {
+    protected Logger log() {
         return Logger.getLogger(this.getClass());
     }
 

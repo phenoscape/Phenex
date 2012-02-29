@@ -4,7 +4,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -19,8 +21,11 @@ import javax.swing.event.ListSelectionListener;
 
 import org.obo.annotation.base.OBOUtil;
 import org.obo.annotation.base.OBOUtil.Differentium;
+import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOProperty;
+import org.obo.util.TermUtil;
+import org.oboedit.controller.SelectionManager;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.PhenotypeProposal;
@@ -62,48 +67,59 @@ public class PhenotypeProposalComponent extends PhenoscapeGUIComponent {
 		constraints.weighty = 1;
 		constraints.gridy = 0;
 		constraints.gridx = 0;
-		final JPanel textPanel = new JPanel(new GridBagLayout());
-		textPanel.setBorder(BorderFactory.createTitledBorder("Parsed Description"));
-		this.add(textPanel, constraints);
-		constraints.gridx += 1;
 		final JPanel phenotypePanel = new JPanel(new GridBagLayout());
-		this.add(phenotypePanel, constraints);
 		phenotypePanel.setBorder(BorderFactory.createTitledBorder("Proposed Phenotype"));
+		this.add(phenotypePanel, constraints);
+		final JButton phenotypeButton = new JButton(new AbstractAction("Add Phenotype") {
 
-		final GridBagConstraints descriptionConstraints = new GridBagConstraints();
-		descriptionConstraints.gridx = 0;
-		descriptionConstraints.gridy = 0;
-		descriptionConstraints.anchor = GridBagConstraints.EAST;
-		textPanel.add(new JLabel("Entity:"), descriptionConstraints);
-		descriptionConstraints.gridy += 1;
-		textPanel.add(new JLabel("Entity Locator:"), descriptionConstraints);
-		descriptionConstraints.gridy += 1;
-		textPanel.add(new JLabel("Quality:"), descriptionConstraints);
-		descriptionConstraints.gridy += 1;
-		textPanel.add(new JLabel("Related Entity:"), descriptionConstraints);
-		descriptionConstraints.anchor = GridBagConstraints.CENTER;
-		descriptionConstraints.fill = GridBagConstraints.HORIZONTAL;
-		descriptionConstraints.weightx = 1;
-		descriptionConstraints.gridy = 0;
-		descriptionConstraints.gridx = 1;
-		this.entityField  = new JTextField();
-		this.entityField.setEditable(false);
-		textPanel.add(this.entityField, descriptionConstraints);
-		this.locatorField = new JTextField();
-		this.locatorField.setEditable(false);
-		descriptionConstraints.gridy += 1;
-		textPanel.add(this.locatorField, descriptionConstraints);
-		this.qualityField = new JTextField();
-		this.qualityField.setEditable(false);
-		descriptionConstraints.gridy += 1;
-		textPanel.add(this.qualityField, descriptionConstraints);
-		descriptionConstraints.gridy += 1;
-		this.relatedEntityField = new JTextField();
-		this.relatedEntityField.setEditable(false);
-		textPanel.add(this.relatedEntityField, descriptionConstraints);
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				createAndAddPhenotype();
+			}
+		});
+		constraints.anchor = GridBagConstraints.EAST;
+		constraints.weightx = 0;
+		constraints.weighty = 0;
+		constraints.gridy = 1;
+		constraints.fill = GridBagConstraints.NONE;
+		this.add(phenotypeButton, constraints);
 
 		final GridBagConstraints phenotypeConstraints = new GridBagConstraints();
+		phenotypeConstraints.gridx = 0;
+		phenotypeConstraints.gridy = 0;
+		phenotypeConstraints.anchor = GridBagConstraints.EAST;
+		phenotypePanel.add(new JLabel("Entity:"), phenotypeConstraints);
+		phenotypeConstraints.gridy += 1;
+		phenotypePanel.add(new JLabel("Entity Locator:"), phenotypeConstraints);
+		phenotypeConstraints.gridy += 1;
+		phenotypePanel.add(new JLabel("Quality:"), phenotypeConstraints);
+		phenotypeConstraints.gridy += 1;
+		phenotypePanel.add(new JLabel("Related Entity:"), phenotypeConstraints);
+		phenotypeConstraints.anchor = GridBagConstraints.CENTER;
+		phenotypeConstraints.fill = GridBagConstraints.HORIZONTAL;
+		phenotypeConstraints.weightx = 1;
+		phenotypeConstraints.gridy = 0;
+		phenotypeConstraints.gridx = 1;
+		this.entityField  = new JTextField();
+		this.entityField.setEditable(false);
+		phenotypePanel.add(this.entityField, phenotypeConstraints);
+		this.locatorField = new JTextField();
+		this.locatorField.setEditable(false);
+		phenotypeConstraints.gridy += 1;
+		phenotypePanel.add(this.locatorField, phenotypeConstraints);
+		this.qualityField = new JTextField();
+		this.qualityField.setEditable(false);
+		phenotypeConstraints.gridy += 1;
+		phenotypePanel.add(this.qualityField, phenotypeConstraints);
+		phenotypeConstraints.gridy += 1;
+		this.relatedEntityField = new JTextField();
+		this.relatedEntityField.setEditable(false);
+		phenotypePanel.add(this.relatedEntityField, phenotypeConstraints);
+
+		phenotypeConstraints.gridy = 0;
+		phenotypeConstraints.gridx = 2;
 		phenotypeConstraints.anchor = GridBagConstraints.WEST;
+		phenotypeConstraints.weightx = 0;
 		this.useEntity = new JCheckBox();
 		this.selectedEntity = new JComboBox();
 		this.useEntityLocator = new JCheckBox();
@@ -112,17 +128,6 @@ public class PhenotypeProposalComponent extends PhenoscapeGUIComponent {
 		this.selectedQuality = new JComboBox();
 		this.useRelatedEntity = new JCheckBox();
 		this.selectedRelatedEntity = new JComboBox();
-		phenotypeConstraints.gridx = 0;
-		phenotypeConstraints.gridy = 0;
-		phenotypePanel.add(useEntity, phenotypeConstraints);
-		phenotypeConstraints.gridy += 1;
-		phenotypePanel.add(useEntityLocator, phenotypeConstraints);
-		phenotypeConstraints.gridy += 1;
-		phenotypePanel.add(useQuality, phenotypeConstraints);
-		phenotypeConstraints.gridy += 1;
-		phenotypePanel.add(useRelatedEntity, phenotypeConstraints);
-		phenotypeConstraints.gridx += 1;
-		phenotypeConstraints.gridy = 0;
 		phenotypePanel.add(selectedEntity, phenotypeConstraints);
 		phenotypeConstraints.gridy += 1;
 		phenotypePanel.add(selectedEntityLocator, phenotypeConstraints);
@@ -130,19 +135,15 @@ public class PhenotypeProposalComponent extends PhenoscapeGUIComponent {
 		phenotypePanel.add(selectedQuality, phenotypeConstraints);
 		phenotypeConstraints.gridy += 1;
 		phenotypePanel.add(selectedRelatedEntity, phenotypeConstraints);
-
-		phenotypeConstraints.gridx = 0;
+		phenotypeConstraints.gridy = 0;
+		phenotypeConstraints.gridx += 1;
+		phenotypePanel.add(useEntity, phenotypeConstraints);
 		phenotypeConstraints.gridy += 1;
-		phenotypeConstraints.gridwidth = 2;
-		phenotypeConstraints.anchor = GridBagConstraints.EAST;
-		final JButton phenotypeButton = new JButton(new AbstractAction("Add Phenotype") {
-
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				createAndAddPhenotype();
-			}
-		});
-		phenotypePanel.add(phenotypeButton, phenotypeConstraints);
+		phenotypePanel.add(useEntityLocator, phenotypeConstraints);
+		phenotypeConstraints.gridy += 1;
+		phenotypePanel.add(useQuality, phenotypeConstraints);
+		phenotypeConstraints.gridy += 1;
+		phenotypePanel.add(useRelatedEntity, phenotypeConstraints);
 	}
 
 	private State getSelectedState() {
@@ -173,8 +174,33 @@ public class PhenotypeProposalComponent extends PhenoscapeGUIComponent {
 				this.configureTermSelector(this.useEntityLocator, this.selectedEntityLocator, proposal.getEntityLocators());
 				this.configureTermSelector(this.useQuality, this.selectedQuality, proposal.getProcessedQualities(this.getController().getOntologyController().getOBOSession()));
 				this.configureTermSelector(this.useRelatedEntity, this.selectedRelatedEntity, proposal.getQualityModifiers());
+
+				SelectionManager.selectTerms(this, this.collectTerms(proposal));
+			}
+
+		}
+	}
+
+	private Set<LinkedObject> collectTerms(PhenotypeProposal proposal) {
+		final Set<LinkedObject> terms = new HashSet<LinkedObject>();
+		terms.addAll(proposal.getEntities());
+		terms.addAll(proposal.getEntityLocators());
+		terms.addAll(proposal.getQualities());
+		terms.addAll(proposal.getQualityModifiers());
+		if (proposal.getNegatedQualityParent() != null) {
+			terms.add(proposal.getNegatedQualityParent());
+		}
+		final Set<LinkedObject> ancestors = new HashSet<LinkedObject>();
+		boolean first = true;
+		for (LinkedObject term : terms) {
+			if (first) {
+				ancestors.addAll(TermUtil.getAncestors(term, null));
+			} else {
+				ancestors.retainAll(TermUtil.getAncestors(term, null));
 			}
 		}
+		terms.addAll(ancestors);
+		return terms;
 	}
 
 	private void createAndAddPhenotype() {

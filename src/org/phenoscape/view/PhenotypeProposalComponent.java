@@ -164,16 +164,11 @@ public class PhenotypeProposalComponent extends PhenoscapeGUIComponent {
 		if (proposal.getNegatedQualityParent() != null) {
 			terms.add(proposal.getNegatedQualityParent());
 		}
-		final Set<LinkedObject> ancestors = new HashSet<LinkedObject>();
-		boolean first = true;
+		final Set<LinkedObject> parents = new HashSet<LinkedObject>();
 		for (LinkedObject term : terms) {
-			if (first) {
-				ancestors.addAll(TermUtil.getAncestors(term, null));
-			} else {
-				ancestors.retainAll(TermUtil.getAncestors(term, null));
-			}
+			parents.addAll(TermUtil.getParents(term, false, null));
 		}
-		terms.addAll(ancestors);
+		terms.addAll(parents);
 		return terms;
 	}
 

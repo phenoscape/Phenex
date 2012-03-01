@@ -50,6 +50,7 @@ import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
 import org.phenoscape.io.NeXMLReader;
 import org.phenoscape.io.NeXMLWriter;
+import org.phenoscape.io.PhenotypeProposalsLoader;
 import org.phenoscape.io.TabDelimitedWriter;
 import org.phenoscape.io.TaxonTabReader;
 import org.phenoscape.io.nexml_1_0.NeXMLReader_1_0;
@@ -361,6 +362,24 @@ public class PhenexController extends DocumentController {
             final File file = fileChooser.getSelectedFile();
             this.writeForExcel(file);
         }
+    }
+    
+    public void openImportPhenotypeProposals() {
+        final JFileChooser fileChooser = this.createFileChooser();
+        final int result = fileChooser.showOpenDialog(GUIManager.getManager().getFrame());
+        if (result == JFileChooser.APPROVE_OPTION) {
+            final File file = fileChooser.getSelectedFile();
+            this.importPhenotypeProposals(file);
+        }
+    }
+    
+    private void importPhenotypeProposals(File file) {
+    	final PhenotypeProposalsLoader loader = new PhenotypeProposalsLoader(this.getDataSet(), this.getOntologyController().getOBOSession());
+    	try {
+			loader.loadProposals(file);
+		} catch (IOException e) {
+			log().error("Failed to load phenotype proposals file: " + file, e);
+		}
     }
 
     @Override

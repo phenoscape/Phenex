@@ -102,5 +102,6 @@
 	<classpathentry kind="lib" path="lib/nexmlbeans2009.jar"/>
 	<classpathentry kind="lib" path="lib/BrowserLauncher2-10rc4.jar"/>
 	<classpathentry kind="lib" path="lib/jpathwatch-0-94.jar"/>
+	<classpathentry kind="lib" path="lib/commons-csv-20070730.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

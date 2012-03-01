@@ -413,8 +413,4 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
 
     }
 
-    private Logger log() {
-        return Logger.getLogger(this.getClass());
-    }
-
 }

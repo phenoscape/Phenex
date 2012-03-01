@@ -72,10 +72,16 @@ public class MenuFactory {
         //        final Action mergeNeXMLAction = new AbstractAction("NeXML Data...") {
         //            public void actionPerformed(ActionEvent e) { controller.openMergeNeXML(); }
         //        };
+        final Action importPhenotypeProposals = new AbstractAction("Phenotype proposals...") {
+            @Override
+			public void actionPerformed(ActionEvent e) { controller.openImportPhenotypeProposals(); }
+        };
+        
         final JMenu mergeMenu = new JMenu("Import");
         //        mergeMenu.add(new JMenuItem(mergeTaxaAction));
         //        mergeMenu.add(new JMenuItem(mergeCharactersAction));
         mergeMenu.add(new JMenuItem(mergeNEXUSAction));
+        mergeMenu.add(new JMenuItem(importPhenotypeProposals));
         //        mergeMenu.add(new JMenuItem(mergeNeXMLAction));
         menu.add(mergeMenu);
         menu.addSeparator();

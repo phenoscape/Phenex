@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
+import org.apache.commons.lang.StringUtils;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.Phenotype;
@@ -21,27 +22,50 @@ public class BioCreativeTabFormat {
 
 	public void write(File file) throws IOException {
 		final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+		writer.write("CharacterID\t");
+		writer.write("StateID\t");
+		writer.write("CharacterLabel\t");
+		writer.write("StateLabel\t");
+		writer.write("EntityLabel\t");
+		writer.write("EntityID\t");
+		writer.write("QualityLabel\t");
+		writer.write("QualityID\t");
+		writer.write("RelatedEntityLabel\t");
+		writer.write("RelatedEntityID\t");
+		writer.write("\n");
 		for (Character character : data.getCharacters()) {
 			for (State state : character.getStates()) {
 				for (Phenotype phenotype : state.getPhenotypes()) {
-					writer.write(character.getNexmlID());
+					writer.write(StringUtils.trimToEmpty(character.getNexmlID()));
 					writer.write("\t");
-					writer.write(state.getNexmlID());
+					writer.write(StringUtils.trimToEmpty(state.getNexmlID()));
 					writer.write("\t");
-					writer.write(character.getLabel());
+					writer.write(StringUtils.trimToEmpty(character.getLabel()));
 					writer.write("\t");
-					writer.write(state.getLabel());
+					writer.write(StringUtils.trimToEmpty(state.getLabel()));
 					writer.write("\t");
 					if (phenotype.getEntity() != null) {
-						writer.write(phenotype.getEntity().getID());
+						writer.write(StringUtils.trimToEmpty(phenotype.getEntity().getName()));
+					}
+					writer.write("\t");
+					if (phenotype.getEntity() != null) {
+						writer.write(StringUtils.trimToEmpty(phenotype.getEntity().getID()));
 					}
 					writer.write("\t");
 					if (phenotype.getQuality() != null) {
-						writer.write(phenotype.getQuality().getID());
+						writer.write(StringUtils.trimToEmpty(phenotype.getQuality().getName()));
+					}
+					writer.write("\t");
+					if (phenotype.getQuality() != null) {
+						writer.write(StringUtils.trimToEmpty(phenotype.getQuality().getID()));
 					}
 					writer.write("\t");
 					if (phenotype.getRelatedEntity() != null) {
-						writer.write(phenotype.getRelatedEntity().getID());
+						writer.write(StringUtils.trimToEmpty(phenotype.getRelatedEntity().getName()));
+					}
+					writer.write("\t");
+					if (phenotype.getRelatedEntity() != null) {
+						writer.write(StringUtils.trimToEmpty(phenotype.getRelatedEntity().getID()));
 					}
 					writer.write("\n");
 				}

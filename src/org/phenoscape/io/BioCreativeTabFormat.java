@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.Phenotype;
@@ -71,6 +72,12 @@ public class BioCreativeTabFormat {
 				}
 			}
 		}
+		writer.close();
+	}
+	
+	@SuppressWarnings("unused")
+	private Logger log() {
+		return Logger.getLogger(this.getClass());
 	}
 
 }

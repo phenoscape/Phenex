@@ -36,7 +36,7 @@ public class BioCreativeTabFormat {
 		writer.write("\n");
 		for (Character character : data.getCharacters()) {
 			for (State state : character.getStates()) {
-				for (Phenotype phenotype : state.getPhenotypes()) {
+				if (state.getPhenotypes().isEmpty()) {
 					writer.write(StringUtils.trimToEmpty(character.getNexmlID()));
 					writer.write("\t");
 					writer.write(StringUtils.trimToEmpty(state.getNexmlID()));
@@ -45,30 +45,47 @@ public class BioCreativeTabFormat {
 					writer.write("\t");
 					writer.write(StringUtils.trimToEmpty(state.getLabel()));
 					writer.write("\t");
-					if (phenotype.getEntity() != null) {
-						writer.write(StringUtils.trimToEmpty(phenotype.getEntity().getName()));
-					}
 					writer.write("\t");
-					if (phenotype.getEntity() != null) {
-						writer.write(StringUtils.trimToEmpty(phenotype.getEntity().getID()));
-					}
 					writer.write("\t");
-					if (phenotype.getQuality() != null) {
-						writer.write(StringUtils.trimToEmpty(phenotype.getQuality().getName()));
-					}
 					writer.write("\t");
-					if (phenotype.getQuality() != null) {
-						writer.write(StringUtils.trimToEmpty(phenotype.getQuality().getID()));
-					}
 					writer.write("\t");
-					if (phenotype.getRelatedEntity() != null) {
-						writer.write(StringUtils.trimToEmpty(phenotype.getRelatedEntity().getName()));
-					}
 					writer.write("\t");
-					if (phenotype.getRelatedEntity() != null) {
-						writer.write(StringUtils.trimToEmpty(phenotype.getRelatedEntity().getID()));
-					}
 					writer.write("\n");
+				} else {
+					for (Phenotype phenotype : state.getPhenotypes()) {
+						writer.write(StringUtils.trimToEmpty(character.getNexmlID()));
+						writer.write("\t");
+						writer.write(StringUtils.trimToEmpty(state.getNexmlID()));
+						writer.write("\t");
+						writer.write(StringUtils.trimToEmpty(character.getLabel()));
+						writer.write("\t");
+						writer.write(StringUtils.trimToEmpty(state.getLabel()));
+						writer.write("\t");
+						if (phenotype.getEntity() != null) {
+							writer.write(StringUtils.trimToEmpty(phenotype.getEntity().getName()));
+						}
+						writer.write("\t");
+						if (phenotype.getEntity() != null) {
+							writer.write(StringUtils.trimToEmpty(phenotype.getEntity().getID()));
+						}
+						writer.write("\t");
+						if (phenotype.getQuality() != null) {
+							writer.write(StringUtils.trimToEmpty(phenotype.getQuality().getName()));
+						}
+						writer.write("\t");
+						if (phenotype.getQuality() != null) {
+							writer.write(StringUtils.trimToEmpty(phenotype.getQuality().getID()));
+						}
+						writer.write("\t");
+						if (phenotype.getRelatedEntity() != null) {
+							writer.write(StringUtils.trimToEmpty(phenotype.getRelatedEntity().getName()));
+						}
+						writer.write("\t");
+						if (phenotype.getRelatedEntity() != null) {
+							writer.write(StringUtils.trimToEmpty(phenotype.getRelatedEntity().getID()));
+						}
+						writer.write("\n");
+					}
 				}
 			}
 		}

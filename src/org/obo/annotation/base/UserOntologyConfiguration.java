@@ -22,8 +22,9 @@ public class UserOntologyConfiguration implements OntologyConfiguration {
     private static final List<OntologySource> defaultSources = new ArrayList<OntologySource>();
     static {
         try {
-            defaultSources.add(new OntologySource("Teleost Anatomy", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/anatomy/gross_anatomy/animal_gross_anatomy/fish/teleost_anatomy.obo")));
+            defaultSources.add(new OntologySource("Teleost Anatomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/teleost_anatomy_VAO.obo")));
             defaultSources.add(new OntologySource("Teleost Taxonomy", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/taxonomy/teleost_taxonomy.obo")));
+            defaultSources.add(new OntologySource("Vertebrate Taxonomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/vertebrate_taxonomy.obo")));
             defaultSources.add(new OntologySource("Museum Collections", new URL("http://phenoscape.svn.sourceforge.net/viewvc/*checkout*/phenoscape/trunk/vocab/fish_collection_abbreviation.obo")));
             defaultSources.add(new OntologySource("PATO Qualities", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo")));
             defaultSources.add(new OntologySource("Spatial Ontology", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/anatomy/caro/spatial.obo")));
@@ -32,6 +33,8 @@ public class UserOntologyConfiguration implements OntologyConfiguration {
             defaultSources.add(new OntologySource("OBO Relations (proposed)", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro_proposed.obo")));
             defaultSources.add(new OntologySource("Gene Ontology", new URL("http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo")));
             defaultSources.add(new OntologySource("PATO Character slim", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/character_slims.obo")));
+            defaultSources.add(new OntologySource("Amniote Anatomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/amniote_chicagoedit.obo?revision=3433")));
+            defaultSources.add(new OntologySource("Vertebrate Anatomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/skeletal/obo/vertebrate_anatomy.obo?revision=3395")));
         } catch (MalformedURLException e) {
             log().error("One of the default URLs is malformed", e);
         }

@@ -9,6 +9,7 @@ import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
@@ -16,6 +17,7 @@ import javax.swing.KeyStroke;
 import org.apache.log4j.Logger;
 import org.bbop.framework.GUIManager;
 import org.bbop.framework.ViewMenu;
+import org.obo.app.controller.DocumentController.AutosaveChangeListener;
 import org.obo.app.swing.ResponderChainAction;
 import org.obo.app.util.CrossPlatform;
 import org.phenoscape.controller.PhenexController;
@@ -52,39 +54,65 @@ public class MenuFactory {
     private JMenuItem createFileMenu() {
         final JMenu menu = new JMenu("File");
         final Action openAction = new AbstractAction("Open...") {
-            public void actionPerformed(ActionEvent e) { controller.open(); }
+            @Override
+			public void actionPerformed(ActionEvent e) { controller.open(); }
         };
         openAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menu.add(new JMenuItem(openAction));
         final Action mergeNEXUSAction = new AbstractAction("NEXUS...") {
             //TODO use import methods instead
-            public void actionPerformed(ActionEvent e) { controller.openMergeNEXUS(); }
+            @Override
+			public void actionPerformed(ActionEvent e) { controller.openMergeNEXUS(); }
         };
-        final JMenu mergeMenu = new JMenu("Import");
+        final Action importPhenotypeProposals = new AbstractAction("Phenotype proposals...") {
+            @Override
+			public void actionPerformed(ActionEvent e) { controller.openImportPhenotypeProposals(); }
+        };
+                final JMenu mergeMenu = new JMenu("Import");
         mergeMenu.add(new JMenuItem(mergeNEXUSAction));
+        mergeMenu.add(new JMenuItem(importPhenotypeProposals));
         menu.add(mergeMenu);
         menu.addSeparator();
         final Action saveAction = new AbstractAction("Save") {
-            public void actionPerformed(ActionEvent e) { controller.save(); }
+            @Override
+			public void actionPerformed(ActionEvent e) { controller.save(); }
         };
         saveAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menu.add(new JMenuItem(saveAction));
         final Action saveAsAction = new AbstractAction("Save As...") {
-            public void actionPerformed(ActionEvent e) { controller.saveAs(); }
+            @Override
+			public void actionPerformed(ActionEvent e) { controller.saveAs(); }
         };
         saveAsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK));
         menu.add(new JMenuItem(saveAsAction));
         final Action exportExcelAction = new AbstractAction("Export for Excel...") {
-            public void actionPerformed(ActionEvent e) { controller.exportToExcel(); }
+            @Override
+			public void actionPerformed(ActionEvent e) { controller.exportToExcel(); }
         };
         menu.add(new JMenuItem(exportExcelAction));
         if (CrossPlatform.shouldPutExitInFileMenu()) {
             menu.addSeparator();
             final Action exitAction = new AbstractAction("Exit") {
-                public void actionPerformed(ActionEvent e) { GUIManager.exit(0); }
+                @Override
+				public void actionPerformed(ActionEvent e) { GUIManager.exit(0); }
             };
             menu.add(new JMenuItem(exitAction));
         }
+        menu.addSeparator();
+        final Action enableAutosaveAction = new AbstractAction("Enable Autosave") {
+          @Override
+		public void actionPerformed(ActionEvent e) { controller.toggleAutosave(); }  
+          
+        };
+        final JCheckBoxMenuItem autosave = new JCheckBoxMenuItem(enableAutosaveAction);
+        autosave.setSelected(controller.getShouldAutosave());
+        controller.addAutosaveChangeListener(new AutosaveChangeListener() {
+			@Override
+			public void autosaveSettingChanged(boolean shouldAutosave) {
+				autosave.setSelected(shouldAutosave);
+			}
+		});
+        menu.add(autosave);
         return menu;
     }
 
@@ -124,7 +152,8 @@ public class MenuFactory {
     private JMenuItem createHelpMenu() {
         final JMenu menu = new JMenu("Help");
         final Action homepageAction = new AbstractAction("Phenex Homepage") {
-            public void actionPerformed(ActionEvent e) {
+            @Override
+			public void actionPerformed(ActionEvent e) {
                 try {
                     (new BrowserLauncher(null)).openURLinBrowser("http://www.phenoscape.org/wiki/Phenex");
                 } catch (BrowserLaunchingInitializingException e1) {
@@ -138,7 +167,8 @@ public class MenuFactory {
             }
         };
         final Action trackerAction = new AbstractAction("Submit Bug Report or Feature Request...") {
-            public void actionPerformed(ActionEvent e) {
+            @Override
+			public void actionPerformed(ActionEvent e) {
                 try {
                     (new BrowserLauncher(null)).openURLinBrowser("https://sourceforge.net/tracker/?func=add&group_id=76834&atid=1116214");
                 } catch (BrowserLaunchingInitializingException e1) {

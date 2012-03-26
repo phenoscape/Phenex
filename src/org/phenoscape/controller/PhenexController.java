@@ -2,6 +2,9 @@ package org.phenoscape.controller;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,20 +12,32 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
+import name.pachler.nio.file.ClosedWatchServiceException;
+import name.pachler.nio.file.FileSystems;
+import name.pachler.nio.file.Path;
+import name.pachler.nio.file.Paths;
+import name.pachler.nio.file.StandardWatchEventKind;
+import name.pachler.nio.file.WatchEvent;
+import name.pachler.nio.file.WatchKey;
+import name.pachler.nio.file.WatchService;
+
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.bbop.framework.GUIManager;
 import org.biojava.bio.seq.io.ParseException;
+import org.jdesktop.swingworker.SwingWorker;
 import org.nexml.schema_2009.NexmlDocument;
 import org.obo.annotation.view.DefaultOntologyCoordinator;
 import org.obo.annotation.view.OntologyCoordinator;
@@ -35,6 +50,7 @@ import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NEXUSReader;
 import org.phenoscape.io.NeXMLReader;
 import org.phenoscape.io.NeXMLWriter;
+import org.phenoscape.io.PhenotypeProposalsLoader;
 import org.phenoscape.io.TabDelimitedWriter;
 import org.phenoscape.io.TaxonTabReader;
 import org.phenoscape.io.nexml_1_0.NeXMLReader_1_0;
@@ -72,6 +88,7 @@ public class PhenexController extends DocumentController {
     private final List<NewDataListener> newDataListeners = new ArrayList<NewDataListener>();
     private final UndoObserver undoObserver;
     private final SelectionManager phenoteSelectionManager;
+    private SwingWorker<WatchEvent<?>, Void> fileMonitor;
 
     public PhenexController(OntologyController ontologyController) {
         super();
@@ -87,6 +104,7 @@ public class PhenexController extends DocumentController {
         this.taxaSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         this.currentSpecimens = new SortedList<Specimen>(new CollectionList<Taxon, Specimen>(this.taxaSelectionModel.getSelected(),
                 new CollectionList.Model<Taxon, Specimen>(){
+            @Override
             public List<Specimen> getChildren(Taxon parent) {
                 return parent.getSpecimens();
             }
@@ -96,6 +114,7 @@ public class PhenexController extends DocumentController {
         new ListSelectionMaintainer<Specimen>(this.currentSpecimens, this.currentSpecimensSelectionModel);
         this.currentStates = new SortedList<State>(new CollectionList<Character, State>(this.charactersSelectionModel.getSelected(),
                 new CollectionList.Model<Character, State>() {
+            @Override
             public List<State> getChildren(Character parent) {
                 return parent.getStates();
             }
@@ -106,6 +125,7 @@ public class PhenexController extends DocumentController {
         this.currentStatesSelectionModel.setSelectionMode(EventSelectionModel.SINGLE_SELECTION);
         this.currentPhenotypes = new SortedList<Phenotype>(new CollectionList<State, Phenotype>(this.currentStatesSelectionModel.getSelected(),
                 new CollectionList.Model<State, Phenotype>() {
+            @Override
             public List<Phenotype> getChildren(State parent) {
                 return parent.getPhenotypes();
             }
@@ -242,7 +262,9 @@ public class PhenexController extends DocumentController {
         final NeXMLWriter writer = new NeXMLWriter(this.charactersBlockID, this.xmlDoc);
         writer.setDataSet(this.dataSet);
         writer.setGenerator(this.getAppName() + " " + this.getAppVersion());
+        this.monitorFileForChanges(null);
         writer.write(aFile);
+        this.monitorFileForChanges(this.getCurrentFile());
     }
 
     public void openMergeTaxa() {
@@ -281,6 +303,58 @@ public class PhenexController extends DocumentController {
         }
     }
 
+    public void openMergeModifiedFile() {
+        log().debug("Data has changed - ask the user if we should merge.");
+        if (this.getUndoController().hasUnsavedChanges()) {
+            final int result = JOptionPane.showOptionDialog(this.getWindow(), String.format("The file for the document at %s has been modified by another application. Do you want to discard your unsaved changes and replace with the newly edited version, or instead save your copy to another file?", this.getCurrentFile()), "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"Replace with new data", "Save as a copy of this version"}, "Replace with new data");
+            if (result == JOptionPane.OK_OPTION) {
+                this.loadModifiedFile();
+            } else {
+                this.saveAs(); //TODO if cancel this need to go back to previous dialog
+            }
+        } else {
+            final JDialog dialog = new JDialog(this.getWindow(), false);
+            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            dialog.setResizable(false);
+            dialog.setLayout(new GridBagLayout());
+            // surrounding with html tags makes the JLabel wrap its text
+            final JLabel label = new JLabel("<HTML>" + String.format("The file for the document at %s has been modified by another application.", this.getCurrentFile()) + "</HTML>");
+            final GridBagConstraints labelConstraints = new GridBagConstraints();
+            labelConstraints.insets = new Insets(11, 11, 11, 11);
+            labelConstraints.fill = GridBagConstraints.BOTH;
+            labelConstraints.weightx = 1.0;
+            labelConstraints.weighty = 1.0;
+            dialog.add(label, labelConstraints);
+            final GridBagConstraints progressConstraints = new GridBagConstraints();
+            progressConstraints.gridy = 1;
+            progressConstraints.fill = GridBagConstraints.HORIZONTAL;
+            progressConstraints.insets = new Insets(11, 11, 11, 11);
+            final JProgressBar progress = new JProgressBar();
+            progress.setIndeterminate(true);
+            dialog.add(progress, progressConstraints);
+            dialog.setTitle("Reloading modified file...");
+            dialog.setSize(400, 150);
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+            this.loadModifiedFile();
+            dialog.setVisible(false);
+        }
+        this.monitorFileForChanges(this.getCurrentFile());
+    }
+    
+    private void loadModifiedFile() {
+        try {
+            this.getUndoController().beginIgnoringEdits();
+            this.readData(this.getCurrentFile());
+            this.getUndoController().discardAllEdits();
+            this.getUndoController().markChangesSaved();
+        } catch (IOException e) {
+            log().error("Failed to read file", e);
+        } finally {
+        	this.getUndoController().endIgnoringEdits();
+        }
+    }
+
     public void exportToExcel() {
         final JFileChooser fileChooser = this.createFileChooser();
         final int result = fileChooser.showSaveDialog(GUIManager.getManager().getFrame());
@@ -288,6 +362,24 @@ public class PhenexController extends DocumentController {
             final File file = fileChooser.getSelectedFile();
             this.writeForExcel(file);
         }
+    }
+    
+    public void openImportPhenotypeProposals() {
+        final JFileChooser fileChooser = this.createFileChooser();
+        final int result = fileChooser.showOpenDialog(GUIManager.getManager().getFrame());
+        if (result == JFileChooser.APPROVE_OPTION) {
+            final File file = fileChooser.getSelectedFile();
+            this.importPhenotypeProposals(file);
+        }
+    }
+    
+    private void importPhenotypeProposals(File file) {
+    	final PhenotypeProposalsLoader loader = new PhenotypeProposalsLoader(this.getDataSet(), this.getOntologyController().getOBOSession());
+    	try {
+			loader.loadProposals(file);
+		} catch (IOException e) {
+			log().error("Failed to load phenotype proposals file: " + file, e);
+		}
     }
 
     @Override
@@ -406,14 +498,17 @@ public class PhenexController extends DocumentController {
         final List<String> ids = new ArrayList<String>(secondaryIDs);
         final TableModel model = new AbstractTableModel() {
 
+            @Override
             public int getColumnCount() {
                 return 1;
             }
 
+            @Override
             public int getRowCount() {
                 return ids.size();
             }
 
+            @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
                 return ids.get(rowIndex);
             }
@@ -429,6 +524,72 @@ public class PhenexController extends DocumentController {
         panel.add(new JScrollPane(new JTable(model)), BorderLayout.CENTER);
         final int result = JOptionPane.showOptionDialog(null, panel, "Secondary Identifiers", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         return result == JOptionPane.YES_OPTION;
+    }
+
+    private void monitorFileForChanges(final File aFile) {
+        if (this.fileMonitor != null) {
+            this.fileMonitor.cancel(true);
+        }
+        if (aFile == null) {
+            return;
+        }
+        final Path watchedPath = Paths.get(aFile.getParentFile().getAbsolutePath());
+        this.fileMonitor = new SwingWorker<WatchEvent<?>, Void>() {
+            @Override
+            protected WatchEvent<?> doInBackground() {
+                try {
+                    final WatchService watchService = FileSystems.getDefault().newWatchService();
+                    watchedPath.register(watchService, StandardWatchEventKind.ENTRY_MODIFY);
+                    while (!this.isCancelled()) {
+                        // take() will block until a file has been modified
+                        final WatchKey signalledKey = watchService.take();
+                        log().debug("Take returned - got an event.");
+                        // get list of events from key
+                        final List<WatchEvent<?>> events = signalledKey.pollEvents();
+                        // VERY IMPORTANT! call reset() AFTER pollEvents() to allow the
+                        // key to be reported again by the watch service
+                        signalledKey.reset();
+                        for (WatchEvent<?> event : events) {
+                            log().debug("Event: " + event);
+                            if (event.kind().equals(StandardWatchEventKind.ENTRY_MODIFY)) {
+                                final Path modifiedPath = (Path)(event.context());
+                                log().debug("Modified path: " + event.context());
+                                final File modifiedFile = new File(modifiedPath.toString());
+                                log().debug("Modified file: " + modifiedFile);
+                                if (modifiedPath.toString().equals(aFile.getName())) {
+                                    return event;
+                                }
+                            }
+                        }
+                    }
+                } catch (ClosedWatchServiceException e) {
+                    log().error("Can't monitor file, watch service closed.", e);
+                } catch (IOException e) {
+                    log().error("Can't monitor file.", e);
+                } catch (InterruptedException e) {
+                    log().error("Watch service interrupted.");
+                } 
+                return null;
+            }
+            /* (non-Javadoc)
+             * This method runs on the Event Dispatch Thread
+             */
+            @Override
+            protected void done() {
+                super.done();
+                if (!this.isCancelled()) {
+                    openMergeModifiedFile();                    
+                }
+            }
+
+        };
+        this.fileMonitor.execute();
+    }
+
+    @Override
+    public void setCurrentFile(final File aFile) {
+        super.setCurrentFile(aFile);
+        this.monitorFileForChanges(aFile);
     }
 
     private Logger log() {

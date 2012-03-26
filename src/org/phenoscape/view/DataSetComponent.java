@@ -141,9 +141,4 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
     
   }
   
-  @SuppressWarnings("unused")
-  private Logger log() {
-    return Logger.getLogger(this.getClass());
-  }
-  
 }

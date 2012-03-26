@@ -2,3 +2,5 @@
 /Ontology Cache
 /OBO-Edit.vmoptions
 /phenex.jar
+/dist
+.DS_Store

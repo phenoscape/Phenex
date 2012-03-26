@@ -62,6 +62,7 @@ import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 import org.phenoscape.model.UndoObserver;
+import org.phenoscape.orb.NewTermRequestPanel;
 import org.phenoscape.util.DataMerger;
 
 import ca.odell.glazedlists.CollectionList;
@@ -422,7 +423,11 @@ public class PhenexController extends DocumentController {
     }
     
     public void runORBTermRequest() {
-        
+       final NewTermRequestPanel panel = new NewTermRequestPanel(this.getOntologyCoordinator());
+       panel.init();
+       final JDialog dialog = new JDialog(this.getWindow());
+       dialog.add(panel);
+       dialog.setVisible(true);
     }
 
     private void fireDataChanged() {

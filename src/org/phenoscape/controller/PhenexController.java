@@ -63,6 +63,7 @@ import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 import org.phenoscape.model.UndoObserver;
 import org.phenoscape.orb.NewTermRequestPanel;
+import org.phenoscape.orb.ORBController;
 import org.phenoscape.util.DataMerger;
 
 import ca.odell.glazedlists.CollectionList;
@@ -72,6 +73,7 @@ import ca.odell.glazedlists.swing.EventSelectionModel;
 public class PhenexController extends DocumentController {
 
     private final OntologyController ontologyController;
+    private final ORBController orbController;
     private final DataSet dataSet = new DataSet();
     private final SortedList<Character> sortedCharacters;
     private final EventSelectionModel<Character> charactersSelectionModel;
@@ -95,6 +97,7 @@ public class PhenexController extends DocumentController {
         super();
         this.phenoteSelectionManager = new org.obo.annotation.view.SelectionManager();
         this.ontologyController = ontologyController;
+        this.orbController = new ORBController(this.getOntologyCoordinator());
         this.sortedCharacters = new SortedList<Character>(this.dataSet.getCharacters(), new EverythingEqualComparator<Character>());
         this.charactersSelectionModel = new EventSelectionModel<Character>(this.sortedCharacters);
         new ListSelectionMaintainer<Character>(this.sortedCharacters, this.charactersSelectionModel);
@@ -423,11 +426,12 @@ public class PhenexController extends DocumentController {
     }
     
     public void runORBTermRequest() {
-       final NewTermRequestPanel panel = new NewTermRequestPanel(this.getOntologyCoordinator());
-       panel.init();
-       final JDialog dialog = new JDialog(this.getWindow());
-       dialog.add(panel);
-       dialog.setVisible(true);
+    	this.orbController.runORBTermRequest();
+//       final NewTermRequestPanel panel = new NewTermRequestPanel(this.getOntologyCoordinator());
+//       panel.init();
+//       panel.setSize(400, 250);
+//       final int result = JOptionPane.showConfirmDialog(this.getWindow(), panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
     }
 
     private void fireDataChanged() {

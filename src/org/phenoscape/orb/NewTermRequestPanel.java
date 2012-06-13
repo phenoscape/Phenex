@@ -7,25 +7,26 @@ import java.util.Collection;
 import java.util.Comparator;
 
 import javax.swing.AbstractAction;
+import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
-import org.obo.annotation.base.OBOUtil.Differentium;
 import org.obo.annotation.view.OntologyCoordinator;
 import org.obo.annotation.view.TermAutocompleteFieldFactory;
 import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.AutocompleteField;
 import org.obo.app.swing.BugWorkaroundTable;
+import org.obo.app.swing.TabActionTextField;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
-import org.obo.datamodel.OBOProperty;
 import org.obo.util.TermUtil;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -37,166 +38,204 @@ import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 
 public class NewTermRequestPanel extends AbstractGUIComponent {
-    
-    private AutocompleteField<OBOObject> parentBox;
-    private EventList<Differentium> links = new BasicEventList<Differentium>();
-    private EventSelectionModel<Differentium> selectionModel = new EventSelectionModel<Differentium>(links);
-    private LinksTableFormat tableFormat;
-    private JTable linksTable;
-    private JButton addLinkButton;
-    private JButton deleteLinkButton;
-    private final OntologyCoordinator ontologyCoordinator;
-    private final ORBTerm orbTerm = new ORBTerm();
 
-    public NewTermRequestPanel(String id, OntologyCoordinator coordinator) {
-        super(id);
-        this.ontologyCoordinator = coordinator;
-    }
-    
-    public NewTermRequestPanel(OntologyCoordinator coordinator) {
-        this("", coordinator);
-    }
+	private JTextField preferredLabelField;
+	private AutocompleteField<OBOObject> parentBox;
+	private EventList<Synonym> synonyms = new BasicEventList<Synonym>();
+	private EventSelectionModel<Synonym> selectionModel = new EventSelectionModel<Synonym>(synonyms);
+	{
+		selectionModel.setSelectionMode(EventSelectionModel.SINGLE_SELECTION);
+	}
+	private SynonymsTableFormat tableFormat;
+	private JTable synonymsTable;
+	private JButton addLinkButton;
+	private JButton deleteLinkButton;
+	private final OntologyCoordinator ontologyCoordinator;
+	private final ORBTerm orbTerm = new ORBTerm();
 
-    @Override
-    public void init() {
-        super.init();
-        this.initializeInterface();    
-    }
-    
-    public ORBTerm getTerm() {
-        return this.orbTerm;
-    }
-    
-    public void addLink() {
-        this.links.add(new Differentium());
-    }
+	public NewTermRequestPanel(String id, OntologyCoordinator coordinator) {
+		super(id);
+		this.ontologyCoordinator = coordinator;
+	}
 
-    public void deleteSelectedLink() {
-        this.selectionModel.getSelected().clear();
-    }
-    
-    private void updateParent() {
-        this.orbTerm.setParent((OBOClass)(this.parentBox.getValue()));
-    }
+	public NewTermRequestPanel(OntologyCoordinator coordinator) {
+		this("", coordinator);
+	}
 
-    private void initializeInterface() {
-        this.setLayout(new GridBagLayout());
-        final GridBagConstraints labelConstraints = new GridBagConstraints();
-        this.add(new JLabel("Parent:"), labelConstraints);
-        final GridBagConstraints comboConstraints = new GridBagConstraints();
-        comboConstraints.gridx = 1;
-        comboConstraints.fill = GridBagConstraints.HORIZONTAL;
-        comboConstraints.weightx = 1.0;
-        this.parentBox = TermAutocompleteFieldFactory.createAutocompleteBox(this.toOBOObjects(TermUtil.getTerms(this.ontologyCoordinator.getOBOSession())), this.ontologyCoordinator);
-        this.parentBox.setAction(new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                updateParent();
-            }
-        });
-        this.add(this.parentBox, comboConstraints);
-        final GridBagConstraints postComposeGenusConstraints = new GridBagConstraints();
-        postComposeGenusConstraints.gridx = 2;
-        this.tableFormat = new LinksTableFormat();
-        final EventTableModel<Differentium> model = new EventTableModel<Differentium>(this.links, this.tableFormat);
-        this.linksTable = new BugWorkaroundTable(model);
-        this.linksTable.setSelectionModel(this.selectionModel);
-        this.linksTable.setDefaultRenderer(OBOObject.class, new TermRenderer("None"));
-        this.linksTable.putClientProperty("Quaqua.Table.style", "striped");
-        this.linksTable.getColumnModel().getColumn(0).setCellEditor(this.tableFormat.getColumnEditor(0));
-        this.linksTable.getColumnModel().getColumn(1).setCellEditor(this.tableFormat.getColumnEditor(1));
-        final GridBagConstraints tableConstraints = new GridBagConstraints();
-        tableConstraints.gridy = 1;
-        tableConstraints.gridwidth = 3;
-        tableConstraints.fill = GridBagConstraints.BOTH;
-        tableConstraints.weighty = 1.0;
-        this.add(new JScrollPane(linksTable), tableConstraints);
-        final GridBagConstraints toolbarConstraints = new GridBagConstraints();
-        toolbarConstraints.gridy = 2;
-        toolbarConstraints.gridwidth = 2;
-        toolbarConstraints.fill = GridBagConstraints.HORIZONTAL;
-        toolbarConstraints.weightx = 1.0;
-        this.add(this.createToolBar(), toolbarConstraints);
-    }
-    
-    private JToolBar createToolBar() {
-        final JToolBar toolBar = new JToolBar();
-        this.addLinkButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
-            public void actionPerformed(ActionEvent e) {
-                addLink();
-            }
-        });
-        this.addLinkButton.setToolTipText("Add Differentia");
-        toolBar.add(this.addLinkButton);
-        this.deleteLinkButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
-            public void actionPerformed(ActionEvent e) {
-                deleteSelectedLink();
-            }
-        });
-        this.deleteLinkButton.setToolTipText("Delete Differentia");
-        toolBar.add(this.deleteLinkButton);
-        toolBar.setFloatable(false);
-        return toolBar;
-    }
-    
-    private class LinksTableFormat implements WritableTableFormat<Differentium>, AdvancedTableFormat<Differentium> {
+	@Override
+	public void init() {
+		super.init();
+		this.initializeInterface();    
+	}
 
-        public boolean isEditable(Differentium diff, int column) {
-            return true;
-        }
+	public ORBTerm getTerm() {
+		return this.orbTerm;
+	}
 
-        public TableCellEditor getColumnEditor(int column) {
-            switch (column) {
-            case 0: return TermAutocompleteFieldFactory.createAutocompleteEditor(toOBOObjects(TermUtil.getRelationshipTypes(ontologyCoordinator.getOBOSession())), ontologyCoordinator);
-            case 1: return TermAutocompleteFieldFactory.createAutocompleteEditor(toOBOObjects(TermUtil.getTerms(ontologyCoordinator.getOBOSession())), ontologyCoordinator);
-            default: return null;
-            }
-        }
+	public void addSynonym() {
+		final Synonym newSynonym = new Synonym();
+		this.synonyms.add(newSynonym);
+		final int index = this.synonyms.indexOf(newSynonym);
+		this.selectionModel.setSelectionInterval(index, index);
+	}
 
-        public Differentium setColumnValue(Differentium diff, Object editedValue, int column) {
-            switch(column) {
-            case 0: diff.setRelation((OBOProperty)editedValue); break;
-            case 1: diff.setTerm((OBOClass)editedValue); break;
-            }
-            return diff;
-        }
+	public void deleteSelectedLink() {
+		this.selectionModel.getSelected().clear();
+	}
+	
+	private void updateTermLabel() {
+		this.orbTerm.setLabel(this.preferredLabelField.getText());
+	}
 
-        public int getColumnCount() {
-            return 2;
-        }
+	private void updateParent() {
+		this.orbTerm.setParent((OBOClass)(this.parentBox.getValue()));
+	}
 
-        public String getColumnName(int column) {
-            switch(column) {
-            case 0: return "Relationship";
-            case 1: return "Target Term";
-            }
-            return null;
-        }
+	private void initializeInterface() {
+		this.setLayout(new GridBagLayout());
+		final GridBagConstraints constraints = new GridBagConstraints();
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		constraints.anchor = GridBagConstraints.EAST;
+		this.add(new JLabel("Preferred name:"), constraints);
+		constraints.gridx += 1;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.weightx = 1.0;
+		this.preferredLabelField = new TabActionTextField();
+		this.preferredLabelField.setAction(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateTermLabel();
+			}
+		});
+		this.add(preferredLabelField, constraints);
+		constraints.gridx = 0;
+		constraints.gridy += 1;
+		constraints.weightx = 0;
+		constraints.fill = GridBagConstraints.NONE;
+		this.add(new JLabel("Parent:"), constraints);
+		constraints.gridx += 1;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.weightx = 1.0;
+		this.parentBox = TermAutocompleteFieldFactory.createAutocompleteBox(this.toOBOObjects(TermUtil.getTerms(this.ontologyCoordinator.getOBOSession())), this.ontologyCoordinator);
+		this.parentBox.setAction(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateParent();
+			}
+		});
+		this.add(this.parentBox, constraints);
+		this.tableFormat = new SynonymsTableFormat();
+		final EventTableModel<Synonym> model = new EventTableModel<Synonym>(this.synonyms, this.tableFormat);
+		this.synonymsTable = new BugWorkaroundTable(model);
+		this.synonymsTable.setSelectionModel(this.selectionModel);
+		this.synonymsTable.setDefaultRenderer(OBOObject.class, new TermRenderer("None"));
+		this.synonymsTable.putClientProperty("Quaqua.Table.style", "striped");
+		constraints.gridy += 1;
+		constraints.gridwidth = 2;
+		constraints.fill = GridBagConstraints.BOTH;
+		constraints.weighty = 1.0;
+		this.add(new JScrollPane(synonymsTable), constraints);
+		constraints.gridy += 1;
+		constraints.gridwidth = 2;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.weightx = 1.0;
+		this.add(this.createToolBar(), constraints);
+	}
 
-        public Object getColumnValue(Differentium diff, int column) {
-            switch(column) {
-            case 0: return diff.getRelation();
-            case 1: return diff.getTerm();
-            }
-            return null;
-        }
+	private JToolBar createToolBar() {
+		final JToolBar toolBar = new JToolBar();
+		this.addLinkButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				addSynonym();
+			}
+		});
+		this.addLinkButton.setToolTipText("Add Differentia");
+		toolBar.add(this.addLinkButton);
+		this.deleteLinkButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteSelectedLink();
+			}
+		});
+		this.deleteLinkButton.setToolTipText("Delete Differentia");
+		toolBar.add(this.deleteLinkButton);
+		toolBar.setFloatable(false);
+		return toolBar;
+	}
 
-        public Class<?> getColumnClass(int column) {
-            return OBOObject.class;
-        }
+	private class SynonymsTableFormat implements WritableTableFormat<Synonym>, AdvancedTableFormat<Synonym> {
 
-        public Comparator<?> getColumnComparator(int column) {
-            return GlazedLists.comparableComparator();
-        }
+		public TableCellEditor getColumnEditor(int column) {
+			return new DefaultCellEditor(new JTextField());
+		}
+		
+		@Override
+		public boolean isEditable(Synonym synonym, int column) {
+			return true;
+		}
 
-    }
-    
-    @SuppressWarnings("unchecked")
-    private Collection<OBOObject> toOBOObjects(Collection<?> terms) {
-        return (Collection<OBOObject>)terms;
-    }
+		@Override
+		public Synonym setColumnValue(Synonym synonym, Object editedValue, int column) {
+			synonym.setLabel(editedValue.toString());
+			return synonym;
+		}
 
-    private Logger log() {
-        return Logger.getLogger(this.getClass());
-    }
+		@Override
+		public int getColumnCount() {
+			return 1;
+		}
+
+		@Override
+		public String getColumnName(int column) {
+			return "Synonym";
+		}
+
+		@Override
+		public Object getColumnValue(Synonym synonym, int column) {
+			return synonym.getLabel();
+		}
+
+		@Override
+		public Class<?> getColumnClass(int column) {
+			return String.class;
+		}
+
+		@Override
+		public Comparator<?> getColumnComparator(int column) {
+			return GlazedLists.comparableComparator();
+		}
+
+	}
+
+	@SuppressWarnings("unchecked")
+	private Collection<OBOObject> toOBOObjects(Collection<?> terms) {
+		return (Collection<OBOObject>)terms;
+	}
+
+	private class Synonym implements Comparable<Synonym> {
+
+		private String label;
+
+		public String getLabel() {
+			return this.label;
+		}
+
+		public void setLabel(String label) {
+			this.label = label;
+		}
+
+		@Override
+		public int compareTo(Synonym other) {
+			return this.getLabel().compareTo(other.getLabel());
+		}
+
+	}
+
+	@SuppressWarnings("unused")
+	private Logger log() {
+		return Logger.getLogger(this.getClass());
+	}
 
 }

@@ -81,7 +81,7 @@ public class TermSet {
         return this.cachedTerms;
     }
 
-    private void invalidateTerms() {
+    public void invalidateTerms() {
         this.cachedTerms = null;
     }
     

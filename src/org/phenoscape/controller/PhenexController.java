@@ -97,7 +97,7 @@ public class PhenexController extends DocumentController {
         super();
         this.phenoteSelectionManager = new org.obo.annotation.view.SelectionManager();
         this.ontologyController = ontologyController;
-        this.orbController = new ORBController(this.getOntologyCoordinator());
+        this.orbController = new ORBController(this);
         this.sortedCharacters = new SortedList<Character>(this.dataSet.getCharacters(), new EverythingEqualComparator<Character>());
         this.charactersSelectionModel = new EventSelectionModel<Character>(this.sortedCharacters);
         new ListSelectionMaintainer<Character>(this.sortedCharacters, this.charactersSelectionModel);

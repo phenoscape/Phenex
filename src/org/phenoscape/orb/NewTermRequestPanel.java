@@ -27,7 +27,7 @@ import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.TabActionTextField;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
-import org.obo.util.TermUtil;
+import org.phenoscape.controller.PhenexController;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -50,16 +50,16 @@ public class NewTermRequestPanel extends AbstractGUIComponent {
 	private JTable synonymsTable;
 	private JButton addLinkButton;
 	private JButton deleteLinkButton;
-	private final OntologyCoordinator ontologyCoordinator;
+	private final PhenexController controller;
 	private final ORBTerm orbTerm = new ORBTerm();
 
-	public NewTermRequestPanel(String id, OntologyCoordinator coordinator) {
+	public NewTermRequestPanel(String id, PhenexController controller) {
 		super(id);
-		this.ontologyCoordinator = coordinator;
+		this.controller = controller;
 	}
 
-	public NewTermRequestPanel(OntologyCoordinator coordinator) {
-		this("", coordinator);
+	public NewTermRequestPanel(PhenexController controller) {
+		this("", controller);
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class NewTermRequestPanel extends AbstractGUIComponent {
 		constraints.gridx += 1;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.weightx = 1.0;
-		this.parentBox = TermAutocompleteFieldFactory.createAutocompleteBox(this.toOBOObjects(TermUtil.getTerms(this.ontologyCoordinator.getOBOSession())), this.ontologyCoordinator);
+		this.parentBox = TermAutocompleteFieldFactory.createAutocompleteBox(this.controller.getOntologyController().getAllTermsSet(), this.controller.getOntologyCoordinator());
 		this.parentBox.setAction(new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

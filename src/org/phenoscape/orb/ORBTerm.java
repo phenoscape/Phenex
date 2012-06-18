@@ -11,7 +11,7 @@ public class ORBTerm extends AbstractPropertyChangeObject {
     
 	private String label;
     private OBOClass parent;
-    private String definition;
+    private String definition = "temporary definition";
     private final ObservableEventList<Differentium> links = new ObservableEventList<Differentium>(new BasicEventList<Differentium>());
 
     public String getLabel() {

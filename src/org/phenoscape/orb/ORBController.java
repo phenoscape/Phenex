@@ -10,6 +10,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -21,14 +22,12 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
-import org.obo.datamodel.Namespace;
 import org.obo.datamodel.OBOClass;
-import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
-import org.obo.datamodel.impl.OBOClassImpl;
-import org.obo.datamodel.impl.OBORestrictionImpl;
 import org.phenoscape.controller.PhenexController;
+import org.phenoscape.util.ProvisionalTermUtil;
 import org.xml.sax.SAXException;
 
 public class ORBController {
@@ -43,9 +42,9 @@ public class ORBController {
 	}
 
 	public void runORBTermRequest() {
-		final NewTermRequestPanel panel = new NewTermRequestPanel(this.controller);
+		final ProvisionalTermRequestPanel panel = new ProvisionalTermRequestPanel(this.controller);
 		panel.init();
-		panel.setSize(400, 250);
+		panel.setSize(400, 100);
 		final int result = JOptionPane.showConfirmDialog(null, panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 		if (result == JOptionPane.OK_OPTION) {
 			final ORBTerm requestedTerm = panel.getTerm();
@@ -81,17 +80,8 @@ public class ORBController {
 		final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 		final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 		final Document xmlDoc = new DOMBuilder().build(docBuilder.parse(response.getEntity().getContent()));
-		final String termID = xmlDoc.getRootElement().getChild("data").getChild("classBean").getChild("id").getValue();
-		final OBOClass newTerm = new OBOClassImpl(termID);
-		newTerm.setName(term.getLabel());
-		newTerm.setDefinition(term.getDefinition());
-		if (term.getParent() != null) {
-			newTerm.addParent(new OBORestrictionImpl(newTerm, term.getParent(), (OBOProperty)(session.getObject("OBO_REL:is_a"))));
-		}
-		if (session.getNamespace("bioportal_provisional") == null) {
-			session.addNamespace(new Namespace("bioportal_provisional"));
-		}
-		newTerm.setNamespace(session.getNamespace("bioportal_provisional"));
+		final Element newTermElement = xmlDoc.getRootElement().getChild("data").getChild("classBean");
+		final OBOClass newTerm = ProvisionalTermUtil.createClassForProvisionalTerm(newTermElement, session);
 		session.addObject(newTerm);
 		this.controller.getOntologyController().invalidateAllTermSets();
 		return newTerm;
@@ -102,6 +92,13 @@ public class ORBController {
 		values.add(new BasicNameValuePair("apikey", APIKEY));
 		values.add(new BasicNameValuePair("preferredname", term.getLabel()));
 		values.add(new BasicNameValuePair("definition", term.getDefinition()));
+		if (term.getParent() != null) {
+			final String parentURI = ProvisionalTermUtil.toURI(term.getParent().getID());
+			values.add(new BasicNameValuePair("superclass", parentURI));
+		}
+		if (!term.getSynonyms().isEmpty()) {
+			StringUtils.join(term.getSynonyms(), ",");
+		}
 		values.add(new BasicNameValuePair("submittedby", "39814"));
 		return new UrlEncodedFormEntity(values);
 	}

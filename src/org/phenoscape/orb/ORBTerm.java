@@ -1,20 +1,19 @@
 package org.phenoscape.orb;
 
-import org.obo.annotation.base.OBOUtil.Differentium;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.obo.app.model.AbstractPropertyChangeObject;
-import org.obo.app.model.ObservableEventList;
 import org.obo.datamodel.OBOClass;
 
-import ca.odell.glazedlists.BasicEventList;
-
 public class ORBTerm extends AbstractPropertyChangeObject {
-    
-	private String label;
-    private OBOClass parent;
-    private String definition = "temporary definition";
-    private final ObservableEventList<Differentium> links = new ObservableEventList<Differentium>(new BasicEventList<Differentium>());
 
-    public String getLabel() {
+	private String label;
+	private OBOClass parent;
+	private String definition;
+	private final List<Synonym> synonyms = new ArrayList<Synonym>();
+
+	public String getLabel() {
 		return label;
 	}
 
@@ -31,23 +30,47 @@ public class ORBTerm extends AbstractPropertyChangeObject {
 	}
 
 	public OBOClass getParent() {
-        return parent;
-    }
+		return parent;
+	}
 
-    public void setParent(OBOClass parent) {
-        this.parent = parent;
-    }
-    
-//    public void addLink(Differentium aLink) {
-//        this.links.add(aLink);
-//    }
-//
-//    public void removeLink(Differentium aLink) {
-//        this.links.remove(aLink);
-//    }
+	public void setParent(OBOClass parent) {
+		this.parent = parent;
+	}
 
-    public ObservableEventList<Differentium> getLinks() {
-        return this.links;
-    }
+	public void addSynonym(Synonym synonym) {
+		this.synonyms.add(synonym);
+	}
+
+	public void removeSynonym(Synonym synonym) {
+		this.synonyms.remove(synonym);
+	}
+
+	public List<Synonym> getSynonyms() {
+		return this.synonyms;
+	}
+
+	public static class Synonym implements Comparable<Synonym> {
+
+		private String label;
+
+		public String getLabel() {
+			return this.label;
+		}
+
+		public void setLabel(String label) {
+			this.label = label;
+		}
+
+		@Override
+		public int compareTo(Synonym other) {
+			return this.getLabel().compareTo(other.getLabel());
+		}
+		
+		@Override
+		public String toString() {
+			return this.label;
+		}
+
+	}
 
 }

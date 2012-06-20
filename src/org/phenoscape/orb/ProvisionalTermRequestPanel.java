@@ -1,25 +1,24 @@
 package org.phenoscape.orb;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.util.Collection;
 import java.util.Comparator;
 
 import javax.swing.AbstractAction;
-import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.table.TableCellEditor;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.bbop.framework.AbstractGUIComponent;
-import org.obo.annotation.view.OntologyCoordinator;
 import org.obo.annotation.view.TermAutocompleteFieldFactory;
 import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.AutocompleteField;
@@ -28,6 +27,7 @@ import org.obo.app.swing.TabActionTextField;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
 import org.phenoscape.controller.PhenexController;
+import org.phenoscape.orb.ORBTerm.Synonym;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -37,10 +37,11 @@ import ca.odell.glazedlists.gui.WritableTableFormat;
 import ca.odell.glazedlists.swing.EventSelectionModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 
-public class NewTermRequestPanel extends AbstractGUIComponent {
+public class ProvisionalTermRequestPanel extends AbstractGUIComponent {
 
 	private JTextField preferredLabelField;
 	private AutocompleteField<OBOObject> parentBox;
+	private JTextArea definitionField;
 	private EventList<Synonym> synonyms = new BasicEventList<Synonym>();
 	private EventSelectionModel<Synonym> selectionModel = new EventSelectionModel<Synonym>(synonyms);
 	{
@@ -48,17 +49,16 @@ public class NewTermRequestPanel extends AbstractGUIComponent {
 	}
 	private SynonymsTableFormat tableFormat;
 	private JTable synonymsTable;
-	private JButton addLinkButton;
-	private JButton deleteLinkButton;
+	private JButton addSynonymButton;
+	private JButton deleteSynonymButton;
 	private final PhenexController controller;
-	private final ORBTerm orbTerm = new ORBTerm();
 
-	public NewTermRequestPanel(String id, PhenexController controller) {
+	public ProvisionalTermRequestPanel(String id, PhenexController controller) {
 		super(id);
 		this.controller = controller;
 	}
 
-	public NewTermRequestPanel(PhenexController controller) {
+	public ProvisionalTermRequestPanel(PhenexController controller) {
 		this("", controller);
 	}
 
@@ -69,7 +69,17 @@ public class NewTermRequestPanel extends AbstractGUIComponent {
 	}
 
 	public ORBTerm getTerm() {
-		return this.orbTerm;
+		final ORBTerm term = new ORBTerm();
+		term.setLabel(StringUtils.stripToNull(this.preferredLabelField.getText()));
+		term.setParent((OBOClass)(this.parentBox.getValue()));
+		term.setDefinition(StringUtils.stripToNull(this.definitionField.getText()));
+		for (Synonym synonym : this.synonyms) {
+			final String text = StringUtils.stripToNull(synonym.getLabel());
+			if (text != null) {
+				term.addSynonym(synonym);
+			}
+		}
+		return term;
 	}
 
 	public void addSynonym() {
@@ -79,16 +89,8 @@ public class NewTermRequestPanel extends AbstractGUIComponent {
 		this.selectionModel.setSelectionInterval(index, index);
 	}
 
-	public void deleteSelectedLink() {
+	public void deleteSelectedSynonym() {
 		this.selectionModel.getSelected().clear();
-	}
-	
-	private void updateTermLabel() {
-		this.orbTerm.setLabel(this.preferredLabelField.getText());
-	}
-
-	private void updateParent() {
-		this.orbTerm.setParent((OBOClass)(this.parentBox.getValue()));
 	}
 
 	private void initializeInterface() {
@@ -105,7 +107,7 @@ public class NewTermRequestPanel extends AbstractGUIComponent {
 		this.preferredLabelField.setAction(new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				updateTermLabel();
+				//TODO enable/disable OK button?
 			}
 		});
 		this.add(preferredLabelField, constraints);
@@ -118,19 +120,27 @@ public class NewTermRequestPanel extends AbstractGUIComponent {
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.weightx = 1.0;
 		this.parentBox = TermAutocompleteFieldFactory.createAutocompleteBox(this.controller.getOntologyController().getAllTermsSet(), this.controller.getOntologyCoordinator());
-		this.parentBox.setAction(new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				updateParent();
-			}
-		});
 		this.add(this.parentBox, constraints);
+		this.definitionField = new JTextArea();
+	    this.definitionField.setLineWrap(true);
+	    this.definitionField.setWrapStyleWord(true);
+	    this.definitionField.setRows(3);
+	    constraints.gridx = 0;
+	    constraints.gridy += 1;
+		constraints.weightx = 0;
+	    constraints.fill = GridBagConstraints.NONE;
+	    this.add(new JLabel("Definition:"), constraints);
+	    constraints.gridx += 1;
+	    constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.weightx = 1.0;
+		this.add(new JScrollPane(this.definitionField), constraints);
 		this.tableFormat = new SynonymsTableFormat();
 		final EventTableModel<Synonym> model = new EventTableModel<Synonym>(this.synonyms, this.tableFormat);
 		this.synonymsTable = new BugWorkaroundTable(model);
 		this.synonymsTable.setSelectionModel(this.selectionModel);
 		this.synonymsTable.setDefaultRenderer(OBOObject.class, new TermRenderer("None"));
 		this.synonymsTable.putClientProperty("Quaqua.Table.style", "striped");
+		this.synonymsTable.setPreferredScrollableViewportSize(new Dimension(300, 100));
 		constraints.gridy += 1;
 		constraints.gridwidth = 2;
 		constraints.fill = GridBagConstraints.BOTH;
@@ -145,31 +155,27 @@ public class NewTermRequestPanel extends AbstractGUIComponent {
 
 	private JToolBar createToolBar() {
 		final JToolBar toolBar = new JToolBar();
-		this.addLinkButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
+		this.addSynonymButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				addSynonym();
 			}
 		});
-		this.addLinkButton.setToolTipText("Add Differentia");
-		toolBar.add(this.addLinkButton);
-		this.deleteLinkButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
+		this.addSynonymButton.setToolTipText("Add Synonym");
+		toolBar.add(this.addSynonymButton);
+		this.deleteSynonymButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				deleteSelectedLink();
+				deleteSelectedSynonym();
 			}
 		});
-		this.deleteLinkButton.setToolTipText("Delete Differentia");
-		toolBar.add(this.deleteLinkButton);
+		this.deleteSynonymButton.setToolTipText("Delete Synonym");
+		toolBar.add(this.deleteSynonymButton);
 		toolBar.setFloatable(false);
 		return toolBar;
 	}
 
 	private class SynonymsTableFormat implements WritableTableFormat<Synonym>, AdvancedTableFormat<Synonym> {
-
-		public TableCellEditor getColumnEditor(int column) {
-			return new DefaultCellEditor(new JTextField());
-		}
 		
 		@Override
 		public boolean isEditable(Synonym synonym, int column) {
@@ -205,30 +211,6 @@ public class NewTermRequestPanel extends AbstractGUIComponent {
 		@Override
 		public Comparator<?> getColumnComparator(int column) {
 			return GlazedLists.comparableComparator();
-		}
-
-	}
-
-	@SuppressWarnings("unchecked")
-	private Collection<OBOObject> toOBOObjects(Collection<?> terms) {
-		return (Collection<OBOObject>)terms;
-	}
-
-	private class Synonym implements Comparable<Synonym> {
-
-		private String label;
-
-		public String getLabel() {
-			return this.label;
-		}
-
-		public void setLabel(String label) {
-			this.label = label;
-		}
-
-		@Override
-		public int compareTo(Synonym other) {
-			return this.getLabel().compareTo(other.getLabel());
 		}
 
 	}

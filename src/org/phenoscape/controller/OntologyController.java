@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
 import org.bbop.framework.GUIManager;
@@ -20,11 +22,14 @@ import org.obo.app.util.URLProxy;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.IdentifiedObject;
+import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.impl.OBOPropertyImpl;
 import org.obo.filters.Filter;
 import org.oboedit.controller.SessionManager;
+import org.phenoscape.util.ProvisionalTermUtil;
+import org.xml.sax.SAXException;
 
 /**
  * @author Jim Balhoff
@@ -67,6 +72,7 @@ public class OntologyController {
 			log().fatal("Failed to load ontologies", e);
 		}
 		this.addVisibleBuiltinTerms();
+		this.loadProvisionalTerms();
 		this.prefetchTermSets();
 	}
 
@@ -233,6 +239,27 @@ public class OntologyController {
 		 newDisjointFrom.setName("not");
 		 newDisjointFrom.setNamespace(this.getOBOSession().getNamespace("relationship"));
 		 this.getOBOSession().addObject(newDisjointFrom);
+	 }
+	 
+	 private void loadProvisionalTerms() {
+		 try {
+			final List<OBOClass> terms = ProvisionalTermUtil.getProvisionalTerms(this.getOBOSession());
+			for (OBOClass term : terms) {
+				this.getOBOSession().addObject(term);	
+			}
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	 }
 
 	 private Logger log() {

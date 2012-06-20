@@ -62,7 +62,6 @@ import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 import org.phenoscape.model.UndoObserver;
-import org.phenoscape.orb.NewTermRequestPanel;
 import org.phenoscape.orb.ORBController;
 import org.phenoscape.util.DataMerger;
 

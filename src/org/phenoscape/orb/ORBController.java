@@ -84,6 +84,7 @@ public class ORBController {
 		final OBOClass newTerm = ProvisionalTermUtil.createClassForProvisionalTerm(newTermElement, session);
 		session.addObject(newTerm);
 		this.controller.getOntologyController().invalidateAllTermSets();
+		this.controller.getOntologyCoordinator().getSelectionManager().selectTerm(this, newTerm, false);
 		return newTerm;
 	}
 

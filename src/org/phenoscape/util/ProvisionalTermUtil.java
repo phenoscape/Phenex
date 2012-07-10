@@ -64,6 +64,7 @@ public class ProvisionalTermUtil {
 		final String permanentID = findEntry(element, "provisionalPermanentId");
 		if (permanentID != null) {
 			newTerm.setObsolete(true);
+			//TODO add replaced_by link
 		}
 		newTerm.setNamespace(new Namespace("bioportal_provisional"));
 		return newTerm;

@@ -42,6 +42,7 @@ public class ProvisionalTermRequestPanel extends AbstractGUIComponent {
 	private JTextField preferredLabelField;
 	private AutocompleteField<OBOObject> parentBox;
 	private JTextArea definitionField;
+	private JTextField contactInfoField;
 	private EventList<Synonym> synonyms = new BasicEventList<Synonym>();
 	private EventSelectionModel<Synonym> selectionModel = new EventSelectionModel<Synonym>(synonyms);
 	{
@@ -72,7 +73,7 @@ public class ProvisionalTermRequestPanel extends AbstractGUIComponent {
 		final ORBTerm term = new ORBTerm();
 		term.setLabel(StringUtils.stripToNull(this.preferredLabelField.getText()));
 		term.setParent((OBOClass)(this.parentBox.getValue()));
-		term.setDefinition(StringUtils.stripToNull(this.definitionField.getText()));
+		term.setDefinition(StringUtils.stripToNull(this.definitionField.getText() + "\n\nRequested by: " + this.contactInfoField.getText()));
 		for (Synonym synonym : this.synonyms) {
 			final String text = StringUtils.stripToNull(synonym.getLabel());
 			if (text != null) {
@@ -151,6 +152,17 @@ public class ProvisionalTermRequestPanel extends AbstractGUIComponent {
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.weightx = 1.0;
 		this.add(this.createToolBar(), constraints);
+		constraints.gridy += 1;
+		constraints.gridx = 0;
+		constraints.gridwidth = 1;
+		constraints.weightx = 0;
+		constraints.fill = GridBagConstraints.NONE;
+		this.add(new JLabel("Contact email:"), constraints);
+	    constraints.gridx += 1;
+	    constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.weightx = 1.0;
+		this.contactInfoField = new TabActionTextField();
+		this.add(this.contactInfoField, constraints);
 	}
 
 	private JToolBar createToolBar() {

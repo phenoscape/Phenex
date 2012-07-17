@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_15" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_29" class="java.beans.XMLDecoder"> 
  <object class="org.obo.filters.CompoundFilterImpl"> 
   <void property="filters"> 
    <void method="add"> 
@@ -113,6 +113,19 @@
         </void> 
         <void property="value"> 
          <string>gene_ontology</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.obo.filters.ObjectFilterImpl"> 
+        <void property="comparison"> 
+         <object idref="EqualsComparison0"/> 
+        </void> 
+        <void property="criterion"> 
+         <object idref="NamespaceSearchCriterion0"/> 
+        </void> 
+        <void property="value"> 
+         <string>vertebrate_anatomy</string> 
         </void> 
        </object> 
       </void> 

@@ -102,6 +102,11 @@ public class MenuFactory {
 			public void actionPerformed(ActionEvent e) { controller.exportToExcel(); }
         };
         menu.add(new JMenuItem(exportExcelAction));
+        final Action exportBiocreativeAction = new AbstractAction("Export for BioCreative...") {
+            @Override
+			public void actionPerformed(ActionEvent e) { controller.exportForBioCreative(); }
+        };
+        menu.add(new JMenuItem(exportBiocreativeAction));
         if (CrossPlatform.shouldPutExitInFileMenu()) {
             menu.addSeparator();
             final Action exitAction = new AbstractAction("Exit") {

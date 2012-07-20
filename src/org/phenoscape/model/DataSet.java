@@ -21,7 +21,7 @@ public class DataSet extends AbstractPropertyChangeObject {
      * The matrix is represented as a map using this format:
      * <taxonID, Map<characterID, stateID>>
      */
-    private final Map<String, Map<String, String>> matrix = new HashMap<String, Map<String, String>>();
+    private final Map<String, Map<String, State>> matrix = new HashMap<String, Map<String, State>>();
     private String publication;
     private String publicationNotes;
     private String curators;
@@ -95,22 +95,19 @@ public class DataSet extends AbstractPropertyChangeObject {
         this.firePropertyChange(CURATORS, oldCurators, curators);
     }
 
-    public Map<String, Map<String, String>> getMatrixData() {
+    public Map<String, Map<String, State>> getMatrixData() {
         return this.matrix;
     }
 
-    public void setMatrixData(Map<String, Map<String, String>> aMatrix) {
+    public void setMatrixData(Map<String, Map<String, State>> aMatrix) {
         this.matrix.clear();
         this.matrix.putAll(aMatrix);
     }
 
     public State getStateForTaxon(Taxon taxon, Character character) {
-        final Map<String, String> states = this.matrix.get(taxon.getNexmlID());
+        final Map<String, State> states = this.matrix.get(taxon.getNexmlID());
         if (states != null) {
-            final String stateID = states.get(character.getNexmlID());
-            for (State state : character.getStates()) {
-                if (state.getNexmlID().equals(stateID)) { return state; }
-            }
+            return states.get(character.getNexmlID());
         }
         return null;
     }
@@ -121,14 +118,14 @@ public class DataSet extends AbstractPropertyChangeObject {
             return;
         }
         final MatrixCellValue oldValue = new MatrixCellValue(taxon, character, this.getStateForTaxon(taxon, character));
-        final Map<String, String> states;
+        final Map<String, State> states;
         if (this.matrix.containsKey(taxon.getNexmlID())) {
             states = this.matrix.get(taxon.getNexmlID());
         } else {
-            states = new HashMap<String, String>();
+            states = new HashMap<String, State>();
         }
         this.matrix.put(taxon.getNexmlID(), states);
-        states.put(character.getNexmlID(), (state != null ? state.getNexmlID() : null));
+        states.put(character.getNexmlID(), state);
         this.firePropertyChange(MATRIX_CELL, oldValue, new MatrixCellValue(taxon, character, state));
     }
     

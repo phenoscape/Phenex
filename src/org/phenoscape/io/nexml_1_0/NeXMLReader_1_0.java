@@ -54,6 +54,7 @@ public class NeXMLReader_1_0 {
     private final Set<String> danglers = new HashSet<String>();
     private final Set<String> secondaryIDs = new HashSet<String>();
     private String charactersBlockID = UUID.randomUUID().toString();
+    private final Map<String, State> allStates = new HashMap<String, State>();
 
     public NeXMLReader_1_0(File aFile, OBOSession session) throws XmlException, IOException {
         this.session = session;
@@ -149,6 +150,7 @@ public class NeXMLReader_1_0 {
                     newState.setLabel(abstractState.getLabel());
                     newState.setComment(this.getComment(abstractState));
                     newState.setFigure(this.getFigure(abstractState));
+                    this.allStates.put(newState.getNexmlID(), newState);
                     final Dict phenotypeDict = NeXMLUtil_1_0.findOrCreateDict(abstractState, "OBO_phenotype", abstractState.getDomNode().getOwnerDocument().createElement("any"));
                     final Element any = NeXMLUtil_1_0.getFirstChildWithTagName((Element)(phenotypeDict.getDomNode()), "any");
                     final Element phenoXML = NeXMLUtil_1_0.getFirstChildWithTagNameNS(any, "http://www.bioontologies.org/obd/schema/pheno", "phenotype");
@@ -217,17 +219,18 @@ public class NeXMLReader_1_0 {
     }
 
     private void parseMatrix(AbstractObsMatrix matrix) {
-        final Map<String, Map<String, String>> matrixMap = new HashMap<String, Map<String, String>>();
+        final Map<String, Map<String, State>> matrixMap = new HashMap<String, Map<String, State>>();
         for (AbstractObsRow row : matrix.getRowArray()) {
             final String otuID = row.getOtu();
             if (otuID != null) {
-                final Map<String, String> currentTaxonMap = new HashMap<String, String>();
+                final Map<String, State> currentTaxonMap = new HashMap<String, State>();
                 matrixMap.put(otuID, currentTaxonMap);
                 for (AbstractObs cell : row.getCellArray()) {
                     final String characterID = cell.getChar() != null ? cell.getChar().getStringValue() : null;
                     final String stateID = cell.getState() != null ? cell.getState().getStringValue() : null;
-                    if (characterID != null && stateID != null) {
-                        currentTaxonMap.put(characterID, stateID);
+                    final State state = this.allStates.get(stateID);
+                    if (characterID != null && state != null) {
+                        currentTaxonMap.put(characterID, state);
                     }
                 }
             }

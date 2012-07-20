@@ -1,12 +1,15 @@
 package org.phenoscape.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.obo.app.model.ObservableEventList;
 
 public class MultipleState extends State {
-	
+
 	public static enum MODE { POLYMORPHIC, UNCERTAIN };
 	private final Set<State> states;
 	private final MODE mode;
@@ -16,11 +19,11 @@ public class MultipleState extends State {
 		this.states = states;
 		this.mode = mode;
 	}
-	
+
 	public Set<State> getStates() {
 		return Collections.unmodifiableSet(this.states);
 	}
-	
+
 	public MODE getMode() {
 		return this.mode;
 	}
@@ -47,8 +50,11 @@ public class MultipleState extends State {
 
 	@Override
 	public String getLabel() {
-		// TODO Auto-generated method stub
-		return super.getLabel();
+		final List<String> labels = new ArrayList<String>();
+		for (State state : this.getStates()) {
+			labels.add(state.getLabel());
+		}
+		return StringUtils.join(labels, this.getSeparator());
 	}
 
 	@Override
@@ -58,8 +64,11 @@ public class MultipleState extends State {
 
 	@Override
 	public String getSymbol() {
-		// TODO Auto-generated method stub
-		return super.getSymbol();
+		final List<String> symbols = new ArrayList<String>();
+		for (State state : this.getStates()) {
+			symbols.add(state.getSymbol());
+		}
+		return StringUtils.join(symbols, this.getSeparator());
 	}
 
 	@Override
@@ -69,8 +78,7 @@ public class MultipleState extends State {
 
 	@Override
 	public String getComment() {
-		// TODO Auto-generated method stub
-		return super.getComment();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -80,8 +88,7 @@ public class MultipleState extends State {
 
 	@Override
 	public String getFigure() {
-		// TODO Auto-generated method stub
-		return super.getFigure();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -101,8 +108,11 @@ public class MultipleState extends State {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return super.toString();
+		return StringUtils.join(getStates(), this.getSeparator());
+	}
+	
+	private String getSeparator() {
+		return this.getMode() == MODE.POLYMORPHIC ? " and " : " or ";
 	}
 
 }

@@ -293,7 +293,9 @@ public class PhenexController extends DocumentController {
         final int result = fileChooser.showOpenDialog(GUIManager.getManager().getFrame());
         if (result == JFileChooser.APPROVE_OPTION) {
             final File file = fileChooser.getSelectedFile();
+            this.getUndoController().beginIgnoringEdits();
             this.mergeNEXUS(file);
+            this.getUndoController().endIgnoringEdits();
         }
     }
 

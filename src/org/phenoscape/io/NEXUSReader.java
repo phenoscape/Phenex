@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.biojava.bio.seq.io.ParseException;
 import org.biojavax.bio.phylo.io.nexus.CharactersBlock;
@@ -20,6 +21,8 @@ import org.biojavax.bio.phylo.io.nexus.NexusFileFormat;
 import org.biojavax.bio.phylo.io.nexus.TaxaBlock;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
+import org.phenoscape.model.MultipleState;
+import org.phenoscape.model.MultipleState.MODE;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 
@@ -75,6 +78,7 @@ public class NEXUSReader {
 					this.characters.add(new Character());
 				}
 				final String missing = charactersBlock.getMissing();
+				final String gap = charactersBlock.getGap();
 				for (Object o : charactersBlock.getAllCharStates()) {
 					final String charNumberString = o.toString();
 					final Character newChar = this.characters.get(Integer.parseInt(charNumberString) - 1);
@@ -106,7 +110,7 @@ public class NEXUSReader {
 								final State state;
 								if (existingState != null) {
 									state = existingState;
-								} else if (!symbol.equals(missing)) {
+								} else if ((!symbol.equals(gap)) && (!symbol.equals(missing))) {
 									state = character.newState();
 									state.setSymbol(symbol);
 								} else {
@@ -117,13 +121,18 @@ public class NEXUSReader {
 									usedStates.add(state);
 								}
 							} else if (item instanceof List) {
-								//TODO
-								System.err.println(item);
 								final Set<State> statesSet = this.findStatesSet(character.getStates(), (List<String>)item);
-								
+								final State state = new MultipleState(statesSet, MODE.POLYMORPHIC);
+								currentMap.put(character.getNexmlID(), state);
+								usedStates.addAll(statesSet);
+								log().debug("Created polymorphic state: " + state);
 							} else if (item instanceof Set) {
-								//TODO
-								System.err.println(item);
+								//FIXME repeated code
+								final Set<State> statesSet = this.findStatesSet(character.getStates(), (Set<String>)item);
+								final State state = new MultipleState(statesSet, MODE.UNCERTAIN);
+								currentMap.put(character.getNexmlID(), state);
+								usedStates.addAll(statesSet);
+								log().debug("Created uncertain state: " + state);
 							}
 						} 
 					}
@@ -145,7 +154,9 @@ public class NEXUSReader {
 	private Set<State> findStatesSet(List<State> allStates, Collection<String> symbols) {
 		final Set<State> states = new HashSet<State>();
 		for (String symbol : symbols) {
-			states.add(this.findState(allStates, symbol));
+			if (StringUtils.stripToNull(symbol) != null) {
+				states.add(this.findState(allStates, symbol));	
+			}
 		}
 		return states;
 	}

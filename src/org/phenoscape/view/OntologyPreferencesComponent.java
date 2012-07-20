@@ -35,184 +35,211 @@ import com.eekboom.utils.Strings;
 
 public class OntologyPreferencesComponent extends AbstractGUIComponent {
 
-    private JButton addURLButton;
-    private JButton deleteURLButton;
-    private JButton applyButton;
-    private JButton revertButton;
-    private final EventList<OntologySource> sources = new BasicEventList<OntologySource>();
-    private final EventSelectionModel<OntologySource> sourcesSelectionModel = new EventSelectionModel<OntologySource>(sources);
-    private final List<OntologySource> oldSources = new ArrayList<OntologySource>();
-    private final UserOntologyConfiguration config;
+	private JButton addURLButton;
+	private JButton deleteURLButton;
+	private JButton applyButton;
+	private JButton revertChangesButton;
+	private JButton revertToDefaultsButton;
+	private final EventList<OntologySource> sources = new BasicEventList<OntologySource>();
+	private final EventSelectionModel<OntologySource> sourcesSelectionModel = new EventSelectionModel<OntologySource>(sources);
+	private final List<OntologySource> oldSources = new ArrayList<OntologySource>();
+	private final UserOntologyConfiguration config;
 
-    //TODO enable/disable apply & revert buttons
-    public OntologyPreferencesComponent(String id, UserOntologyConfiguration configuration) {
-        super(id);
-        this.config = configuration;
-    }
+	//TODO enable/disable apply & revert buttons
+	public OntologyPreferencesComponent(String id, UserOntologyConfiguration configuration) {
+		super(id);
+		this.config = configuration;
+	}
 
-    @Override
-    public void init() {
-        super.init();
-        final List<OntologySource> storedSources = this.config.getStoredSources();
-        if (storedSources != null) {
-            this.sources.addAll(storedSources);
-        }
-        this.cloneContents(this.sources, this.oldSources);
-        this.initializeInterface();
-    }
+	@Override
+	public void init() {
+		super.init();
+		final List<OntologySource> storedSources = this.config.getStoredSources();
+		if (storedSources != null) {
+			this.sources.addAll(storedSources);
+		}
+		this.cloneContents(this.sources, this.oldSources);
+		this.initializeInterface();
+	}
 
-    private void addSource() {
-        this.sources.add(new OntologySource());
-    }
+	private void addSource() {
+		this.sources.add(new OntologySource());
+	}
 
-    private void deleteSelectedSource() {
-        final OntologySource source = this.getSelectedSource();
-        if (source != null) { this.sources.remove(source); }
-    }
+	private void deleteSelectedSource() {
+		final OntologySource source = this.getSelectedSource();
+		if (source != null) { this.sources.remove(source); }
+	}
 
-    private void applyChanges() {
-        this.config.storeSources(this.sources);
-        this.cloneContents(this.sources, this.oldSources);
-        //TODO tell user they will need to relaunch to see changes
-    }
+	private void applyChanges() {
+		this.config.storeSources(this.sources);
+		this.cloneContents(this.sources, this.oldSources);
+		//TODO tell user they will need to relaunch to see changes
+	}
 
-    private void revertChanges() {
-        this.cloneContents(this.oldSources, this.sources);
-    }
+	private void revertChanges() {
+		this.cloneContents(this.oldSources, this.sources);
+	}
+	
+	private void revertToDefaults() {
+		this.config.clearStoredSources();
+		this.sources.clear();
+		//TODO tell user they will need to relaunch to see changes
+	}
 
-    private OntologySource getSelectedSource() {
-        final EventList<OntologySource> selected = this.sourcesSelectionModel.getSelected();
-        if (selected.size() == 1) {
-            return selected.get(0);
-        } else {
-            return null;
-        }
-    }
+	private OntologySource getSelectedSource() {
+		final EventList<OntologySource> selected = this.sourcesSelectionModel.getSelected();
+		if (selected.size() == 1) {
+			return selected.get(0);
+		} else {
+			return null;
+		}
+	}
 
-    private void cloneContents(List<OntologySource> original, List<OntologySource> destination) {
-        destination.clear();
-        for (OntologySource item : original) {
-            destination.add(item.copy());
-        }
-    }
+	private void cloneContents(List<OntologySource> original, List<OntologySource> destination) {
+		destination.clear();
+		for (OntologySource item : original) {
+			destination.add(item.copy());
+		}
+	}
 
-    private void initializeInterface() {
-        this.setLayout(new BorderLayout());
-        final EventTableModel<OntologySource> sourcesTableModel = new EventTableModel<OntologySource>(this.sources, new OntologySourcesTableFormat());
-        final JTable sourcesTable = new BugWorkaroundTable(sourcesTableModel);
-        sourcesTable.setSelectionModel(this.sourcesSelectionModel);
-        sourcesTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
-        sourcesTable.putClientProperty("Quaqua.Table.style", "striped");
-        new TableColumnPrefsSaver(sourcesTable, this.getClass().getName());
-        //final TableComparatorChooser<Character> sortChooser = new TableComparatorChooser<Character>(charactersTable, this.getController().getSortedCharacters(), false);
-        //sortChooser.addSortActionListener(new SortDisabler());
-        this.add(new JScrollPane(sourcesTable), BorderLayout.CENTER);
-        this.add(this.createToolBar(), BorderLayout.NORTH);
-        this.add(this.createSavePanel(), BorderLayout.SOUTH);
-    }
+	private void initializeInterface() {
+		this.setLayout(new BorderLayout());
+		final EventTableModel<OntologySource> sourcesTableModel = new EventTableModel<OntologySource>(this.sources, new OntologySourcesTableFormat());
+		final JTable sourcesTable = new BugWorkaroundTable(sourcesTableModel);
+		sourcesTable.setSelectionModel(this.sourcesSelectionModel);
+		sourcesTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
+		sourcesTable.putClientProperty("Quaqua.Table.style", "striped");
+		new TableColumnPrefsSaver(sourcesTable, this.getClass().getName());
+		//final TableComparatorChooser<Character> sortChooser = new TableComparatorChooser<Character>(charactersTable, this.getController().getSortedCharacters(), false);
+		//sortChooser.addSortActionListener(new SortDisabler());
+		this.add(new JScrollPane(sourcesTable), BorderLayout.CENTER);
+		this.add(this.createToolBar(), BorderLayout.NORTH);
+		this.add(this.createSavePanel(), BorderLayout.SOUTH);
+	}
 
-    private JToolBar createToolBar() {
-        final JToolBar toolBar = new JToolBar();
-        this.addURLButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
-            public void actionPerformed(ActionEvent e) {
-                addSource();
-            }
-        });
-        this.addURLButton.setToolTipText("Add Source URL");
-        toolBar.add(this.addURLButton);
-        this.deleteURLButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
-            public void actionPerformed(ActionEvent e) {
-                deleteSelectedSource();
-            }
-        });
-        this.deleteURLButton.setToolTipText("Delete Source URL");
-        toolBar.add(this.deleteURLButton);
-        toolBar.setFloatable(false);
-        return toolBar;
-    }
+	private JToolBar createToolBar() {
+		final JToolBar toolBar = new JToolBar();
+		this.addURLButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				addSource();
+			}
+		});
+		this.addURLButton.setToolTipText("Add Source URL");
+		toolBar.add(this.addURLButton);
+		this.deleteURLButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteSelectedSource();
+			}
+		});
+		this.deleteURLButton.setToolTipText("Delete Source URL");
+		toolBar.add(this.deleteURLButton);
+		toolBar.setFloatable(false);
+		return toolBar;
+	}
 
-    private JPanel createSavePanel() {
-        final JPanel panel = new JPanel(new BorderLayout());
-        this.revertButton = new JButton(new AbstractAction("Revert") {
-            public void actionPerformed(ActionEvent e) {
-                revertChanges();
-            }
-        });
-        this.revertButton.setToolTipText("Revert Changes");
-        panel.add(this.revertButton, BorderLayout.WEST);
-        this.applyButton = new JButton(new AbstractAction("Apply") {
-            public void actionPerformed(ActionEvent e) {
-                applyChanges();
-            }
-        });
-        this.applyButton.setToolTipText("Apply Changes");
-        panel.add(this.applyButton, BorderLayout.EAST);
-        return panel;
-    }
+	private JPanel createSavePanel() {
+		final JPanel panel = new JPanel(new BorderLayout());
+		this.revertToDefaultsButton = new JButton(new AbstractAction("Revert to defaults") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				revertToDefaults();
+			}
+		});
+		this.revertToDefaultsButton.setToolTipText("Clear custom ontology sources and revert to Phenex defaults.");
+		panel.add(this.revertToDefaultsButton, BorderLayout.WEST);
+		this.revertChangesButton = new JButton(new AbstractAction("Revert") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				revertChanges();
+			}
+		});
+		this.revertChangesButton.setToolTipText("Revert Changes");
+		panel.add(this.revertChangesButton, BorderLayout.CENTER);
+		this.applyButton = new JButton(new AbstractAction("Apply") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				applyChanges();
+			}
+		});
+		this.applyButton.setToolTipText("Apply Changes");
+		panel.add(this.applyButton, BorderLayout.EAST);
+		return panel;
+	}
 
-    private class OntologySourcesTableFormat implements WritableTableFormat<OntologySource>, AdvancedTableFormat<OntologySource> {
+	private class OntologySourcesTableFormat implements WritableTableFormat<OntologySource>, AdvancedTableFormat<OntologySource> {
 
-        public boolean isEditable(OntologySource source, int column) {
-            return true;
-        }
+		@Override
+		public boolean isEditable(OntologySource source, int column) {
+			return true;
+		}
 
-        public OntologySource setColumnValue(OntologySource source, Object editedValue, int column) {
-            switch(column) {
-            case 0: source.setLabel(editedValue.toString()); break;
-            case 1:
-                try {
-                    source.setURL(new URL(editedValue.toString()));
-                } catch (MalformedURLException e) {
-                    log().error("User entered bad URL");
-                } break;
-            }
-            return source;
-        }
+		@Override
+		public OntologySource setColumnValue(OntologySource source, Object editedValue, int column) {
+			switch(column) {
+			case 0: source.setLabel(editedValue.toString()); break;
+			case 1:
+				try {
+					source.setURL(new URL(editedValue.toString()));
+				} catch (MalformedURLException e) {
+					log().error("User entered bad URL");
+				} break;
+			}
+			return source;
+		}
 
-        public int getColumnCount() {
-            return 2;
-        }
+		@Override
+		public int getColumnCount() {
+			return 2;
+		}
 
-        public String getColumnName(int column) {
-            switch(column) {
-            case 0: return "Label";
-            case 1: return "URL";
-            }
-            return null;
-        }
+		@Override
+		public String getColumnName(int column) {
+			switch(column) {
+			case 0: return "Label";
+			case 1: return "URL";
+			}
+			return null;
+		}
 
-        public Object getColumnValue(OntologySource source, int column) {
-            switch(column) {
-            case 0: return source.getLabel();
-            case 1: return source.getURL();
-            }
-            return null;
-        }
+		@Override
+		public Object getColumnValue(OntologySource source, int column) {
+			switch(column) {
+			case 0: return source.getLabel();
+			case 1: return source.getURL();
+			}
+			return null;
+		}
 
-        public Class<?> getColumnClass(int column) {
-            switch(column) {
-            case 0: return String.class;
-            case 1: return URL.class;
-            }
-            return null;
-        }
+		@Override
+		public Class<?> getColumnClass(int column) {
+			switch(column) {
+			case 0: return String.class;
+			case 1: return URL.class;
+			}
+			return null;
+		}
 
-        public Comparator<?> getColumnComparator(int column) {
-            switch(column) {
-            case 0: return Strings.getNaturalComparator();
-            case 1: return new Comparator<URL>() {
-                public int compare(URL o1, URL o2) {
-                    return Strings.compareNatural(o1.toString(), o2.toString());
-                }
-            };
-            }
-            return null;
-        }
+		@Override
+		public Comparator<?> getColumnComparator(int column) {
+			switch(column) {
+			case 0: return Strings.getNaturalComparator();
+			case 1: return new Comparator<URL>() {
+				@Override
+				public int compare(URL o1, URL o2) {
+					return Strings.compareNatural(o1.toString(), o2.toString());
+				}
+			};
+			}
+			return null;
+		}
 
-    }
+	}
 
-    private Logger log() {
-        return Logger.getLogger(this.getClass());
-    }
+	private Logger log() {
+		return Logger.getLogger(this.getClass());
+	}
 
 }

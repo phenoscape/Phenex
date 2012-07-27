@@ -23,7 +23,7 @@ public class UserOntologyConfiguration implements OntologyConfiguration {
     private static final List<OntologySource> defaultSources = new ArrayList<OntologySource>();
     static {
         try {
-            defaultSources.add(new OntologySource("Phenoscape Anatomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/phenoscape-anatomy.obo")));
+            defaultSources.add(new OntologySource("Phenoscape Anatomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/phenoscape-anatomy.obo?revision=3552")));
             defaultSources.add(new OntologySource("Vertebrate Taxonomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/vertebrate_taxonomy.obo")));
             defaultSources.add(new OntologySource("Museum Collections", new URL("http://phenoscape.svn.sourceforge.net/viewvc/*checkout*/phenoscape/trunk/vocab/fish_collection_abbreviation.obo")));
             defaultSources.add(new OntologySource("Phenotypic Qualities", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo")));

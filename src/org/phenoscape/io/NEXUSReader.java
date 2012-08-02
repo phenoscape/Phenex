@@ -92,6 +92,10 @@ public class NEXUSReader {
 						}            
 						newChar.addState(newState);
 					}
+					if (charNumberString.equals("121")) {
+						log().debug(newChar.getLabel());
+						log().debug(newChar.getStates());
+					}
 				}
 				final Set<State> usedStates = new HashSet<State>();
 				for (Taxon taxon : this.taxa) {
@@ -141,7 +145,7 @@ public class NEXUSReader {
 				for (Character character : this.characters) {
 					final List<State> statesToRemove = new ArrayList<State>();
 					for (State state : character.getStates()) {
-						if (!usedStates.contains(state) && state.getLabel() == null) {
+						if (!usedStates.contains(state) && StringUtils.isBlank(state.getLabel())) {
 							statesToRemove.add(state);
 						}
 					}

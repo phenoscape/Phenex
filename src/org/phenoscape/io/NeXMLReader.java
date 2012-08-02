@@ -144,6 +144,7 @@ public class NeXMLReader {
 			newCharacter.setLabel(standardChar.getLabel());
 			newCharacter.setComment(this.getComment(standardChar));
 			newCharacter.setFigure(this.getFigure(standardChar));
+			newCharacter.setDiscussion(this.getDiscussion(standardChar));
 			final AbstractStates states = NeXMLUtil.findOrCreateStates(format, newCharacter.getStatesNexmlID());
 			if (states instanceof StandardStates) {
 				for (AbstractState abstractState : states.getStateArray()) {
@@ -292,6 +293,11 @@ public class NeXMLReader {
 		return stringOrNull(comment);
 	}
 
+	private String getDiscussion(Annotated node) {
+		final Object comment = NeXMLUtil.getFirstMetadataValue(node, NeXMLUtil.DISCUSSION_PREDICATE);
+		return stringOrNull(comment);
+	}
+
 	private String getFigure(Annotated node) {
 		final Object figure = NeXMLUtil.getFirstMetadataValue(node, NeXMLUtil.FIGURE_PREDICATE);
 		return stringOrNull(figure);
@@ -312,9 +318,9 @@ public class NeXMLReader {
 				return altTerm;
 			} else {
 				log().warn("Term not found; creating dangler for " + id);
-						this.danglers.add(id);
-						final OBOClass dangler = new DanglingClassImpl(id.trim());
-						return dangler;
+				this.danglers.add(id);
+				final OBOClass dangler = new DanglingClassImpl(id.trim());
+				return dangler;
 			}
 		}
 	}

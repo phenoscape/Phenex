@@ -203,6 +203,7 @@ public class UndoObserver {
 		private final PropertyChangeListener labelListener = new PropertyUndoer("Edit Character Description");
 		private final PropertyChangeListener commentListener = new PropertyUndoer("Edit Character Comment");
 		private final PropertyChangeListener figureListener = new PropertyUndoer("Edit Character Figure");
+		private final PropertyChangeListener discussionListener = new PropertyUndoer("Edit Character Discussion");
 		private final StateObserver stateObserver = new StateObserver();
 		private final ListObserver<State> statesObserver = new ListObserver<State>(stateObserver, "State");
 
@@ -211,6 +212,7 @@ public class UndoObserver {
 			character.addPropertyChangeListener(Character.LABEL, this.labelListener);
 			character.addPropertyChangeListener(Character.COMMENT, this.commentListener);
 			character.addPropertyChangeListener(Character.FIGURE, this.figureListener);
+			character.addPropertyChangeListener(Character.DISCUSSION, this.discussionListener);
 			this.statesObserver.startObserving(character.getStates());
 		}
 
@@ -226,6 +228,7 @@ public class UndoObserver {
 			character.removePropertyChangeListener(Character.LABEL, this.labelListener);
 			character.removePropertyChangeListener(Character.COMMENT, this.commentListener);
 			character.removePropertyChangeListener(Character.FIGURE, this.figureListener);
+			character.removePropertyChangeListener(Character.DISCUSSION, this.discussionListener);
 			this.statesObserver.stopObserving(character.getStates());
 		}
 

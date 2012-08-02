@@ -35,6 +35,7 @@ public class NeXMLUtil {
     public static final String PHENOSCAPE_PREFIX = "ps";
     public static final QName MATRIX_NAME_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "hasMatrixName", PHENOSCAPE_PREFIX);
     public static final QName FIGURE_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "inFigure", PHENOSCAPE_PREFIX);
+    public static final QName DISCUSSION_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "discussion", PHENOSCAPE_PREFIX);
     public static final QName PHENOTYPE_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "describesPhenotype", PHENOSCAPE_PREFIX);
     
     public static final String PHENOXML_NAMESPACE = "http://www.bioontologies.org/obd/schema/pheno";

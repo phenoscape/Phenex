@@ -130,13 +130,14 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 			case 1: character.setLabel(editedValue.toString()); break;
 			case 2: character.setComment(editedValue.toString()); break;
 			case 3: character.setFigure(editedValue.toString()); break;
+			case 4: character.setDiscussion(editedValue.toString()); break;
 			}
 			return character;
 		}
 
 		@Override
 		public int getColumnCount() {
-			return 4;
+			return 5;
 		}
 
 		@Override
@@ -146,6 +147,7 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 			case 1: return "Character Description";
 			case 2: return "Comment";
 			case 3: return "Figure";
+			case 4: return "Discussion";
 			default: return null;
 			}
 		}
@@ -157,6 +159,7 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 			case 1: return character.getLabel();
 			case 2: return character.getComment();
 			case 3: return character.getFigure();
+			case 4: return character.getDiscussion();
 			default: return null;
 			}
 		}
@@ -168,6 +171,7 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 			case 1: return String.class;
 			case 2: return String.class;
 			case 3: return String.class;
+			case 4: return String.class;
 			default: return null;
 			}
 		}
@@ -179,6 +183,7 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 			case 1: return Strings.getNaturalComparator();
 			case 2: return Strings.getNaturalComparator();
 			case 3: return Strings.getNaturalComparator();
+			case 4: return Strings.getNaturalComparator();
 			default: return null;
 			}
 		}

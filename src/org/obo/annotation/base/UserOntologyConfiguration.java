@@ -26,11 +26,10 @@ public class UserOntologyConfiguration implements OntologyConfiguration {
             defaultSources.add(new OntologySource("Phenoscape Anatomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/phenoscape-anatomy.obo?revision=3552")));
             defaultSources.add(new OntologySource("Vertebrate Taxonomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/vertebrate_taxonomy.obo")));
             defaultSources.add(new OntologySource("Museum Collections", new URL("http://phenoscape.svn.sourceforge.net/viewvc/*checkout*/phenoscape/trunk/vocab/fish_collection_abbreviation.obo")));
-            defaultSources.add(new OntologySource("Phenotypic Qualities", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/quality.obo")));
-            defaultSources.add(new OntologySource("Spatial Ontology", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/anatomy/caro/spatial.obo")));
+            defaultSources.add(new OntologySource("Phenotypic Qualities", new URL("http://purl.obolibrary.org/obo/pato.obo")));
+            defaultSources.add(new OntologySource("Spatial Ontology", new URL("http://purl.obolibrary.org/obo/bspo.obo")));
             defaultSources.add(new OntologySource("Unit Ontology", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/phenotype/unit.obo")));
-            defaultSources.add(new OntologySource("OBO Relations", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro.obo")));
-            defaultSources.add(new OntologySource("OBO Relations (proposed)", new URL("http://obo.cvs.sourceforge.net/*checkout*/obo/obo/ontology/OBO_REL/ro_proposed.obo")));
+            defaultSources.add(new OntologySource("OBO Relations", new URL("http://purl.obolibrary.org/obo/ro.obo")));
             // need this?
             //defaultSources.add(new OntologySource("Gene Ontology", new URL("http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo")));
             defaultSources.add(new OntologySource("PATO Character slim", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/character_slims.obo")));

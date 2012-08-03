@@ -24,7 +24,7 @@ public class UserOntologyConfiguration implements OntologyConfiguration {
     static {
         try {
             defaultSources.add(new OntologySource("Phenoscape Anatomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/phenoscape-anatomy.obo?revision=3552")));
-            defaultSources.add(new OntologySource("Vertebrate Taxonomy", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/vertebrate_taxonomy.obo")));
+            defaultSources.add(new OntologySource("Vertebrate Taxonomy", new URL("http://purl.obolibrary.org/obo/vto.obo")));
             defaultSources.add(new OntologySource("Museum Collections", new URL("http://phenoscape.svn.sourceforge.net/viewvc/*checkout*/phenoscape/trunk/vocab/fish_collection_abbreviation.obo")));
             defaultSources.add(new OntologySource("Phenotypic Qualities", new URL("http://purl.obolibrary.org/obo/pato.obo")));
             defaultSources.add(new OntologySource("Spatial Ontology", new URL("http://purl.obolibrary.org/obo/bspo.obo")));

@@ -123,7 +123,7 @@ public class SpecimenTableComponent extends PhenoscapeGUIComponent {
 		specimensTable.setSelectionModel(this.getController().getCurrentSpecimensSelectionModel());
 		specimensTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
 		specimensTable.setDefaultRenderer(OBOObject.class, new TermRenderer("None"));
-		specimensTable.getColumnModel().getColumn(0).setCellEditor(TermAutocompleteFieldFactory.createAutocompleteEditor(this.getController().getOntologyController().getCollectionTermSet().getTerms(), getController().getOntologyCoordinator()));
+		specimensTable.getColumnModel().getColumn(0).setCellEditor(TermAutocompleteFieldFactory.createAutocompleteEditor(this.getController().getOntologyController().getCollectionTermSet(), getController().getOntologyCoordinator()));
 		specimensTable.putClientProperty("Quaqua.Table.style", "striped");
 		new TableColumnPrefsSaver(specimensTable, this.getClass().getName());
 		final TableComparatorChooser<Specimen> sortChooser = new TableComparatorChooser<Specimen>(specimensTable, this.getController().getSpecimensForCurrentTaxonSelection(), false);

@@ -8,6 +8,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.Logger;
+import org.obo.annotation.base.TermSet;
 import org.obo.app.swing.AutocompleteCellEditor;
 import org.obo.app.swing.AutocompleteField;
 import org.obo.app.swing.SearchHit;
@@ -24,13 +25,13 @@ public class TermAutocompleteFieldFactory {
         selectionManager.selectTerm(source, term, false);
     }
 
-    public static AutocompleteField<OBOObject> createAutocompleteBox(Collection<OBOObject> terms, OntologyCoordinator coordinator) {
+    public static AutocompleteField<OBOObject> createAutocompleteBox(TermSet terms, OntologyCoordinator coordinator) {
         final AutocompleteField<OBOObject> ac =  new AutocompleteField<OBOObject>(new TermSearcher(terms));
         ac.getListComponent().addListSelectionListener(new CompletionListListener(coordinator.getSelectionManager()));
         return ac;
     }
 
-    public static TableCellEditor createAutocompleteEditor(Collection<OBOObject> terms, OntologyCoordinator coordinator) {
+    public static TableCellEditor createAutocompleteEditor(TermSet terms, OntologyCoordinator coordinator) {
         return new AutocompleteCellEditor<OBOObject>(createAutocompleteBox(terms, coordinator));
     }
 

@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.obo.app.model.AbstractPropertyChangeObject;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
@@ -31,7 +33,7 @@ public class OBOUtil {
         }
         return postComposition;
     }
-    
+
     private static String createPostcompositionID(OBOClass genus, List<Differentium> differentia) {
         final StringBuffer sb = new StringBuffer();
         sb.append(genus.getID());
@@ -40,7 +42,7 @@ public class OBOUtil {
         }
         return sb.toString();
     }
-    
+
     private static String createPostcompositionName(OBOClass genus, List<Differentium> differentia) {
         final StringBuffer sb = new StringBuffer();
         sb.append(genus.getName());
@@ -53,11 +55,11 @@ public class OBOUtil {
     private static String relationDifferentiumFormat(String r, String d) {
         return "^"+r+"("+d+")";
     }
-    
+
     private static String createDifferentiumID(Differentium differentium) {
         return relationDifferentiumFormat(differentium.getRelation().getID(), differentium.getTerm().getID());
     }
-    
+
     private static String createDifferentiumName(Differentium differentium) {
         return relationDifferentiumFormat(differentium.getRelation().getName(), differentium.getTerm().getName());
     }
@@ -141,8 +143,15 @@ public class OBOUtil {
         return null;
     }
 
-    public static class Differentium {
+    //    if (ObjectUtils.equals(this.validName, validName)) return;
+    //    final OBOClass oldValue = this.validName;
+    //    this.validName = validName;
+    //    this.firePropertyChange(VALID_NAME, oldValue, validName);
 
+    public static class Differentium extends AbstractPropertyChangeObject {
+
+        public static final String RELATION = "relation";
+        public static final String TERM = "term";
         private OBOProperty relation;
         private OBOClass term;
 
@@ -151,7 +160,10 @@ public class OBOUtil {
         }
 
         public void setRelation(OBOProperty relation) {
+            if (ObjectUtils.equals(this.relation, relation)) return;
+            final OBOProperty oldValue = this.relation;
             this.relation = relation;
+            this.firePropertyChange(RELATION, oldValue, relation);
         }
 
         public OBOClass getTerm() {
@@ -159,11 +171,25 @@ public class OBOUtil {
         }
 
         public void setTerm(OBOClass term) {
+            if (ObjectUtils.equals(this.term, term)) return;
+            final OBOClass oldValue = this.term;
             this.term = term;
+            this.firePropertyChange(TERM, oldValue, term);
         }
 
         public boolean isComplete() {
             return (this.relation != null) && (this.term != null);
+        }
+
+        @Override
+        public Class<?> getClass(String propertyKey) throws UndefinedKeyException {
+            if (propertyKey.equals(TERM)) {
+                return OBOClass.class;
+            } else if (propertyKey.equals(RELATION)) {
+                return OBOProperty.class;
+            } else {
+                return super.getClass(propertyKey);
+            }
         }
 
     }

@@ -41,10 +41,11 @@ public class MenuFactory {
         menus.add(this.createEditMenu());
         final ViewMenu bbopViewMenu = new ViewMenu();
         final JMenuItem perspectivesMenu = bbopViewMenu.getItem(0);
-        final JMenuItem showMenu = bbopViewMenu.getItem(1);
+        final JMenuItem viewMenu = bbopViewMenu.getItem(1);
         perspectivesMenu.setText("Window");
-        showMenu.setText("View");
-        menus.add(showMenu);
+        viewMenu.setText("View");
+        menus.add(viewMenu);
+        menus.add(this.createORBMenu());
         menus.add(perspectivesMenu);
         menus.add(this.createHelpMenu());
         return menus;
@@ -58,31 +59,18 @@ public class MenuFactory {
         };
         openAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menu.add(new JMenuItem(openAction));
-        //        final Action mergeTaxaAction = new AbstractAction("Tab-delimited Taxa...") {
-        //            public void actionPerformed(ActionEvent e) { controller.openMergeTaxa(); }
-        //        };
-        //        final Action mergeCharactersAction = new AbstractAction("Tab-delimited Characters...") {
-        //            public void actionPerformed(ActionEvent e) { controller.openMergeCharacters(); }
-        //        };
         final Action mergeNEXUSAction = new AbstractAction("NEXUS...") {
             //TODO use import methods instead
             @Override
 			public void actionPerformed(ActionEvent e) { controller.openMergeNEXUS(); }
         };
-        //        final Action mergeNeXMLAction = new AbstractAction("NeXML Data...") {
-        //            public void actionPerformed(ActionEvent e) { controller.openMergeNeXML(); }
-        //        };
         final Action importPhenotypeProposals = new AbstractAction("Phenotype proposals...") {
             @Override
 			public void actionPerformed(ActionEvent e) { controller.openImportPhenotypeProposals(); }
         };
-        
-        final JMenu mergeMenu = new JMenu("Import");
-        //        mergeMenu.add(new JMenuItem(mergeTaxaAction));
-        //        mergeMenu.add(new JMenuItem(mergeCharactersAction));
+                final JMenu mergeMenu = new JMenu("Import");
         mergeMenu.add(new JMenuItem(mergeNEXUSAction));
         mergeMenu.add(new JMenuItem(importPhenotypeProposals));
-        //        mergeMenu.add(new JMenuItem(mergeNeXMLAction));
         menu.add(mergeMenu);
         menu.addSeparator();
         final Action saveAction = new AbstractAction("Save") {
@@ -154,6 +142,15 @@ public class MenuFactory {
         final Action selectAllAction = new ResponderChainAction("selectAll", "Select All");
         selectAllAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menu.add(new JMenuItem(selectAllAction));
+        return menu;
+    }
+    
+    private JMenuItem createORBMenu() {
+        final JMenu menu = new JMenu("ORB");
+        final Action termRequestAction = new AbstractAction("Request New Term...") {
+            public void actionPerformed(ActionEvent e) { controller.runORBTermRequest(); }
+        };
+        menu.add(new JMenuItem(termRequestAction));
         return menu;
     }
 

@@ -82,8 +82,7 @@ public class OntologyController {
 		final List<String> urls = new ArrayList<String>();
 		for (OntologySource source : this.config.getSources()) {
 			try {
-				//final File localFile = proxy.get(source.getURL());
-				final File localFile = proxy.get(source.getURL(), URLProxy.CacheOption.FORCE_CACHE);
+				final File localFile = proxy.get(source.getURL());
 				urls.add(localFile.toURI().toString());
 			} catch (IOException e) {
 				//TODO alert user somehow

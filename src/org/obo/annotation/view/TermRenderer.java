@@ -20,7 +20,7 @@ import org.obo.datamodel.OBOObject;
  * @author Jim Balhoff
  */
 public class TermRenderer extends PlaceholderRenderer {
-	
+
 	private static final Color THE_COLOR_PURPLE = new Color(133, 0, 175);
 
 	public TermRenderer(String placeholder) {
@@ -73,7 +73,11 @@ public class TermRenderer extends PlaceholderRenderer {
 	}
 
 	private boolean isProvisional(OBOObject term) {
-		return term.getNamespace().equals(new Namespace("bioportal_provisional"));
+		if (term.getNamespace() != null) {
+			return term.getNamespace().equals(new Namespace("bioportal_provisional"));	
+		} else {
+			return false;
+		}
 	}
 
 }

@@ -69,7 +69,7 @@ public class OBOUtil {
         if (isPostCompTerm(term)) {
             for (Object o : term.getParents()) {
                 OBORestriction r = (OBORestriction)o;
-                if (r.completes() && r.getType().equals(OBOProperty.IS_A))
+                if (r.getCompletes() && r.getType().equals(OBOProperty.IS_A))
                     return (OBOClass)r.getParent(); // check downcast?
             }
             // error msg?
@@ -92,7 +92,7 @@ public class OBOUtil {
 
     public static boolean isLinkToDiff(OBORestriction r) {
         // i guess there is a case where isa is completes - but why?
-        return r.completes() && !r.getType().equals(OBOProperty.IS_A);
+        return r.getCompletes() && !r.getType().equals(OBOProperty.IS_A);
     }
 
     public static boolean isOboRestriction(Link l) {

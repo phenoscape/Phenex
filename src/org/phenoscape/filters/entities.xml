@@ -168,6 +168,19 @@
         </void> 
        </object> 
       </void> 
+      <void method="add"> 
+       <object class="org.obo.filters.ObjectFilterImpl"> 
+        <void property="comparison"> 
+         <object idref="EqualsComparison0"/> 
+        </void> 
+        <void property="criterion"> 
+         <object idref="NamespaceSearchCriterion0"/> 
+        </void> 
+        <void property="value"> 
+         <string>bioportal_provisional</string> 
+        </void> 
+       </object> 
+      </void> 
      </void> 
     </object> 
    </void> 

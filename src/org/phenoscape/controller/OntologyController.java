@@ -22,6 +22,7 @@ import org.obo.app.util.URLProxy;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.IdentifiedObject;
+import org.obo.datamodel.Namespace;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
@@ -236,7 +237,9 @@ public class OntologyController {
 	 private void addVisibleBuiltinTerms() {
 		 final OBOProperty newDisjointFrom = new OBOPropertyImpl("PHENOSCAPE:complement_of");
 		 newDisjointFrom.setName("not");
-		 newDisjointFrom.setNamespace(this.getOBOSession().getNamespace("relationship"));
+		 final Namespace namespace = (this.getOBOSession().getNamespace("relationship") != null) ? this.getOBOSession().getNamespace("relationship") : new Namespace("relationship");
+		 this.getOBOSession().addNamespace(namespace);
+		 newDisjointFrom.setNamespace(namespace);
 		 this.getOBOSession().addObject(newDisjointFrom);
 	 }
 	 

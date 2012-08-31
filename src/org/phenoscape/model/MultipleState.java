@@ -19,6 +19,12 @@ public class MultipleState extends State {
 		this.states = states;
 		this.mode = mode;
 	}
+	
+	public MultipleState(String nexmlID, Set<State> states, MODE mode) {
+		super(nexmlID);
+		this.states = states;
+		this.mode = mode;
+	}
 
 	public Set<State> getStates() {
 		return Collections.unmodifiableSet(this.states);

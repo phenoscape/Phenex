@@ -36,6 +36,7 @@ import org.nexml.schema_2009.Annotated;
 import org.nexml.schema_2009.NexmlDocument;
 import org.nexml.schema_2009.StandardCells;
 import org.nexml.schema_2009.StandardChar;
+import org.nexml.schema_2009.StandardMapping;
 import org.nexml.schema_2009.StandardMatrixObsRow;
 import org.nexml.schema_2009.StandardObs;
 import org.nexml.schema_2009.StandardPolymorphicStateSet;
@@ -302,9 +303,15 @@ public class NeXMLWriter {
 			final List<AbstractPolymorphicStateSet> newStates = new ArrayList<AbstractPolymorphicStateSet>();
 			newStates.addAll(Arrays.asList(oldStates));
 			newStates.add(polymorphicSet);
+			final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
+			for (State substate : state.getStates()) {
+				final StandardMapping mapping = StandardMapping.Factory.newInstance();
+				mapping.setState(substate.getNexmlID());
+				mappings.add(mapping);
+			}
+			set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
 			block.setPolymorphicStateSetArray(newStates.toArray(new AbstractPolymorphicStateSet[] {}));
 			//log().debug("Added polymorphic state to states set.");
-			log().debug(block.getPolymorphicStateSetArray().length);
 		} else {
 			final StandardUncertainStateSet uncertainSet = StandardUncertainStateSet.Factory.newInstance(); 
 			set = uncertainSet;
@@ -313,13 +320,23 @@ public class NeXMLWriter {
 			final List<AbstractUncertainStateSet> newStates = new ArrayList<AbstractUncertainStateSet>();
 			newStates.addAll(Arrays.asList(oldStates));
 			newStates.add(uncertainSet);
+			final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
+			for (State substate : state.getStates()) {
+				final StandardMapping mapping = StandardMapping.Factory.newInstance();
+				mapping.setState(substate.getNexmlID());
+				mappings.add(mapping);
+			}
+			set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
 			block.setUncertainStateSetArray(newStates.toArray(new AbstractUncertainStateSet[] {}));
 			//log().debug("Added uncertain state to states set.");
 		}
-		for (State substate : state.getStates()) {
-			final AbstractMapping mapping = set.addNewMember();
-			mapping.setState(substate.getNexmlID());
-		}
+//		final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
+//		for (State substate : state.getStates()) {
+//			final StandardMapping mapping = StandardMapping.Factory.newInstance();
+//			mapping.setState(substate.getNexmlID());
+//			mappings.add(mapping);
+//		}
+//		set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
 		log().debug(block.toString());
 		return set;
 	}

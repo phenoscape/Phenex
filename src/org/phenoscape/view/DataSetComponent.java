@@ -16,7 +16,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.jdesktop.xswingx.PromptSupport;
 import org.obo.app.swing.TabActionTextField;
 import org.phenoscape.controller.PhenexController;
@@ -44,14 +43,16 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
     PromptSupport.setPrompt("None", this.curatorsField);
     this.curatorsField.setBackground(new JTextField().getBackground());
     this.curatorsField.setAction(new AbstractAction() {
-      public void actionPerformed(ActionEvent e) {
+      @Override
+	public void actionPerformed(ActionEvent e) {
         getController().getDataSet().setCurators(StringUtils.stripToNull(curatorsField.getText()));
       }
     });
     this.publicationField = new TabActionTextField();
     PromptSupport.setPrompt("None", this.publicationField);
     this.publicationField.setAction(new AbstractAction() {
-      public void actionPerformed(ActionEvent e) {
+      @Override
+	public void actionPerformed(ActionEvent e) {
         getController().getDataSet().setPublication(StringUtils.stripToNull(publicationField.getText()));
       }
     });
@@ -95,17 +96,20 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
     
     this.updateInterface();
     this.getController().getDataSet().addPropertyChangeListener(DataSet.CURATORS, new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
+        @Override
+		public void propertyChange(PropertyChangeEvent evt) {
             curatorsField.setText(getController().getDataSet().getCurators());
         }
     });
     this.getController().getDataSet().addPropertyChangeListener(DataSet.PUBLICATION, new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
+        @Override
+		public void propertyChange(PropertyChangeEvent evt) {
             publicationField.setText(getController().getDataSet().getPublication());
         }
     });
     this.getController().getDataSet().addPropertyChangeListener(DataSet.PUBLICATION_NOTES, new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
+        @Override
+		public void propertyChange(PropertyChangeEvent evt) {
             pubNotesField.setText(getController().getDataSet().getPublicationNotes());
         }
     });
@@ -119,21 +123,25 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
   
   private class PubNotesListener implements DocumentListener {
 
-    public void changedUpdate(DocumentEvent e) {
+    @Override
+	public void changedUpdate(DocumentEvent e) {
       this.documentChanged();
     }
 
-    public void insertUpdate(DocumentEvent e) {
+    @Override
+	public void insertUpdate(DocumentEvent e) {
       this.documentChanged();
     }
 
-    public void removeUpdate(DocumentEvent e) {
+    @Override
+	public void removeUpdate(DocumentEvent e) {
       this.documentChanged();
     }
     
     private void documentChanged() {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 getController().getDataSet().setPublicationNotes(pubNotesField.getText());                
             }
         });

@@ -14,7 +14,6 @@ import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
 
-import org.apache.log4j.Logger;
 import org.obo.datamodel.OBOObject;
 
 
@@ -29,15 +28,12 @@ import org.obo.datamodel.OBOObject;
  */
 public class TermInfoToolbar extends JToolBar {
 
-    private static final Logger LOG =  Logger.getLogger(TermInfoToolbar.class);
     public static final int BUTTON_HEIGHT = 30;
     private static final int TERM_INFO_DEFAULT_WIDTH=350;
     private UseTermListener useTermListener;
     private OBOObject currentOboClass = null;
     private final int BACKBUTTONINDEX = 0;
     private final int FORWARDBUTTONINDEX = 1;
-    private final int FAVBUTTONINDEX = 2;
-    private final int USETERMBUTTONINDEX = 3;
     private final int GETANNOTATIONSBUTTONINDEX = 4;
 
     private Vector<JButton> buttons;
@@ -124,8 +120,8 @@ public class TermInfoToolbar extends JToolBar {
     UseTermListener getUseTermListener() { return useTermListener; }
 
     private class UseTermActionListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            //      System.out.println("curent term for use term="+currentOboClass);
+        @Override
+		public void actionPerformed(ActionEvent e) {
             UseTermListener utl = useTermListener;
             if (utl == null) return;
             if (currentOboClass == null) return; // shouldnt happen

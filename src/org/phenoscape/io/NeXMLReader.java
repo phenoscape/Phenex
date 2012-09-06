@@ -40,8 +40,10 @@ import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.impl.DanglingClassImpl;
+import org.phenoscape.io.NeXMLUtil;
 import org.phenoscape.io.NeXMLUtil.LiteralContents;
 import org.phenoscape.io.NeXMLUtil.OBOURISyntaxException;
+import org.phenoscape.io.PhenoXMLAdapter;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.MultipleState;
@@ -149,6 +151,7 @@ public class NeXMLReader {
 			newCharacter.setLabel(standardChar.getLabel());
 			newCharacter.setComment(this.getComment(standardChar));
 			newCharacter.setFigure(this.getFigure(standardChar));
+			newCharacter.setDiscussion(this.getDiscussion(standardChar));
 			final AbstractStates states = NeXMLUtil.findOrCreateStates(format, newCharacter.getStatesNexmlID());
 			if (states instanceof StandardStates) {
 				for (AbstractState abstractState : states.getStateArray()) {
@@ -230,6 +233,35 @@ public class NeXMLReader {
 		return attribute.getValue();
 	}
 
+	private void parseMatrix(AbstractObsMatrix matrix) {
+		final Map<String, Map<String, State>> matrixMap = new HashMap<String, Map<String, State>>();
+		for (AbstractObsRow row : matrix.getRowArray()) {
+			final String otuID = row.getOtu();
+			if (otuID != null) {
+				final Map<String, State> currentTaxonMap = new HashMap<String, State>();
+				matrixMap.put(otuID, currentTaxonMap);
+				for (AbstractObs cell : row.getCellArray()) {
+					final String characterID = cell.getChar() != null ? cell.getChar().getStringValue() : null;
+					final String stateID = cell.getState() != null ? cell.getState().getStringValue() : null;
+					final State state = this.allStates.get(stateID);
+					if (characterID != null && state != null) {
+						currentTaxonMap.put(characterID, state);
+					}
+				}
+			}
+		}
+		this.data.setMatrixData(matrixMap);
+	}
+
+	private void parseMetadata(Nexml nexml) {
+		final Object curatorsObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.CURATORS_PREDICATE);
+		this.data.setCurators(stringOrNull(curatorsObj));
+		final Object publicationObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.PUBLICATION_PREDICATE);
+		this.data.setPublication(stringOrNull(publicationObj));
+		final Object pubNotesObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.PUBLICATION_NOTES_PREDICATE);
+		this.data.setPublicationNotes(stringOrNull(pubNotesObj));
+	}
+
 	@SuppressWarnings("unchecked")
 	private void parseTaxa(Taxa taxa) {
 		for (org.nexml.schema_2009.Taxon xmlTaxon : taxa.getOtuArray()) {
@@ -272,43 +304,23 @@ public class NeXMLReader {
 						final List<Object> accessionList = map.get(NeXMLUtil.ACCESSION_PREDICATE);
 						newSpecimen.setCatalogID(stringOrNull(NeXMLUtil.first(accessionList)));
 					}
+					if (map.containsKey(NeXMLUtil.COMMENT_PREDICATE)) {
+						final List<Object> commentList = map.get(NeXMLUtil.COMMENT_PREDICATE);
+						newSpecimen.setComment(stringOrNull(NeXMLUtil.first(commentList)));
+					}
 				}
 			}
 			this.data.addTaxon(newTaxon);
 		}
 	}
 
-	private void parseMatrix(AbstractObsMatrix matrix) {
-		final Map<String, Map<String, State>> matrixMap = new HashMap<String, Map<String, State>>();
-		for (AbstractObsRow row : matrix.getRowArray()) {
-			final String otuID = row.getOtu();
-			if (otuID != null) {
-				final Map<String, State> currentTaxonMap = new HashMap<String, State>();
-				matrixMap.put(otuID, currentTaxonMap);
-				for (AbstractObs cell : row.getCellArray()) {
-					final String characterID = cell.getChar() != null ? cell.getChar().getStringValue() : null;
-					final String stateID = cell.getState() != null ? cell.getState().getStringValue() : null;
-					final State state = this.allStates.get(stateID);
-					if (characterID != null && state != null) {
-						currentTaxonMap.put(characterID, state);
-					}
-				}
-			}
-		}
-		this.data.setMatrixData(matrixMap);
-	}
-
-	private void parseMetadata(Nexml nexml) {
-		final Object curatorsObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.CURATORS_PREDICATE);
-		this.data.setCurators(stringOrNull(curatorsObj));
-		final Object publicationObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.PUBLICATION_PREDICATE);
-		this.data.setPublication(stringOrNull(publicationObj));
-		final Object pubNotesObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.PUBLICATION_NOTES_PREDICATE);
-		this.data.setPublicationNotes(stringOrNull(pubNotesObj));
-	}
-
 	private String getComment(Annotated node) {
 		final Object comment = NeXMLUtil.getFirstMetadataValue(node, NeXMLUtil.COMMENT_PREDICATE);
+		return stringOrNull(comment);
+	}
+
+	private String getDiscussion(Annotated node) {
+		final Object comment = NeXMLUtil.getFirstMetadataValue(node, NeXMLUtil.DISCUSSION_PREDICATE);
 		return stringOrNull(comment);
 	}
 
@@ -332,9 +344,9 @@ public class NeXMLReader {
 				return altTerm;
 			} else {
 				log().warn("Term not found; creating dangler for " + id);
-						this.danglers.add(id);
-						final OBOClass dangler = new DanglingClassImpl(id.trim());
-						return dangler;
+				this.danglers.add(id);
+				final OBOClass dangler = new DanglingClassImpl(id.trim());
+				return dangler;
 			}
 		}
 	}

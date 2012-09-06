@@ -22,6 +22,7 @@ import org.obo.app.util.URLProxy;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.IdentifiedObject;
+import org.obo.datamodel.Namespace;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
@@ -82,8 +83,7 @@ public class OntologyController {
 		final List<String> urls = new ArrayList<String>();
 		for (OntologySource source : this.config.getSources()) {
 			try {
-				//final File localFile = proxy.get(source.getURL());
-				final File localFile = proxy.get(source.getURL(), URLProxy.CacheOption.FORCE_CACHE);
+				final File localFile = proxy.get(source.getURL());
 				urls.add(localFile.toURI().toString());
 			} catch (IOException e) {
 				//TODO alert user somehow
@@ -237,7 +237,9 @@ public class OntologyController {
 	 private void addVisibleBuiltinTerms() {
 		 final OBOProperty newDisjointFrom = new OBOPropertyImpl("PHENOSCAPE:complement_of");
 		 newDisjointFrom.setName("not");
-		 newDisjointFrom.setNamespace(this.getOBOSession().getNamespace("relationship"));
+		 final Namespace namespace = (this.getOBOSession().getNamespace("relationship") != null) ? this.getOBOSession().getNamespace("relationship") : new Namespace("relationship");
+		 this.getOBOSession().addNamespace(namespace);
+		 newDisjointFrom.setNamespace(namespace);
 		 this.getOBOSession().addObject(newDisjointFrom);
 	 }
 	 

@@ -14,6 +14,7 @@ import javax.swing.JToolBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.obo.annotation.view.TermAutocompleteFieldFactory;
 import org.obo.annotation.view.TermRenderer;
 import org.obo.app.swing.BugWorkaroundTable;
@@ -176,14 +177,15 @@ public class SpecimenTableComponent extends PhenoscapeGUIComponent {
 		public Specimen setColumnValue(Specimen specimen, Object editedValue, int column) {
 			switch(column) {
 			case 0: specimen.setCollectionCode((OBOClass)editedValue); break;
-			case 1: specimen.setCatalogID(editedValue.toString()); break;
+			case 1: specimen.setCatalogID(StringUtils.stripToNull(editedValue.toString())); break;
+			case 2: specimen.setComment(StringUtils.stripToNull(editedValue.toString())); break;
 			}
 			return specimen;
 		}
 
 		@Override
 		public int getColumnCount() {
-			return 2;
+			return 3;
 		}
 
 		@Override
@@ -191,6 +193,7 @@ public class SpecimenTableComponent extends PhenoscapeGUIComponent {
 			switch(column) {
 			case 0: return "Collection";
 			case 1: return "Catalog ID";
+			case 2: return "Comment";
 			default: return null;
 			}
 		}
@@ -200,6 +203,7 @@ public class SpecimenTableComponent extends PhenoscapeGUIComponent {
 			switch(column) {
 			case 0: return specimen.getCollectionCode();
 			case 1: return specimen.getCatalogID();
+			case 2: return specimen.getComment();
 			default: return null;
 			}
 		}
@@ -209,6 +213,7 @@ public class SpecimenTableComponent extends PhenoscapeGUIComponent {
 			switch(column) {
 			case 0: return OBOObject.class;
 			case 1: return String.class;
+			case 2: return String.class;
 			default: return null;
 			}
 		}
@@ -218,6 +223,7 @@ public class SpecimenTableComponent extends PhenoscapeGUIComponent {
 			switch(column) {
 			case 0: return GlazedLists.comparableComparator();
 			case 1: return Strings.getNaturalComparator();
+			case 2: return Strings.getNaturalComparator();
 			default: return null;
 			}
 		}

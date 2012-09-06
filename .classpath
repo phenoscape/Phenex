@@ -5,6 +5,7 @@
 	<classpathentry kind="src" path="logging-dev"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="lib/biojava.jar"/>
 	<classpathentry kind="lib" path="lib/xbean.jar"/>
 	<classpathentry kind="lib" path="lib/glazedlists-1.7.0_java15.jar">
 		<attributes>
@@ -107,6 +108,7 @@
 	<classpathentry kind="lib" path="lib/httpcore-4.1.4.jar"/>
 	<classpathentry kind="lib" path="lib/httpmime-4.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
-	<classpathentry kind="lib" path="lib/biojava.jar"/>
+	<classpathentry kind="lib" path="lib/oboformat-0.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/owlapi-3.2.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

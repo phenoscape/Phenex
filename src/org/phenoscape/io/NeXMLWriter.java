@@ -148,6 +148,7 @@ public class NeXMLWriter {
 			xmlChar.setLabel(character.getLabel());
 			this.writeComment(xmlChar, character.getComment());
 			this.writeFigure(xmlChar, character.getFigure());
+			this.writeDiscussion(xmlChar, character.getDiscussion());
 			final AbstractStates statesBlock = this.findOrCreateStatesBlockWithID(existingStatesList, character.getStatesNexmlID());
 			final AbstractStates usableStatesBlock;
 			if (usedStatesIDs.contains(statesBlock.getId())) {
@@ -373,6 +374,9 @@ public class NeXMLWriter {
 			if (specimen.getCatalogID() != null) {
 				specimenData.put(NeXMLUtil.ACCESSION_PREDICATE, specimen.getCatalogID());    
 			}
+			if (specimen.getComment() != null) {
+				specimenData.put(NeXMLUtil.COMMENT_PREDICATE, specimen.getComment());
+			}
 			NeXMLUtil.addMetadata(annotatableOTU, NeXMLUtil.SPECIMEN_PREDICATE, specimenData);
 		}
 
@@ -393,6 +397,15 @@ public class NeXMLWriter {
 			NeXMLUtil.unsetMetadata(annotatableNode, NeXMLUtil.FIGURE_PREDICATE);
 		} else {
 			NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.FIGURE_PREDICATE, figure);
+		}
+	}
+	
+	private void writeDiscussion(Annotated node, String discussion) {
+		final Annotatable annotatableNode = new Annotatable(node);
+		if ((discussion == null) || (discussion.equals(""))) {
+			NeXMLUtil.unsetMetadata(annotatableNode, NeXMLUtil.DISCUSSION_PREDICATE);
+		} else {
+			NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.DISCUSSION_PREDICATE, discussion);
 		}
 	}
 
@@ -435,7 +448,6 @@ public class NeXMLWriter {
 		attribute.setValue(symbolValue);
 	}
 
-	@SuppressWarnings("unused")
 	private Logger log() {
 		return Logger.getLogger(this.getClass());
 	}

@@ -130,7 +130,7 @@ public class ProvisionalTermRequestPanel extends AbstractGUIComponent {
 	    constraints.gridy += 1;
 		constraints.weightx = 0;
 	    constraints.fill = GridBagConstraints.NONE;
-	    this.add(new JLabel("Definition:"), constraints);
+	    this.add(new JLabel("Description:"), constraints);
 	    constraints.gridx += 1;
 	    constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.weightx = 1.0;

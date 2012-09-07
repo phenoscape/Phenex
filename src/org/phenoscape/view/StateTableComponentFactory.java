@@ -16,14 +16,17 @@ public class StateTableComponentFactory extends AbstractComponentFactory<StateTa
 		return new StateTableComponent(id, this.controller);
 	}
 
+	@Override
 	public FactoryCategory getCategory() {
 		return FactoryCategory.ANNOTATION;
 	}
 
+	@Override
 	public String getID() {
 		return "phenoscape_states_browser";
 	}
 
+	@Override
 	public String getName() {
 		return "States";
 	}

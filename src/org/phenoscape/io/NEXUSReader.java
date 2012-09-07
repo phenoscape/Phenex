@@ -101,7 +101,7 @@ public class NEXUSReader {
 				for (Taxon taxon : this.taxa) {
 					final Map<String, State> currentMap = new HashMap<String, State>();
 					this.matrix.put(taxon.getNexmlID(), currentMap);
-					List cells = charactersBlock.getMatrixData(taxon.getPublicationName());
+					List<?> cells = charactersBlock.getMatrixData(taxon.getPublicationName());
 					cells.remove(0);
 					for (int i = 0; i < cells.size(); i++) {
 						final Object item = cells.get(i);
@@ -172,7 +172,6 @@ public class NEXUSReader {
 		return null;
 	}
 
-	@SuppressWarnings("unused")
 	private Logger log() {
 		return Logger.getLogger(this.getClass());
 	}

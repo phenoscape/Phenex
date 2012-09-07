@@ -357,18 +357,18 @@ public class UndoObserver {
 		private class ListListener implements ObservableListListener {
 
 			@Override
-			public void listElementPropertyChanged(ObservableList list, int index) {}
+			public void listElementPropertyChanged(@SuppressWarnings("rawtypes") ObservableList list, int index) {}
 
 			@Override
-			public void listElementReplaced(ObservableList list, int index, Object oldElement) {
+			public void listElementReplaced(@SuppressWarnings("rawtypes") ObservableList list, int index, Object oldElement) {
 				elementObserver.stopObserving((Y)oldElement);
 				elementObserver.startObserving((Y)(list.get(index)));
 				log().debug("Replaced " + elementUndoName); //TODO UNDO
 			}
 
 			@Override
-			public void listElementsAdded(final ObservableList list, final int index, final int length) {
-				final List added = list.subList(index, index + length);
+			public void listElementsAdded(@SuppressWarnings("rawtypes") final ObservableList list, final int index, final int length) {
+				final List<Y> added = list.subList(index, index + length);
 				elementObserver.startObserving(added);
 				if (undoing) {
 					undoing = false;
@@ -376,7 +376,7 @@ public class UndoObserver {
 				}
 				postEdit(new AbstractUndoableEdit() {
 
-					private final List items = new ArrayList(added);
+					private final List<Y> items = new ArrayList<Y>(added);
 					final int location = index;
 
 					@Override
@@ -402,7 +402,7 @@ public class UndoObserver {
 			}
 
 			@Override
-			public void listElementsRemoved(final ObservableList list, final int index, final List oldElements) {
+			public void listElementsRemoved(@SuppressWarnings("rawtypes") final ObservableList list, final int index, @SuppressWarnings("rawtypes") final List oldElements) {
 				elementObserver.stopObserving(oldElements);
 				if (undoing) {
 					undoing = false;
@@ -410,7 +410,7 @@ public class UndoObserver {
 				}
 				postEdit(new AbstractUndoableEdit() {
 
-					final List items = new ArrayList(oldElements);
+					final List<Y> items = new ArrayList<Y>(oldElements);
 					final int location = index;
 
 					@Override

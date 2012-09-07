@@ -4,39 +4,42 @@ import org.bbop.framework.AbstractComponentFactory;
 import org.obo.annotation.base.UserOntologyConfiguration;
 
 public class OntologyPreferencesComponentFactory extends AbstractComponentFactory<OntologyPreferencesComponent> {
-    
-    private final UserOntologyConfiguration config;
-    
-    public OntologyPreferencesComponentFactory(UserOntologyConfiguration configuration) {
-        super();
-        this.config = configuration;
-    }
 
-    @Override
-    public OntologyPreferencesComponent doCreateComponent(String id) {
-        return new OntologyPreferencesComponent(id, this.config);
-    }
+	private final UserOntologyConfiguration config;
 
-    public FactoryCategory getCategory() {
-        return FactoryCategory.CONFIG;
-    }
+	public OntologyPreferencesComponentFactory(UserOntologyConfiguration configuration) {
+		super();
+		this.config = configuration;
+	}
 
-    public String getID() {
-        return "phenex_ontology_sources";
-    }
+	@Override
+	public OntologyPreferencesComponent doCreateComponent(String id) {
+		return new OntologyPreferencesComponent(id, this.config);
+	}
 
-    public String getName() {
-        return "Ontology Sources";
-    }
+	@Override
+	public FactoryCategory getCategory() {
+		return FactoryCategory.CONFIG;
+	}
 
-    @Override
-    public boolean isSingleton() {
-        return true;
-    }
+	@Override
+	public String getID() {
+		return "phenex_ontology_sources";
+	}
 
-    @Override
-    public boolean getPreferSeparateWindow() {
-        return true;
-    }
+	@Override
+	public String getName() {
+		return "Ontology Sources";
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
+
+	@Override
+	public boolean getPreferSeparateWindow() {
+		return true;
+	}
 
 }

@@ -237,6 +237,7 @@ public abstract class DocumentController {
 	protected JFileChooser createFileChooser() {
 		final JFileChooser chooser = new JFileChooser(this.getPreviousFileChooserDirectory());
 		chooser.addPropertyChangeListener(JFileChooser.DIRECTORY_CHANGED_PROPERTY, new PropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				storeCurrentFileChooserDirectory(chooser.getCurrentDirectory().getAbsolutePath());
 			}
@@ -258,6 +259,7 @@ public abstract class DocumentController {
 
 	private class DirtyDocumentIndicator implements UnsavedChangesListener {
 
+		@Override
 		public void setUnsavedChanges(boolean unsaved) {
 			CrossPlatform.setWindowModified(getWindow(), unsaved);
 		}
@@ -266,6 +268,7 @@ public abstract class DocumentController {
 
 	private class Autosaver implements UnsavedChangesListener {
 
+		@Override
 		public void setUnsavedChanges(boolean unsaved) {
 			if (unsaved && shouldAutosave) {
 				save();                

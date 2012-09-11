@@ -4,33 +4,36 @@ import org.bbop.framework.AbstractComponentFactory;
 import org.phenoscape.controller.PhenexController;
 
 public class DataSetComponentFactory extends AbstractComponentFactory<DataSetComponent> {
-  
-  private final PhenexController controller;
 
-  public DataSetComponentFactory(PhenexController controller) {
-    this.controller = controller;
-  }
+	private final PhenexController controller;
 
-  @Override
-  public DataSetComponent doCreateComponent(String id) {
-    return new DataSetComponent(id, this.controller);
-  }
+	public DataSetComponentFactory(PhenexController controller) {
+		this.controller = controller;
+	}
 
-  public FactoryCategory getCategory() {
-    return FactoryCategory.ANNOTATION;
-  }
+	@Override
+	public DataSetComponent doCreateComponent(String id) {
+		return new DataSetComponent(id, this.controller);
+	}
 
-  public String getID() {
-    return "phenoscape_dataset_component";
-  }
+	@Override
+	public FactoryCategory getCategory() {
+		return FactoryCategory.ANNOTATION;
+	}
 
-  public String getName() {
-    return "Data Set";
-  }
-  
-  @Override
-  public boolean isSingleton() {
-    return true;
-  }
+	@Override
+	public String getID() {
+		return "phenoscape_dataset_component";
+	}
+
+	@Override
+	public String getName() {
+		return "Data Set";
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
 
 }

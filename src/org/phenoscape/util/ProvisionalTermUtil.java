@@ -21,6 +21,7 @@ import org.obo.datamodel.Namespace;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
+import org.obo.datamodel.impl.DanglingClassImpl;
 import org.obo.datamodel.impl.OBOClassImpl;
 import org.obo.datamodel.impl.OBORestrictionImpl;
 import org.xml.sax.SAXException;
@@ -42,6 +43,7 @@ public class ProvisionalTermUtil {
 		final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 		final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 		final Document xmlDoc = new DOMBuilder().build(docBuilder.parse(response.getEntity().getContent()));
+		@SuppressWarnings("unchecked")
 		final List<Element> termElements = xmlDoc.getRootElement().getChild("data").getChild("page").getChild("contents").getChild("classBeanResultList").getChildren("classBean");
 		final List<OBOClass> terms = new ArrayList<OBOClass>();
 		for (Element element : termElements) {
@@ -59,7 +61,15 @@ public class ProvisionalTermUtil {
 		newTerm.setName(label);
 		newTerm.setDefinition(definition);
 		if (parentURI != null) {
-			newTerm.addParent(new OBORestrictionImpl(newTerm, (OBOClass)(session.getObject(toOBOID(parentURI))), (OBOProperty)(session.getObject("OBO_REL:is_a"))));
+			final String parentOBOID = toOBOID(parentURI);
+			final OBOClass parent;
+			if (session.getObject(parentOBOID) != null) {
+				parent = (OBOClass)(session.getObject(parentOBOID));
+			} else {
+				parent = new DanglingClassImpl(parentOBOID);
+				session.addObject(parent);
+			}
+			newTerm.addParent(new OBORestrictionImpl(newTerm, parent, (OBOProperty)(session.getObject("OBO_REL:is_a"))));
 		}		
 		final String permanentID = findEntry(element, "provisionalPermanentId");
 		if (permanentID != null) {

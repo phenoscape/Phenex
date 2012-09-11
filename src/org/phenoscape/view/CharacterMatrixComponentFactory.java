@@ -5,33 +5,36 @@ import org.phenoscape.controller.PhenexController;
 
 public class CharacterMatrixComponentFactory extends AbstractComponentFactory<CharacterMatrixComponent> {
 
-  private final PhenexController controller;
-  
-  public CharacterMatrixComponentFactory(PhenexController controller) {
-    super();
-    this.controller = controller;
-  }
+	private final PhenexController controller;
 
-  @Override
-  public CharacterMatrixComponent doCreateComponent(String id) {
-    return new CharacterMatrixComponent(id, this.controller);
-  }
+	public CharacterMatrixComponentFactory(PhenexController controller) {
+		super();
+		this.controller = controller;
+	}
 
-  public FactoryCategory getCategory() {
-    return FactoryCategory.ANNOTATION;
-    }
+	@Override
+	public CharacterMatrixComponent doCreateComponent(String id) {
+		return new CharacterMatrixComponent(id, this.controller);
+	}
 
-  public String getID() {
-    return "phenoscape_character_matrix";
-    }
+	@Override
+	public FactoryCategory getCategory() {
+		return FactoryCategory.ANNOTATION;
+	}
 
-  public String getName() {
-    return "Matrix";
-  }
-  
-  @Override
-  public boolean isSingleton() {
-    return true;
-  }
-  
+	@Override
+	public String getID() {
+		return "phenoscape_character_matrix";
+	}
+
+	@Override
+	public String getName() {
+		return "Matrix";
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
+
 }

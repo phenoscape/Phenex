@@ -18,12 +18,14 @@ public class Character extends AbstractPropertyChangeObject {
     public static final String COMMENT = "comment";
     public static final String LABEL = "label";
     public static final String FIGURE = "figure";
+    public static final String DISCUSSION = "discussion";
     private final String nexmlID;
     private final String statesNexmlID;
     private final ObservableEventList<State> states = new ObservableEventList<State>(new BasicEventList<State>());
     private String label;
     private String comment;
     private String figure;
+    private String discussion;
 
     public Character() {
         this(UUID.randomUUID().toString(), UUID.randomUUID().toString());
@@ -85,6 +87,17 @@ public class Character extends AbstractPropertyChangeObject {
         this.comment = notes;
         this.firePropertyChange(COMMENT, oldValue, notes);
     }
+    
+    public String getDiscussion() {
+        return this.discussion;
+    }
+
+    public void setDiscussion(String notes) {
+        if (ObjectUtils.equals(this.discussion, notes)) return;
+        final String oldValue = this.discussion;
+        this.discussion = notes;
+        this.firePropertyChange(DISCUSSION, oldValue, notes);
+    }
 
     public String getFigure() {
         return this.figure;
@@ -109,6 +122,8 @@ public class Character extends AbstractPropertyChangeObject {
         } else if (propertyKey.equals(COMMENT)) {
             return String.class;
         } else if (propertyKey.equals(FIGURE)) {
+            return String.class;
+        } else if (propertyKey.equals(DISCUSSION)) {
             return String.class;
         } else {
             return super.getClass(propertyKey);

@@ -7,16 +7,17 @@ import org.oboedit.gui.event.SelectionEvent;
 import org.oboedit.gui.event.SelectionListener;
 
 public class SelectionBridge implements SelectionListener,
-		TermSelectionListener {
+TermSelectionListener {
 
 	protected final SelectionManager phenoteSelectionManager;
 	protected org.oboedit.controller.SelectionManager oboeditSelectionManager = org.oboedit.controller.SelectionManager
 			.getManager();
-	
+
 	public SelectionBridge(SelectionManager phenoteSelectionManager) {
-	    this.phenoteSelectionManager = phenoteSelectionManager;
+		this.phenoteSelectionManager = phenoteSelectionManager;
 	}
 
+	@Override
 	public void selectionChanged(SelectionEvent e) {
 		if (e.getSelection().getTermSubSelection() instanceof OBOClass) {
 			oboeditSelectionManager.removeSelectionListener(this);
@@ -29,6 +30,7 @@ public class SelectionBridge implements SelectionListener,
 
 	}
 
+	@Override
 	public void termSelected(TermSelectionEvent e) {
 		if (!e.isMouseOverEvent()) {
 			oboeditSelectionManager.removeSelectionListener(this);

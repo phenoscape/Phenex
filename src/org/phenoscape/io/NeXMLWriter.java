@@ -24,23 +24,31 @@ import org.bioontologies.obd.schema.pheno.PhenotypeCharacterDocument.PhenotypeCh
 import org.bioontologies.obd.schema.pheno.PhenotypeManifestationDocument.PhenotypeManifestation;
 import org.nexml.schema_2009.AbstractBlock;
 import org.nexml.schema_2009.AbstractChar;
+import org.nexml.schema_2009.AbstractMapping;
 import org.nexml.schema_2009.AbstractObs;
 import org.nexml.schema_2009.AbstractObsMatrix;
 import org.nexml.schema_2009.AbstractObsRow;
+import org.nexml.schema_2009.AbstractPolymorphicStateSet;
 import org.nexml.schema_2009.AbstractState;
 import org.nexml.schema_2009.AbstractStates;
+import org.nexml.schema_2009.AbstractUncertainStateSet;
 import org.nexml.schema_2009.Annotated;
 import org.nexml.schema_2009.NexmlDocument;
 import org.nexml.schema_2009.StandardCells;
 import org.nexml.schema_2009.StandardChar;
+import org.nexml.schema_2009.StandardMapping;
 import org.nexml.schema_2009.StandardMatrixObsRow;
 import org.nexml.schema_2009.StandardObs;
+import org.nexml.schema_2009.StandardPolymorphicStateSet;
 import org.nexml.schema_2009.StandardState;
 import org.nexml.schema_2009.StandardStates;
+import org.nexml.schema_2009.StandardUncertainStateSet;
 import org.nexml.schema_2009.Taxa;
 import org.phenoscape.io.NeXMLUtil.Annotatable;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
+import org.phenoscape.model.MultipleState;
+import org.phenoscape.model.MultipleState.MODE;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
@@ -49,309 +57,399 @@ import org.w3c.dom.Attr;
 
 public class NeXMLWriter {
 
-    private final NexmlDocument xmlDoc;
-    private final String charactersBlockID;
-    private DataSet data;
-    private String generator;
-    private final XmlOptions options = new XmlOptions();
+	private final NexmlDocument xmlDoc;
+	private final String charactersBlockID;
+	private DataSet data;
+	private String generator;
+	private final XmlOptions options = new XmlOptions();
+	private final Map<Character, AbstractStates> statesBlocksByCharacter = new HashMap<Character, AbstractStates>();
 
-    public NeXMLWriter(String charactersBlockID) {
-        this(charactersBlockID, NexmlDocument.Factory.newInstance());
-    }
+	public NeXMLWriter(String charactersBlockID) {
+		this(charactersBlockID, NexmlDocument.Factory.newInstance());
+	}
 
-    public NeXMLWriter(String charactersBlockID, NexmlDocument startingDoc) {
-        this.charactersBlockID = charactersBlockID;
-        this.xmlDoc = startingDoc;
-        this.options.setSavePrettyPrint();
-        final Map<String, String> suggestedPrefixes = new HashMap<String, String>();
-        suggestedPrefixes.put("http://www.nexml.org/2009", "");
-        suggestedPrefixes.put(NeXMLUtil.DARWIN_CORE_NAMESPACE, NeXMLUtil.DARWIN_CORE_PREFIX);
-        suggestedPrefixes.put(NeXMLUtil.DUBLIN_CORE_NAMESPACE, NeXMLUtil.DUBLIN_CORE_PREFIX);
-        suggestedPrefixes.put(NeXMLUtil.PHENOSCAPE_NAMESPACE, NeXMLUtil.PHENOSCAPE_PREFIX);
-        suggestedPrefixes.put(NeXMLUtil.RDFS_NAMESPACE, NeXMLUtil.RDFS_PREFIX);
-        this.options.setSaveAggressiveNamespaces();
-        this.options.setSaveSuggestedPrefixes(suggestedPrefixes);
-        this.options.setSaveNamespacesFirst();
-        this.options.setUseDefaultNamespace();
+	public NeXMLWriter(String charactersBlockID, NexmlDocument startingDoc) {
+		this.charactersBlockID = charactersBlockID;
+		this.xmlDoc = startingDoc;
+		this.options.setSavePrettyPrint();
+		final Map<String, String> suggestedPrefixes = new HashMap<String, String>();
+		suggestedPrefixes.put("http://www.nexml.org/2009", "");
+		suggestedPrefixes.put(NeXMLUtil.DARWIN_CORE_NAMESPACE, NeXMLUtil.DARWIN_CORE_PREFIX);
+		suggestedPrefixes.put(NeXMLUtil.DUBLIN_CORE_NAMESPACE, NeXMLUtil.DUBLIN_CORE_PREFIX);
+		suggestedPrefixes.put(NeXMLUtil.PHENOSCAPE_NAMESPACE, NeXMLUtil.PHENOSCAPE_PREFIX);
+		suggestedPrefixes.put(NeXMLUtil.RDFS_NAMESPACE, NeXMLUtil.RDFS_PREFIX);
+		this.options.setSaveAggressiveNamespaces();
+		this.options.setSaveSuggestedPrefixes(suggestedPrefixes);
+		this.options.setSaveNamespacesFirst();
+		this.options.setUseDefaultNamespace();
 
-        final Map<String, String> implicitNamespaces = new HashMap<String, String>();
-        implicitNamespaces.put("http://www.nexml.org/2009", "nex");
-        //this.options.setSaveImplicitNamespaces(implicitNamespaces);
-    }
+		final Map<String, String> implicitNamespaces = new HashMap<String, String>();
+		implicitNamespaces.put("http://www.nexml.org/2009", "nex");
+		//this.options.setSaveImplicitNamespaces(implicitNamespaces);
+	}
 
-    public void setDataSet(DataSet data) {
-        this.data = data;
-    }
+	public void setDataSet(DataSet data) {
+		this.data = data;
+		this.statesBlocksByCharacter.clear();
+	}
 
-    public void setGenerator(String appName) {
-        this.generator = appName;
-    }
+	public void setGenerator(String appName) {
+		this.generator = appName;
+	}
 
-    public void write(File aFile) throws IOException {
-        this.constructXMLDoc().save(aFile, this.options);
-    }
+	public void write(File aFile) throws IOException {
+		this.constructXMLDoc().save(aFile, this.options);
+	}
 
-    public void write(OutputStream aStream) throws IOException {
-        this.constructXMLDoc().save(aStream, this.options);
-    }
+	public void write(OutputStream aStream) throws IOException {
+		this.constructXMLDoc().save(aStream, this.options);
+	}
 
-    public void write(Writer aWriter) throws IOException {
-        this.constructXMLDoc().save(aWriter, this.options);
-    }
+	public void write(Writer aWriter) throws IOException {
+		this.constructXMLDoc().save(aWriter, this.options);
+	}
 
-    private NexmlDocument constructXMLDoc() {
-        final NexmlDocument newDoc = (NexmlDocument)(xmlDoc.copy());
-        if (newDoc.getNexml() == null) { newDoc.addNewNexml(); }
-        if (this.generator != null) { newDoc.getNexml().setGenerator(this.generator); }
-        newDoc.getNexml().setVersion(BigDecimal.valueOf(0.9));
-        final Annotatable annotatableNexml = new Annotatable(newDoc.getNexml());
-        NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.CURATORS_PREDICATE, this.data.getCurators());
-        NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.PUBLICATION_PREDICATE, this.data.getPublication());
-        NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.PUBLICATION_NOTES_PREDICATE, this.data.getPublicationNotes());
-        final AbstractBlock charBlock = NeXMLUtil.findOrCreateCharactersBlock(newDoc, this.charactersBlockID);
-        this.writeCharacters(charBlock);
-        final String taxaID;
-        if ((charBlock.getOtus() == null) || (charBlock.getOtus().equals(""))) {
-            taxaID = UUID.randomUUID().toString();
-            charBlock.setOtus(taxaID);
-        } else {
-            taxaID = charBlock.getOtus();
-        }
-        final Taxa taxaBlock = NeXMLUtil.findOrCreateTaxa(newDoc, taxaID);
-        this.writeTaxa(taxaBlock);
-        // move taxa ahead of characters
-        final XmlCursor firstCharCursor = newDoc.getNexml().getCharactersArray()[0].newCursor();
-        final XmlCursor taxaCursor = taxaBlock.newCursor();
-        taxaCursor.moveXml(firstCharCursor);
-        return newDoc;
-    }
+	private NexmlDocument constructXMLDoc() {
+		final NexmlDocument newDoc = (NexmlDocument)(xmlDoc.copy());
+		if (newDoc.getNexml() == null) { newDoc.addNewNexml(); }
+		if (this.generator != null) { newDoc.getNexml().setGenerator(this.generator); }
+		newDoc.getNexml().setVersion(BigDecimal.valueOf(0.9));
+		final Annotatable annotatableNexml = new Annotatable(newDoc.getNexml());
+		NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.CURATORS_PREDICATE, this.data.getCurators());
+		NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.PUBLICATION_PREDICATE, this.data.getPublication());
+		NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.PUBLICATION_NOTES_PREDICATE, this.data.getPublicationNotes());
+		final AbstractBlock charBlock = NeXMLUtil.findOrCreateCharactersBlock(newDoc, this.charactersBlockID);
+		this.writeCharacters(charBlock);
+		final String taxaID;
+		if ((charBlock.getOtus() == null) || (charBlock.getOtus().equals(""))) {
+			taxaID = UUID.randomUUID().toString();
+			charBlock.setOtus(taxaID);
+		} else {
+			taxaID = charBlock.getOtus();
+		}
+		final Taxa taxaBlock = NeXMLUtil.findOrCreateTaxa(newDoc, taxaID);
+		this.writeTaxa(taxaBlock);
+		// move taxa ahead of characters
+		final XmlCursor firstCharCursor = newDoc.getNexml().getCharactersArray()[0].newCursor();
+		final XmlCursor taxaCursor = taxaBlock.newCursor();
+		taxaCursor.moveXml(firstCharCursor);
+		return newDoc;
+	}
 
-    private void writeCharacters(AbstractBlock charBlock) {
-        final List<AbstractChar> existingChars = Arrays.asList(charBlock.getFormat().getCharArray());
-        final List<AbstractStates> existingStatesList = Arrays.asList(charBlock.getFormat().getStatesArray());
-        final List<AbstractChar> newCharacters = new ArrayList<AbstractChar>();
-        final List<AbstractStates> newStatesBlocks = new ArrayList<AbstractStates>();
-        final Set<String> usedStatesIDs = new HashSet<String>();
-        for (Character character : this.data.getCharacters()) {
-            final AbstractChar xmlChar = this.findOrCreateCharWithID(existingChars, character.getNexmlID());
-            newCharacters.add(xmlChar);
-            xmlChar.setLabel(character.getLabel());
-            this.writeComment(xmlChar, character.getComment());
-            this.writeFigure(xmlChar, character.getFigure());
-            final AbstractStates statesBlock = this.findOrCreateStatesBlockWithID(existingStatesList, character.getStatesNexmlID());
-            final AbstractStates usableStatesBlock;
-            if (usedStatesIDs.contains(statesBlock.getId())) {
-                usableStatesBlock = (AbstractStates)(statesBlock.copy());
-                usableStatesBlock.setId(UUID.randomUUID().toString());
-            } else {
-                usableStatesBlock = statesBlock;
-            }
-            newStatesBlocks.add(usableStatesBlock);
-            usedStatesIDs.add(usableStatesBlock.getId());
-            xmlChar.setStates(usableStatesBlock.getId());
-            final List<AbstractState> existingStates = Arrays.asList(usableStatesBlock.getStateArray());
-            final List<AbstractState> newStates = new ArrayList<AbstractState>();
-            for (State state : character.getStates()) {
-                final AbstractState xmlState = this.findOrCreateStateWithID(existingStates, state.getNexmlID());
-                newStates.add(xmlState);
-                xmlState.setLabel(state.getLabel());
-                this.writeComment(xmlState, state.getComment());
-                this.writeFigure(xmlState, state.getFigure());
-                this.writeSymbol(xmlState, state.getSymbol() != null ? state.getSymbol() : "0");
-                this.writePhenotypes(xmlState, state);
-            }
-            usableStatesBlock.setStateArray(newStates.toArray(new AbstractState[] {}));
-        }
-        charBlock.getFormat().setCharArray(newCharacters.toArray(new AbstractChar[] {}));
-        charBlock.getFormat().setStatesArray(newStatesBlocks.toArray(new AbstractStates[] {}));
-        if (charBlock instanceof StandardCells) {
-            final StandardCells cells = (StandardCells)charBlock;
-            final AbstractObsMatrix matrix = cells.getMatrix() != null ? cells.getMatrix() : cells.addNewMatrix();
-            this.writeMatrix(matrix);
-        }
-    }
+	private void writeCharacters(AbstractBlock charBlock) {
+		final List<AbstractChar> existingChars = Arrays.asList(charBlock.getFormat().getCharArray());
+		final List<AbstractStates> existingStatesList = Arrays.asList(charBlock.getFormat().getStatesArray());
+		final List<AbstractChar> newCharacters = new ArrayList<AbstractChar>();
+		final List<AbstractStates> newStatesBlocks = new ArrayList<AbstractStates>();
+		final Set<String> usedStatesIDs = new HashSet<String>();
+		for (Character character : this.data.getCharacters()) {
+			final AbstractChar xmlChar = this.findOrCreateCharWithID(existingChars, character.getNexmlID());
+			newCharacters.add(xmlChar);
+			xmlChar.setLabel(character.getLabel());
+			this.writeComment(xmlChar, character.getComment());
+			this.writeFigure(xmlChar, character.getFigure());
+			this.writeDiscussion(xmlChar, character.getDiscussion());
+			final AbstractStates statesBlock = this.findOrCreateStatesBlockWithID(existingStatesList, character.getStatesNexmlID());
+			final AbstractStates usableStatesBlock;
+			if (usedStatesIDs.contains(statesBlock.getId())) {
+				usableStatesBlock = (AbstractStates)(statesBlock.copy());
+				usableStatesBlock.setId(UUID.randomUUID().toString());
+			} else {
+				usableStatesBlock = statesBlock;
+			}
+			this.statesBlocksByCharacter.put(character, usableStatesBlock);
+			newStatesBlocks.add(usableStatesBlock);
+			usedStatesIDs.add(usableStatesBlock.getId());
+			xmlChar.setStates(usableStatesBlock.getId());
+			final List<AbstractState> existingStates = Arrays.asList(usableStatesBlock.getStateArray());
+			final List<AbstractState> newStates = new ArrayList<AbstractState>();
+			for (State state : character.getStates()) {
+				final AbstractState xmlState = this.findOrCreateStateWithID(existingStates, state.getNexmlID());
+				newStates.add(xmlState);
+				xmlState.setLabel(state.getLabel());
+				this.writeComment(xmlState, state.getComment());
+				this.writeFigure(xmlState, state.getFigure());
+				this.writeSymbol(xmlState, state.getSymbol() != null ? state.getSymbol() : "0");
+				this.writePhenotypes(xmlState, state);
+			}
+			usableStatesBlock.setStateArray(newStates.toArray(new AbstractState[] {}));
+		}
+		charBlock.getFormat().setCharArray(newCharacters.toArray(new AbstractChar[] {}));
+		charBlock.getFormat().setStatesArray(newStatesBlocks.toArray(new AbstractStates[] {}));
+		if (charBlock instanceof StandardCells) {
+			final StandardCells cells = (StandardCells)charBlock;
+			final AbstractObsMatrix matrix = cells.getMatrix() != null ? cells.getMatrix() : cells.addNewMatrix();
+			this.writeMatrix(matrix);
+		}
+	}
 
-    private void writeMatrix(AbstractObsMatrix matrix) {
-        final List<AbstractObsRow> existingRows = Arrays.asList(matrix.getRowArray());
-        final List<AbstractObsRow> newRows = new ArrayList<AbstractObsRow>();
-        for (Taxon taxon : this.data.getTaxa()) {
-            final AbstractObsRow xmlRow = this.findOrCreateRowForTaxon(existingRows, taxon.getNexmlID());
-            newRows.add(xmlRow);
-            final List<AbstractObs> existingCells = Arrays.asList(xmlRow.getCellArray());
-            final List<AbstractObs> newCells = new ArrayList<AbstractObs>();
-            for (Character character : this.data.getCharacters()) {
-                final State state = this.data.getStateForTaxon(taxon, character);
-                if (state != null) {
-                    final AbstractObs xmlCell = this.findOrCreateCellForCharacter(existingCells, character.getNexmlID());
-                    final XmlAnySimpleType xmlState = XmlAnySimpleType.Factory.newInstance();
-                    xmlState.setStringValue(state.getNexmlID());
-                    xmlCell.setState(xmlState);
-                    newCells.add(xmlCell);
-                }
-            }
-            xmlRow.setCellArray(newCells.toArray(new AbstractObs[] {}));
-        }
-        matrix.setRowArray(newRows.toArray(new AbstractObsRow[] {}));
-    }
+	private void writeMatrix(AbstractObsMatrix matrix) {
+		final List<AbstractObsRow> existingRows = Arrays.asList(matrix.getRowArray());
+		final List<AbstractObsRow> newRows = new ArrayList<AbstractObsRow>();
+		for (Taxon taxon : this.data.getTaxa()) {
+			final AbstractObsRow xmlRow = this.findOrCreateRowForTaxon(existingRows, taxon.getNexmlID());
+			newRows.add(xmlRow);
+			final List<AbstractObs> existingCells = Arrays.asList(xmlRow.getCellArray());
+			final List<AbstractObs> newCells = new ArrayList<AbstractObs>();
+			for (Character character : this.data.getCharacters()) {
+				final State state = this.data.getStateForTaxon(taxon, character);
+				if (state != null) {
+					final AbstractObs xmlCell = this.findOrCreateCellForCharacter(existingCells, character.getNexmlID());
+					final XmlAnySimpleType xmlState = XmlAnySimpleType.Factory.newInstance();
+					if (state instanceof MultipleState) {
+						xmlState.setStringValue(this.findOrCreateMultiValueState(character, (MultipleState)state).getId());
+						log().debug("Set multiple state value for a taxon: " + xmlState.getStringValue());
+					} else {
+						xmlState.setStringValue(state.getNexmlID());	
+					}
+					xmlCell.setState(xmlState);
+					newCells.add(xmlCell);
+				}
+			}
+			xmlRow.setCellArray(newCells.toArray(new AbstractObs[] {}));
+		}
+		matrix.setRowArray(newRows.toArray(new AbstractObsRow[] {}));
+	}
 
-    private void writeTaxa(Taxa taxaBlock) {
-        final List<org.nexml.schema_2009.Taxon> existingOTUs = Arrays.asList(taxaBlock.getOtuArray());
-        final List<org.nexml.schema_2009.Taxon> newOTUs = new ArrayList<org.nexml.schema_2009.Taxon>();
-        for (Taxon taxon : this.data.getTaxa()) {
-            final org.nexml.schema_2009.Taxon otu = this.findOrCreateOTUWithID(existingOTUs, taxon.getNexmlID());
-            newOTUs.add(otu);
-            otu.setLabel(taxon.getPublicationName());
-            this.writeOBOID(otu, taxon);
-            this.writeSpecimens(otu, taxon);
-            this.writeComment(otu, taxon.getComment());
-            this.writeFigure(otu, taxon.getFigure());
-            this.writeMatrixTaxon(otu, taxon.getMatrixTaxonName());
-        }
-        taxaBlock.setOtuArray(newOTUs.toArray(new org.nexml.schema_2009.Taxon[] {}));
-    }
+	private void writeTaxa(Taxa taxaBlock) {
+		final List<org.nexml.schema_2009.Taxon> existingOTUs = Arrays.asList(taxaBlock.getOtuArray());
+		final List<org.nexml.schema_2009.Taxon> newOTUs = new ArrayList<org.nexml.schema_2009.Taxon>();
+		for (Taxon taxon : this.data.getTaxa()) {
+			final org.nexml.schema_2009.Taxon otu = this.findOrCreateOTUWithID(existingOTUs, taxon.getNexmlID());
+			newOTUs.add(otu);
+			otu.setLabel(taxon.getPublicationName());
+			this.writeOBOID(otu, taxon);
+			this.writeSpecimens(otu, taxon);
+			this.writeComment(otu, taxon.getComment());
+			this.writeFigure(otu, taxon.getFigure());
+			this.writeMatrixTaxon(otu, taxon.getMatrixTaxonName());
+		}
+		taxaBlock.setOtuArray(newOTUs.toArray(new org.nexml.schema_2009.Taxon[] {}));
+	}
 
-    private AbstractObsRow findOrCreateRowForTaxon(List<AbstractObsRow> list, String id) {
-        for (AbstractObsRow row : list) {
-            if (id.equals(row.getOtu())) { return row; }
-        }
-        final AbstractObsRow newRow = StandardMatrixObsRow.Factory.newInstance();
-        newRow.setId(UUID.randomUUID().toString());
-        newRow.setOtu(id);
-        return newRow;
-    }
+	private AbstractObsRow findOrCreateRowForTaxon(List<AbstractObsRow> list, String id) {
+		for (AbstractObsRow row : list) {
+			if (id.equals(row.getOtu())) { return row; }
+		}
+		final AbstractObsRow newRow = StandardMatrixObsRow.Factory.newInstance();
+		newRow.setId(UUID.randomUUID().toString());
+		newRow.setOtu(id);
+		return newRow;
+	}
 
-    private AbstractObs findOrCreateCellForCharacter(List<AbstractObs> list, String id) {
-        for (AbstractObs cell : list) {
-            if (id.equals(cell.getChar().getStringValue())) { return cell; }
-        }
-        final AbstractObs newCell = StandardObs.Factory.newInstance();
-        final XmlAnySimpleType charXML = XmlAnySimpleType.Factory.newInstance();
-        charXML.setStringValue(id);
-        newCell.setChar(charXML);
-        return newCell;
-    }
+	private AbstractObs findOrCreateCellForCharacter(List<AbstractObs> list, String id) {
+		for (AbstractObs cell : list) {
+			if (id.equals(cell.getChar().getStringValue())) { return cell; }
+		}
+		final AbstractObs newCell = StandardObs.Factory.newInstance();
+		final XmlAnySimpleType charXML = XmlAnySimpleType.Factory.newInstance();
+		charXML.setStringValue(id);
+		newCell.setChar(charXML);
+		return newCell;
+	}
 
-    private org.nexml.schema_2009.Taxon findOrCreateOTUWithID(List<org.nexml.schema_2009.Taxon> list, String id) {
-        for (org.nexml.schema_2009.Taxon otu : list) {
-            if (otu.getId().equals(id)) { return otu; }
-        }
-        final org.nexml.schema_2009.Taxon newOTU = org.nexml.schema_2009.Taxon.Factory.newInstance();
-        newOTU.setId(id);
-        return newOTU;
-    }
+	private org.nexml.schema_2009.Taxon findOrCreateOTUWithID(List<org.nexml.schema_2009.Taxon> list, String id) {
+		for (org.nexml.schema_2009.Taxon otu : list) {
+			if (otu.getId().equals(id)) { return otu; }
+		}
+		final org.nexml.schema_2009.Taxon newOTU = org.nexml.schema_2009.Taxon.Factory.newInstance();
+		newOTU.setId(id);
+		return newOTU;
+	}
 
-    private AbstractChar findOrCreateCharWithID(List<AbstractChar> list, String id) {
-        for (AbstractChar character : list) {
-            if (character.getId().equals(id)) { return character; }
-        }
-        final AbstractChar newCharacter = StandardChar.Factory.newInstance();
-        newCharacter.setId(id);
-        return newCharacter;
-    }
+	private AbstractChar findOrCreateCharWithID(List<AbstractChar> list, String id) {
+		for (AbstractChar character : list) {
+			if (character.getId().equals(id)) { return character; }
+		}
+		final AbstractChar newCharacter = StandardChar.Factory.newInstance();
+		newCharacter.setId(id);
+		return newCharacter;
+	}
 
-    private AbstractStates findOrCreateStatesBlockWithID(List<AbstractStates> list, String id) {
-        for (AbstractStates statesBlock : list) {
-            if (statesBlock.getId().equals(id)) { return statesBlock; }
-        }
-        final AbstractStates newStatesBlock = StandardStates.Factory.newInstance();
-        newStatesBlock.setId(id);
-        return newStatesBlock;
-    }
+	private AbstractStates findOrCreateStatesBlockWithID(List<AbstractStates> list, String id) {
+		for (AbstractStates statesBlock : list) {
+			if (statesBlock.getId().equals(id)) { return statesBlock; }
+		}
+		final AbstractStates newStatesBlock = StandardStates.Factory.newInstance();
+		newStatesBlock.setId(id);
+		return newStatesBlock;
+	}
 
-    private AbstractState findOrCreateStateWithID(List<AbstractState> list, String id) {
-        for (AbstractState state : list) {
-            if (state.getId().equals(id)) { return state; }
-        }
-        final AbstractState newState = StandardState.Factory.newInstance();
-        newState.setId(id);
-        return newState;
-    }
+	private AbstractState findOrCreateStateWithID(List<AbstractState> list, String id) {
+		for (AbstractState state : list) {
+			if (state.getId().equals(id)) { return state; }
+		}
+		final AbstractState newState = StandardState.Factory.newInstance();
+		newState.setId(id);
+		return newState;
+	}
 
-    private void writeOBOID(org.nexml.schema_2009.Taxon otu, Taxon taxon) {
-        final Annotatable annotatableOTU = new Annotatable(otu);
-        if (taxon.getValidName() == null) {
-            NeXMLUtil.unsetMetadata(annotatableOTU, NeXMLUtil.VALID_NAME_PREDICATE);
-        } else {
-            NeXMLUtil.setMetadata(annotatableOTU, NeXMLUtil.VALID_NAME_PREDICATE, NeXMLUtil.oboURI(taxon.getValidName()));
-        }
-    }
+	private AbstractState findOrCreateMultiValueState(Character character, MultipleState state) {
+		final AbstractStates block = this.statesBlocksByCharacter.get(character);
+		final AbstractUncertainStateSet[] sets = (state.getMode() == MODE.POLYMORPHIC) ? block.getPolymorphicStateSetArray() : block.getUncertainStateSetArray(); 
+		for (AbstractUncertainStateSet set : sets) {
+			if (this.multipleStateSetMatches(state, set)) {
+				log().debug("Found matching set.");
+				return set;
+			}
+		}
+		final AbstractUncertainStateSet set;
+		if (state.getMode() == MODE.POLYMORPHIC) {
+			log().debug(block.getStateArray());
+			log().debug(block.getPolymorphicStateSetArray().length);
+			final StandardPolymorphicStateSet polymorphicSet = StandardPolymorphicStateSet.Factory.newInstance(); 
+			set = polymorphicSet;
+			polymorphicSet.setId(UUID.randomUUID().toString());
+			final AbstractPolymorphicStateSet[] oldStates = block.getPolymorphicStateSetArray();
+			final List<AbstractPolymorphicStateSet> newStates = new ArrayList<AbstractPolymorphicStateSet>();
+			newStates.addAll(Arrays.asList(oldStates));
+			newStates.add(polymorphicSet);
+			final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
+			for (State substate : state.getStates()) {
+				final StandardMapping mapping = StandardMapping.Factory.newInstance();
+				mapping.setState(substate.getNexmlID());
+				mappings.add(mapping);
+			}
+			set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
+			block.setPolymorphicStateSetArray(newStates.toArray(new AbstractPolymorphicStateSet[] {}));
+			//log().debug("Added polymorphic state to states set.");
+		} else {
+			final StandardUncertainStateSet uncertainSet = StandardUncertainStateSet.Factory.newInstance(); 
+			set = uncertainSet;
+			uncertainSet.setId(UUID.randomUUID().toString());
+			final AbstractUncertainStateSet[] oldStates = block.getUncertainStateSetArray();
+			final List<AbstractUncertainStateSet> newStates = new ArrayList<AbstractUncertainStateSet>();
+			newStates.addAll(Arrays.asList(oldStates));
+			newStates.add(uncertainSet);
+			final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
+			for (State substate : state.getStates()) {
+				final StandardMapping mapping = StandardMapping.Factory.newInstance();
+				mapping.setState(substate.getNexmlID());
+				mappings.add(mapping);
+			}
+			set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
+			block.setUncertainStateSetArray(newStates.toArray(new AbstractUncertainStateSet[] {}));
+			//log().debug("Added uncertain state to states set.");
+		}
+//		final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
+//		for (State substate : state.getStates()) {
+//			final StandardMapping mapping = StandardMapping.Factory.newInstance();
+//			mapping.setState(substate.getNexmlID());
+//			mappings.add(mapping);
+//		}
+//		set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
+		log().debug(block.toString());
+		return set;
+	}
 
-    private void writeSpecimens(org.nexml.schema_2009.Taxon otu, Taxon taxon) {
-        final Annotatable annotatableOTU = new Annotatable(otu);
-        NeXMLUtil.unsetMetadata(annotatableOTU, NeXMLUtil.SPECIMEN_PREDICATE);
-        for (Specimen specimen : taxon.getSpecimens()) {
-            final Map<QName, Object> specimenData = new HashMap<QName, Object>();
-            if (specimen.getCollectionCode() != null) {
-                specimenData.put(NeXMLUtil.COLLECTION_PREDICATE, NeXMLUtil.oboURI(specimen.getCollectionCode()));    
-            }
-            if (specimen.getCatalogID() != null) {
-                specimenData.put(NeXMLUtil.ACCESSION_PREDICATE, specimen.getCatalogID());    
-            }
-            NeXMLUtil.addMetadata(annotatableOTU, NeXMLUtil.SPECIMEN_PREDICATE, specimenData);
-        }
+	private boolean multipleStateSetMatches(MultipleState state, AbstractUncertainStateSet set) {
+		final Set<String> stateIDs = new HashSet<String>();
+		for (State substate : state.getStates()) {
+			stateIDs.add(substate.getNexmlID());
+		}
+		final Set<String> setStateIDs = new HashSet<String>();
+		for (AbstractMapping mapping : set.getMemberArray()) {
+			setStateIDs.add(mapping.getState());
+		}
+		return stateIDs.equals(setStateIDs);
+	}
 
-    }
+	private void writeOBOID(org.nexml.schema_2009.Taxon otu, Taxon taxon) {
+		final Annotatable annotatableOTU = new Annotatable(otu);
+		if (taxon.getValidName() == null) {
+			NeXMLUtil.unsetMetadata(annotatableOTU, NeXMLUtil.VALID_NAME_PREDICATE);
+		} else {
+			NeXMLUtil.setMetadata(annotatableOTU, NeXMLUtil.VALID_NAME_PREDICATE, NeXMLUtil.oboURI(taxon.getValidName()));
+		}
+	}
 
-    private void writeComment(Annotated node, String comment) {
-        final Annotatable annotatableNode = new Annotatable(node);
-        if ((comment == null) || (comment.equals(""))) {
-            NeXMLUtil.unsetMetadata(annotatableNode, NeXMLUtil.COMMENT_PREDICATE);
-        } else {
-            NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.COMMENT_PREDICATE, comment);
-        }
-    }
+	private void writeSpecimens(org.nexml.schema_2009.Taxon otu, Taxon taxon) {
+		final Annotatable annotatableOTU = new Annotatable(otu);
+		NeXMLUtil.unsetMetadata(annotatableOTU, NeXMLUtil.SPECIMEN_PREDICATE);
+		for (Specimen specimen : taxon.getSpecimens()) {
+			final Map<QName, Object> specimenData = new HashMap<QName, Object>();
+			if (specimen.getCollectionCode() != null) {
+				specimenData.put(NeXMLUtil.COLLECTION_PREDICATE, NeXMLUtil.oboURI(specimen.getCollectionCode()));    
+			}
+			if (specimen.getCatalogID() != null) {
+				specimenData.put(NeXMLUtil.ACCESSION_PREDICATE, specimen.getCatalogID());    
+			}
+			if (specimen.getComment() != null) {
+				specimenData.put(NeXMLUtil.COMMENT_PREDICATE, specimen.getComment());
+			}
+			NeXMLUtil.addMetadata(annotatableOTU, NeXMLUtil.SPECIMEN_PREDICATE, specimenData);
+		}
 
-    private void writeFigure(Annotated node, String figure) {
-        final Annotatable annotatableNode = new Annotatable(node);
-        if ((figure == null) || (figure.equals(""))) {
-            NeXMLUtil.unsetMetadata(annotatableNode, NeXMLUtil.FIGURE_PREDICATE);
-        } else {
-            NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.FIGURE_PREDICATE, figure);
-        }
-    }
+	}
 
-    private void writeMatrixTaxon(org.nexml.schema_2009.Taxon otu, String matrixTaxon) {
-        final Annotatable annotatableOTU = new Annotatable(otu);
-        if ((matrixTaxon == null) || (matrixTaxon.equals(""))) {
-            NeXMLUtil.unsetMetadata(annotatableOTU, NeXMLUtil.MATRIX_NAME_PREDICATE);
-        } else {
-            NeXMLUtil.setMetadata(annotatableOTU, NeXMLUtil.MATRIX_NAME_PREDICATE, matrixTaxon);
-        }
-    }
+	private void writeComment(Annotated node, String comment) {
+		final Annotatable annotatableNode = new Annotatable(node);
+		if ((comment == null) || (comment.equals(""))) {
+			NeXMLUtil.unsetMetadata(annotatableNode, NeXMLUtil.COMMENT_PREDICATE);
+		} else {
+			NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.COMMENT_PREDICATE, comment);
+		}
+	}
 
-    private void writePhenotypes(AbstractState xmlState, State state) {
-        final Annotatable annotatableState = new Annotatable(xmlState);
-        if (state.getPhenotypes().isEmpty()) {
-            NeXMLUtil.unsetMetadata(annotatableState, NeXMLUtil.PHENOTYPE_PREDICATE);
-            return;
-        } else {
-            final List<PhenotypeCharacter> pcs = new ArrayList<PhenotypeCharacter>();
-            for (Phenotype phenotype : state.getPhenotypes()) {
-                final PhenotypeCharacter pc = PhenoXMLAdapter.createPhenotypeCharacter(phenotype);
-                if (pc != null) { pcs.add(pc); }
-            }
-            final org.bioontologies.obd.schema.pheno.PhenotypeDocument.Phenotype phenoXML = PhenoXMLAdapter.createPhenotype(pcs);
-            // for some reason the PhenoXML Phenotype appears only as a DocumentFragment instead of Element until it's stuck into a PhenotypeManifestation
-            final PhenotypeManifestation scratchPM = PhenotypeManifestation.Factory.newInstance();
-            scratchPM.setPhenotype(phenoXML);
-            NeXMLUtil.setMetadata(annotatableState, NeXMLUtil.PHENOTYPE_PREDICATE, scratchPM.getPhenotype().getDomNode());
-        }
-    }
+	private void writeFigure(Annotated node, String figure) {
+		final Annotatable annotatableNode = new Annotatable(node);
+		if ((figure == null) || (figure.equals(""))) {
+			NeXMLUtil.unsetMetadata(annotatableNode, NeXMLUtil.FIGURE_PREDICATE);
+		} else {
+			NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.FIGURE_PREDICATE, figure);
+		}
+	}
+	
+	private void writeDiscussion(Annotated node, String discussion) {
+		final Annotatable annotatableNode = new Annotatable(node);
+		if ((discussion == null) || (discussion.equals(""))) {
+			NeXMLUtil.unsetMetadata(annotatableNode, NeXMLUtil.DISCUSSION_PREDICATE);
+		} else {
+			NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.DISCUSSION_PREDICATE, discussion);
+		}
+	}
 
-    /**
-     * The NeXML schema forces symbols to be an integer, but I 
-     * believe this is incorrect.  This method should allow us 
-     * to write any kind of symbol.
-     */
-    private void writeSymbol(AbstractState state, String symbolValue) {
-        final XmlAnySimpleType symbol = state.getSymbol() != null ? state.getSymbol() : state.addNewSymbol();
-        final Attr attribute = (Attr)(symbol.getDomNode());
-        attribute.setValue(symbolValue);
-    }
+	private void writeMatrixTaxon(org.nexml.schema_2009.Taxon otu, String matrixTaxon) {
+		final Annotatable annotatableOTU = new Annotatable(otu);
+		if ((matrixTaxon == null) || (matrixTaxon.equals(""))) {
+			NeXMLUtil.unsetMetadata(annotatableOTU, NeXMLUtil.MATRIX_NAME_PREDICATE);
+		} else {
+			NeXMLUtil.setMetadata(annotatableOTU, NeXMLUtil.MATRIX_NAME_PREDICATE, matrixTaxon);
+		}
+	}
 
-    @SuppressWarnings("unused")
-    private Logger log() {
-        return Logger.getLogger(this.getClass());
-    }
+	private void writePhenotypes(AbstractState xmlState, State state) {
+		final Annotatable annotatableState = new Annotatable(xmlState);
+		if (state.getPhenotypes().isEmpty()) {
+			NeXMLUtil.unsetMetadata(annotatableState, NeXMLUtil.PHENOTYPE_PREDICATE);
+			return;
+		} else {
+			final List<PhenotypeCharacter> pcs = new ArrayList<PhenotypeCharacter>();
+			for (Phenotype phenotype : state.getPhenotypes()) {
+				final PhenotypeCharacter pc = PhenoXMLAdapter.createPhenotypeCharacter(phenotype);
+				if (pc != null) { pcs.add(pc); }
+			}
+			final org.bioontologies.obd.schema.pheno.PhenotypeDocument.Phenotype phenoXML = PhenoXMLAdapter.createPhenotype(pcs);
+			// for some reason the PhenoXML Phenotype appears only as a DocumentFragment instead of Element until it's stuck into a PhenotypeManifestation
+			final PhenotypeManifestation scratchPM = PhenotypeManifestation.Factory.newInstance();
+			scratchPM.setPhenotype(phenoXML);
+			NeXMLUtil.setMetadata(annotatableState, NeXMLUtil.PHENOTYPE_PREDICATE, scratchPM.getPhenotype().getDomNode());
+		}
+	}
+
+	/**
+	 * The NeXML schema forces symbols to be an integer, but I 
+	 * believe this is incorrect.  This method should allow us 
+	 * to write any kind of symbol.
+	 */
+	private void writeSymbol(AbstractState state, String symbolValue) {
+		final XmlAnySimpleType symbol = state.getSymbol() != null ? state.getSymbol() : state.addNewSymbol();
+		final Attr attribute = (Attr)(symbol.getDomNode());
+		attribute.setValue(symbolValue);
+	}
+
+	private Logger log() {
+		return Logger.getLogger(this.getClass());
+	}
 
 }

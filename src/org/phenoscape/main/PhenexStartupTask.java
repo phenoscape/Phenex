@@ -53,189 +53,191 @@ import org.phenoscape.view.TaxonTableComponentFactory;
  */
 public class PhenexStartupTask extends DefaultGUIStartupTask {
 
-    private PhenexController controller;
-    private UserOntologyConfiguration ontologyConfiguration;
+	private PhenexController controller;
+	private UserOntologyConfiguration ontologyConfiguration;
 
-    @Override
-    protected Collection<GUIComponentFactory<?>> getDefaultComponentFactories() {
-        Collection<GUIComponentFactory<?>> factories = new ArrayList<GUIComponentFactory<?>>();
-        factories.add(new DataSetComponentFactory(this.controller));
-        factories.add(new CharacterTableComponentFactory(this.controller));
-        factories.add(new StateTableComponentFactory(this.controller));
-        factories.add(new PhenotypeTableComponentFactory(this.controller));
-        factories.add(new PhenotypeProposalComponentFactory(this.controller));
-        factories.add(new TaxonTableComponentFactory(this.controller));
-        factories.add(new SpecimenTableComponentFactory(this.controller));
-        factories.add(new CharacterMatrixComponentFactory(this.controller));
-        factories.add(new OntologyPreferencesComponentFactory(this.ontologyConfiguration));
-        factories.add(new TermInfoComponentFactory(this.controller.getOntologyCoordinator()));
-        factories.add(new PhenoteOntologyTreeEditorFactory());
-        factories.add(new PhenoteGraphViewFactory());
-        factories.add(new SearchComponentFactory() {
-            @Override
-            public FactoryCategory getCategory() {
-                return FactoryCategory.ONTOLOGY;
-            }
-        });
-        factories.add(new SearchResultsComponentFactory());
-        factories.add(new LogViewComponentFactory());
-        return factories;
-    }
+	@Override
+	protected Collection<GUIComponentFactory<?>> getDefaultComponentFactories() {
+		Collection<GUIComponentFactory<?>> factories = new ArrayList<GUIComponentFactory<?>>();
+		factories.add(new DataSetComponentFactory(this.controller));
+		factories.add(new CharacterTableComponentFactory(this.controller));
+		factories.add(new StateTableComponentFactory(this.controller));
+		factories.add(new PhenotypeTableComponentFactory(this.controller));
+		factories.add(new PhenotypeProposalComponentFactory(this.controller));
+		factories.add(new TaxonTableComponentFactory(this.controller));
+		factories.add(new SpecimenTableComponentFactory(this.controller));
+		factories.add(new CharacterMatrixComponentFactory(this.controller));
+		factories.add(new OntologyPreferencesComponentFactory(this.ontologyConfiguration));
+		factories.add(new TermInfoComponentFactory(this.controller.getOntologyCoordinator()));
+		factories.add(new PhenoteOntologyTreeEditorFactory());
+		factories.add(new PhenoteGraphViewFactory());
+		factories.add(new SearchComponentFactory() {
+			@Override
+			public FactoryCategory getCategory() {
+				return FactoryCategory.ONTOLOGY;
+			}
+		});
+		factories.add(new SearchResultsComponentFactory());
+		factories.add(new LogViewComponentFactory());
+		return factories;
+	}
 
-    @Override
-    protected void configureLogging() {
-        //logging is configured via the log4j config file in the classpath
-    }
+	@Override
+	protected void configureLogging() {
+		//logging is configured via the log4j config file in the classpath
+	}
 
-    @Override
-    protected void configureUI() {
-        try {
-            final String lookAndFeelClassName = UIManager.getSystemLookAndFeelClassName();
-            if (CrossPlatform.getCurrentPlatform().equals(CrossPlatform.Platform.MAC)) {
-                // We are running on Mac OS X - use the Quaqua look and feel
-                System.setProperty("apple.laf.useScreenMenuBar", "true");
-                UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
-            } else {
-                // We are on some other platform, use the system look and feel
-                UIManager.setLookAndFeel(lookAndFeelClassName);
-            }
-        } catch (ClassNotFoundException e) {
-            log().error("Look and feel class not found", e);
-        } catch (InstantiationException e) {
-            log().error("Could not instantiate look and feel", e);
-        } catch (IllegalAccessException e) {
-            log().error("Error setting look and feel", e);
-        } catch (UnsupportedLookAndFeelException e) {
-            log().error("Look and feel not supported", e);
-        }
-    }
+	@Override
+	protected void configureUI() {
+		try {
+			final String lookAndFeelClassName = UIManager.getSystemLookAndFeelClassName();
+			if (CrossPlatform.getCurrentPlatform().equals(CrossPlatform.Platform.MAC)) {
+				// We are running on Mac OS X - use the Quaqua look and feel
+				System.setProperty("apple.laf.useScreenMenuBar", "true");
+				UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
+			} else {
+				// We are on some other platform, use the system look and feel
+				UIManager.setLookAndFeel(lookAndFeelClassName);
+			}
+		} catch (ClassNotFoundException e) {
+			log().error("Look and feel class not found", e);
+		} catch (InstantiationException e) {
+			log().error("Could not instantiate look and feel", e);
+		} catch (IllegalAccessException e) {
+			log().error("Error setting look and feel", e);
+		} catch (UnsupportedLookAndFeelException e) {
+			log().error("Look and feel not supported", e);
+		}
+	}
 
-    @Override
-    protected void configureSystem() {
-        super.configureSystem();
-        this.ontologyConfiguration = new UserOntologyConfiguration();
-        final SwingWorker<OntologyController, Void> ontologyLoader = new SwingWorker<OntologyController, Void>() {
-            @Override
-            protected OntologyController doInBackground() {
-                return new OntologyController(ontologyConfiguration);
-            }
-        };
-        // you would expect that displaying the progress dialog would make the splash screen go away, but it doesn't
-        this.flashJFrameToMakeSplashScreenGoAway();
-        final BlockingProgressDialog<OntologyController, Void> dialog = new BlockingProgressDialog<OntologyController, Void>(ontologyLoader, "Phenex is checking for ontology updates.  It may take some time to download and configure ontologies.");
-        dialog.setTitle("Launching " + this.getAppName());
-        dialog.setSize(400, 150);
-        dialog.setLocationRelativeTo(null);
-        dialog.run();
-        try {
-            this.controller = new PhenexController(ontologyLoader.get());
-        } catch (InterruptedException e) {
-            log().fatal("Failed to create ontology controller", e);
-            GUIManager.exit(1);
-        } catch (ExecutionException e) {
-            log().fatal("Failed to create ontology controller", e);
-            GUIManager.exit(1);
-        }
-        this.controller.setAppName(this.getAppName());
-    }
+	@Override
+	protected void configureSystem() {
+		super.configureSystem();
+		this.ontologyConfiguration = new UserOntologyConfiguration();
+		final SwingWorker<OntologyController, Void> ontologyLoader = new SwingWorker<OntologyController, Void>() {
+			@Override
+			protected OntologyController doInBackground() {
+				return new OntologyController(ontologyConfiguration);
+			}
+		};
+		// you would expect that displaying the progress dialog would make the splash screen go away, but it doesn't
+		this.flashJFrameToMakeSplashScreenGoAway();
+		final BlockingProgressDialog<OntologyController, Void> dialog = new BlockingProgressDialog<OntologyController, Void>(ontologyLoader, "Phenex is checking for ontology updates.  It may take some time to download and configure ontologies.");
+		dialog.setTitle("Launching " + this.getAppName());
+		dialog.setSize(400, 150);
+		dialog.setLocationRelativeTo(null);
+		dialog.run();
+		try {
+			this.controller = new PhenexController(ontologyLoader.get());
+		} catch (InterruptedException e) {
+			log().fatal("Failed to create ontology controller", e);
+			GUIManager.exit(1);
+		} catch (ExecutionException e) {
+			log().fatal("Failed to create ontology controller", e);
+			GUIManager.exit(1);
+		}
+		this.controller.setAppName(this.getAppName());
+	}
 
-    @Override
-    protected String getAppID() {
-        return "Phenex";
-    }
+	@Override
+	protected String getAppID() {
+		return "Phenex";
+	}
 
-    @Override
-    protected String getAppName() {
-        return "Phenex";
-    }
+	@Override
+	protected String getAppName() {
+		return "Phenex";
+	}
 
-    @Override
-    protected Action getAboutAction() {
-        //TODO make an about panel
-        return new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-            }
-        };
-    }
+	@Override
+	protected Action getAboutAction() {
+		//TODO make an about panel
+		return new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			}
+		};
+	}
 
-    @Override
-    protected JFrame createFrame() {
-        final JFrame frame = super.createFrame();
-        frame.setTitle(getAppName());
-        // the window prefs saver is not currently working because the BBOP MainFrame is trying to be too smart
-        new WindowSizePrefsSaver(frame, this.getClass().getName() + "mainwindow");
-        return frame;
-    }
+	@Override
+	protected JFrame createFrame() {
+		final JFrame frame = super.createFrame();
+		frame.setTitle(getAppName());
+		// the window prefs saver is not currently working because the BBOP MainFrame is trying to be too smart
+		new WindowSizePrefsSaver(frame, this.getClass().getName() + "mainwindow");
+		return frame;
+	}
 
-    @Override
-    protected void showFrame() {
-        // BBOP centers and makes frame a certain size - we are overriding this
-        GUIManager.getManager().getFrame().setVisible(true);
-    }
+	@Override
+	protected void showFrame() {
+		// BBOP centers and makes frame a certain size - we are overriding this
+		GUIManager.getManager().getFrame().setVisible(true);
+	}
 
-    @Override
-    protected LayoutDriver createLayoutDriver() {
-        final LayoutDriver driver = super.createLayoutDriver();
-        if (driver instanceof IDWDriver) {
-            ((IDWDriver)driver).setCustomTheme(new NativeDockingTheme());
-        }
-        driver.setSaveLayoutOnExit(false);
-        return driver;
-    }
+	@Override
+	protected LayoutDriver createLayoutDriver() {
+		final LayoutDriver driver = super.createLayoutDriver();
+		if (driver instanceof IDWDriver) {
+			((IDWDriver)driver).setCustomTheme(new NativeDockingTheme());
+		}
+		driver.setSaveLayoutOnExit(false);
+		return driver;
+	}
 
-    @Override
-    protected String getPerspectiveResourceDir() {
-        return "org/phenoscape/view/layouts";
-    }
+	@Override
+	protected String getPerspectiveResourceDir() {
+		return "org/phenoscape/view/layouts";
+	}
 
-    @Override
-    protected String getDefaultPerspectiveResourcePath() {
-        if (getPerspectiveResourceDir() != null)
-            return getPerspectiveResourceDir() + "/default.idw";
-        else
-            return null;
-    }
+	@Override
+	protected String getDefaultPerspectiveResourcePath() {
+		if (getPerspectiveResourceDir() != null)
+			return getPerspectiveResourceDir() + "/default.idw";
+		else
+			return null;
+	}
 
-    @Override
-    public File getPrefsDir() {
-        return CrossPlatform.getUserPreferencesFolder(this.getAppID());
-    }
+	@Override
+	public File getPrefsDir() {
+		return CrossPlatform.getUserPreferencesFolder(this.getAppID());
+	}
 
-    @Override
-    protected void installSystemListeners() {
-        GUIManager.addVetoableShutdownListener(new VetoableShutdownListener() {
-            public boolean willShutdown() {
-                return controller.canCloseDocument();
-            }
-        });
-    }
+	@Override
+	protected void installSystemListeners() {
+		GUIManager.addVetoableShutdownListener(new VetoableShutdownListener() {
+			@Override
+			public boolean willShutdown() {
+				return controller.canCloseDocument();
+			}
+		});
+	}
 
-    @Override
-    protected void doOtherInstallations() {
-        super.doOtherInstallations();
-        new SelectionBridge(this.controller.getOntologyCoordinator().getSelectionManager()).install();
-    }
+	@Override
+	protected void doOtherInstallations() {
+		super.doOtherInstallations();
+		new SelectionBridge(this.controller.getOntologyCoordinator().getSelectionManager()).install();
+	}
 
-    @Override
-    protected Collection<? extends JMenuItem> getDefaultMenus() {
-        return (new MenuFactory(this.controller)).createMenus();
-    }
+	@Override
+	protected Collection<? extends JMenuItem> getDefaultMenus() {
+		return (new MenuFactory(this.controller)).createMenus();
+	}
 
-    @Override
-    protected Collection<GUITask> getDefaultTasks() {
-        // OBO-Edit startup task adds some things we don't want
-        // hopefully none of these tasks are needed for operations in Phenex
-        return new ArrayList<GUITask>();
-    }
+	@Override
+	protected Collection<GUITask> getDefaultTasks() {
+		// OBO-Edit startup task adds some things we don't want
+		// hopefully none of these tasks are needed for operations in Phenex
+		return new ArrayList<GUITask>();
+	}
 
-    private void flashJFrameToMakeSplashScreenGoAway() {
-        final JFrame frame = new JFrame();
-        frame.setVisible(true);
-        frame.setVisible(false);
-    }
+	private void flashJFrameToMakeSplashScreenGoAway() {
+		final JFrame frame = new JFrame();
+		frame.setVisible(true);
+		frame.setVisible(false);
+	}
 
-    private Logger log() {
-        return Logger.getLogger(this.getClass());
-    }
+	private Logger log() {
+		return Logger.getLogger(this.getClass());
+	}
 
 }

@@ -19,104 +19,112 @@ import ca.odell.glazedlists.event.ListEventListener;
  * @author Jim Balhoff
  */
 public class ObservableEventList<T extends PropertyChangeObject> extends ObservableElementList<T> implements ObservableList<T> {
-    
-    private final List<T> observedElements;
-    private final List<ObservableListListener> listeners = new ArrayList<ObservableListListener>();
 
-    public ObservableEventList(EventList<T> source) {
-        super(source, new PropertyChangeConnector<T>());
-        this.observedElements = new ArrayList<T>(source);
-        this.addListEventListener(new ListChangeListener());
-    }
+	private final List<T> observedElements;
+	private final List<ObservableListListener> listeners = new ArrayList<ObservableListListener>();
 
-    public void addObservableListListener(ObservableListListener listener) {
-        this.listeners.add(listener);
-    }
+	public ObservableEventList(EventList<T> source) {
+		super(source, new PropertyChangeConnector<T>());
+		this.observedElements = new ArrayList<T>(source);
+		this.addListEventListener(new ListChangeListener());
+	}
 
-    public void removeObservableListListener(ObservableListListener listener) {
-        this.listeners.remove(listener);
-    }
+	@Override
+	public void addObservableListListener(ObservableListListener listener) {
+		this.listeners.add(listener);
+	}
 
-    public boolean supportsElementPropertyChanged() {
-        return true;
-    }
+	@Override
+	public void removeObservableListListener(ObservableListListener listener) {
+		this.listeners.remove(listener);
+	}
 
-    public void listDidChange(ListEvent<T> listChanges) {
-        while (listChanges.hasNext()) {
-            listChanges.next();
-            final int index = listChanges.getIndex();
-            if (listChanges.getType() == ListEvent.UPDATE) {
-                this.observedElements.set(index, listChanges.getSourceList().get(index));
-                this.fireListElementPropertyChanged(index);
-            } else if (listChanges.getType() == ListEvent.DELETE) {
-                final T deleted = this.observedElements.get(index);
-                this.observedElements.remove(index);
-                this.fireListElementsRemoved(listChanges.getIndex(), Collections.singletonList(deleted));
-            } else if (listChanges.getType() == ListEvent.INSERT) {
-                this.observedElements.add(index, listChanges.getSourceList().get(index));
-                this.fireListElementsAdded(index, 1);
-            }
-        }
-    }
-    
-    @Override
-    protected boolean isWritable() {
-        return true;
-    }
-    
-    private void fireListElementPropertyChanged(int index) {
-        for (ObservableListListener listener : this.listeners) {
-            listener.listElementPropertyChanged(this, index);
-        }
-    }
-    
-    private void fireListElementsRemoved(int index, List<T> oldElements) {
-        for (ObservableListListener listener : this.listeners) {
-            listener.listElementsRemoved(this, index, oldElements);
-        }
-    }
-    
-    private void fireListElementsAdded(int index, int length) {
-        for (ObservableListListener listener : this.listeners) {
-            listener.listElementsAdded(this, index, length);
-        }
-    }
-    
-    private class ListChangeListener implements ListEventListener<T> {
+	@Override
+	public boolean supportsElementPropertyChanged() {
+		return true;
+	}
 
-        public void listChanged(ListEvent<T> listChanges) {
-            listDidChange(listChanges);
-        }
-        
-    }
-    
-    private static class PropertyChangeConnector<T extends PropertyChangeObject> implements Connector<T> {
+	public void listDidChange(ListEvent<T> listChanges) {
+		while (listChanges.hasNext()) {
+			listChanges.next();
+			final int index = listChanges.getIndex();
+			if (listChanges.getType() == ListEvent.UPDATE) {
+				this.observedElements.set(index, listChanges.getSourceList().get(index));
+				this.fireListElementPropertyChanged(index);
+			} else if (listChanges.getType() == ListEvent.DELETE) {
+				final T deleted = this.observedElements.get(index);
+				this.observedElements.remove(index);
+				this.fireListElementsRemoved(listChanges.getIndex(), Collections.singletonList(deleted));
+			} else if (listChanges.getType() == ListEvent.INSERT) {
+				this.observedElements.add(index, listChanges.getSourceList().get(index));
+				this.fireListElementsAdded(index, 1);
+			}
+		}
+	}
 
-        private ObservableElementList<T> list;
+	@Override
+	protected boolean isWritable() {
+		return true;
+	}
 
-        public EventListener installListener(T element) {
-            final Observer observer = new Observer();
-            element.addPropertyChangeListener(observer);
-            return observer;
-        }
+	private void fireListElementPropertyChanged(int index) {
+		for (ObservableListListener listener : this.listeners) {
+			listener.listElementPropertyChanged(this, index);
+		}
+	}
 
-        public void setObservableElementList(ObservableElementList<T> list) {
-            this.list = list;
-        }
+	private void fireListElementsRemoved(int index, List<T> oldElements) {
+		for (ObservableListListener listener : this.listeners) {
+			listener.listElementsRemoved(this, index, oldElements);
+		}
+	}
 
-        public void uninstallListener(T element, EventListener listener) {
-            element.removePropertyChangeListener((Observer)listener);
-        }
+	private void fireListElementsAdded(int index, int length) {
+		for (ObservableListListener listener : this.listeners) {
+			listener.listElementsAdded(this, index, length);
+		}
+	}
 
-        private class Observer implements PropertyChangeListener {
+	private class ListChangeListener implements ListEventListener<T> {
 
-            @SuppressWarnings("unchecked")
-            public void propertyChange(PropertyChangeEvent evt) {
-                list.elementChanged((T)evt.getSource());
-            }
+		@Override
+		public void listChanged(ListEvent<T> listChanges) {
+			listDidChange(listChanges);
+		}
 
-        }
+	}
 
-    }
-    
+	private static class PropertyChangeConnector<T extends PropertyChangeObject> implements Connector<T> {
+
+		private ObservableElementList<T> list;
+
+		@Override
+		public EventListener installListener(T element) {
+			final Observer observer = new Observer();
+			element.addPropertyChangeListener(observer);
+			return observer;
+		}
+
+		@Override
+		public void setObservableElementList(ObservableElementList<T> list) {
+			this.list = list;
+		}
+
+		@Override
+		public void uninstallListener(T element, EventListener listener) {
+			element.removePropertyChangeListener((Observer)listener);
+		}
+
+		private class Observer implements PropertyChangeListener {
+
+			@Override
+			@SuppressWarnings("unchecked")
+			public void propertyChange(PropertyChangeEvent evt) {
+				list.elementChanged((T)evt.getSource());
+			}
+
+		}
+
+	}
+
 }

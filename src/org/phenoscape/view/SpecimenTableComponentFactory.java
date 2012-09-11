@@ -5,33 +5,36 @@ import org.phenoscape.controller.PhenexController;
 
 public class SpecimenTableComponentFactory extends AbstractComponentFactory<SpecimenTableComponent> {
 
-  private final PhenexController controller;
-  
-  public SpecimenTableComponentFactory(PhenexController controller) {
-    super();
-    this.controller = controller;
-  }
+	private final PhenexController controller;
 
-  @Override
-  public SpecimenTableComponent doCreateComponent(String id) {
-    return new SpecimenTableComponent(id, this.controller);
-  }
+	public SpecimenTableComponentFactory(PhenexController controller) {
+		super();
+		this.controller = controller;
+	}
 
-  public FactoryCategory getCategory() {
-    return FactoryCategory.ANNOTATION;
-    }
+	@Override
+	public SpecimenTableComponent doCreateComponent(String id) {
+		return new SpecimenTableComponent(id, this.controller);
+	}
 
-  public String getID() {
-    return "phenoscape_specimens_table";
-    }
+	@Override
+	public FactoryCategory getCategory() {
+		return FactoryCategory.ANNOTATION;
+	}
 
-  public String getName() {
-    return "Specimens";
-  }
-  
-  @Override
-  public boolean isSingleton() {
-    return true;
-  }
+	@Override
+	public String getID() {
+		return "phenoscape_specimens_table";
+	}
+
+	@Override
+	public String getName() {
+		return "Specimens";
+	}
+
+	@Override
+	public boolean isSingleton() {
+		return true;
+	}
 
 }

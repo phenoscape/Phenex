@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_26" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_29" class="java.beans.XMLDecoder"> 
  <object class="org.obo.filters.CompoundFilterImpl"> 
   <void property="filters"> 
    <void method="add"> 
@@ -31,13 +31,29 @@
       <object idref="EqualsComparison0"/> 
      </void> 
      <void property="criterion"> 
-      <object class="org.obo.filters.NamespaceSearchCriterion"/> 
+      <object id="NamespaceSearchCriterion0" class="org.obo.filters.NamespaceSearchCriterion"/> 
      </void> 
      <void property="negate"> 
       <boolean>true</boolean> 
      </void> 
      <void property="value"> 
       <string>teleost-taxonomy</string> 
+     </void> 
+    </object> 
+   </void> 
+   <void method="add"> 
+    <object class="org.obo.filters.ObjectFilterImpl"> 
+     <void property="comparison"> 
+      <object idref="EqualsComparison0"/> 
+     </void> 
+     <void property="criterion"> 
+      <object idref="NamespaceSearchCriterion0"/> 
+     </void> 
+     <void property="negate"> 
+      <boolean>true</boolean> 
+     </void> 
+     <void property="value"> 
+      <string>vto-namespace</string> 
      </void> 
     </object> 
    </void> 

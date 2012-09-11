@@ -1,11 +1,14 @@
 package org.phenoscape.util;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.obo.datamodel.OBOClass;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
+import org.phenoscape.model.MultipleState;
 import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
@@ -101,6 +104,8 @@ public class DataMerger {
                 final State state;
                 if (newStateValue == null) {
                     state = null;
+                } else if (newStateValue instanceof MultipleState) {
+                	state = mapMultipleStateIntoExistingStates(currentCharacter.getStates(), (MultipleState)newStateValue);
                 } else {
                     final String valueSymbol = newStateValue.getSymbol();
                     final State existingState = findState(currentCharacter.getStates(), valueSymbol);
@@ -155,6 +160,19 @@ public class DataMerger {
             if (symbol.equals(state.getSymbol())) { return state; }
         }
         return null;
+    }
+    
+    private static MultipleState mapMultipleStateIntoExistingStates(List<State> allExistingStates, MultipleState newState) {
+    	final Set<State> existingStates = new HashSet<State>();
+    	for (State state : newState.getStates()) {
+    		final State foundState = findState(allExistingStates, state.getSymbol());
+    		if (foundState != null) {
+    			existingStates.add(foundState);
+    		} else {
+    			existingStates.add(state);
+    		}
+    	}
+    	return new MultipleState(existingStates, newState.getMode());
     }
 
     @SuppressWarnings("unused")

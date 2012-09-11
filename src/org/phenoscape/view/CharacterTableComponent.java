@@ -33,164 +33,180 @@ import com.eekboom.utils.Strings;
 
 public class CharacterTableComponent extends PhenoscapeGUIComponent {
 
-    private JButton addCharacterButton;
-    private JButton deleteCharacterButton;
+	private JButton addCharacterButton;
+	private JButton deleteCharacterButton;
 
-    public CharacterTableComponent(String id, PhenexController controller) {
-        super(id, controller);
-    }
+	public CharacterTableComponent(String id, PhenexController controller) {
+		super(id, controller);
+	}
 
-    @Override
-    public void init() {
-        super.init();
-        this.initializeInterface();
-    }
+	@Override
+	public void init() {
+		super.init();
+		this.initializeInterface();
+	}
 
-    private void initializeInterface() {
-        this.setLayout(new BorderLayout());
-        final EventTableModel<Character> charactersTableModel = new EventTableModel<Character>(this.getController().getSortedCharacters(), new CharactersTableFormat());
-        final JTable charactersTable = new BugWorkaroundTable(charactersTableModel);
-        charactersTable.setSelectionModel(this.getController().getCharactersSelectionModel());
-        charactersTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
-        charactersTable.putClientProperty("Quaqua.Table.style", "striped");
-        new TableColumnPrefsSaver(charactersTable, this.getClass().getName());
-        final TableComparatorChooser<Character> sortChooser = new TableComparatorChooser<Character>(charactersTable, this.getController().getSortedCharacters(), false);
-        sortChooser.addSortActionListener(new SortDisabler());
-        this.add(new JScrollPane(charactersTable), BorderLayout.CENTER);
-        this.add(this.createToolBar(), BorderLayout.NORTH);
-        this.getController().getCharactersSelectionModel().addListSelectionListener(new CharacterSelectionListener());
-    }
+	private void initializeInterface() {
+		this.setLayout(new BorderLayout());
+		final EventTableModel<Character> charactersTableModel = new EventTableModel<Character>(this.getController().getSortedCharacters(), new CharactersTableFormat());
+		final JTable charactersTable = new BugWorkaroundTable(charactersTableModel);
+		charactersTable.setSelectionModel(this.getController().getCharactersSelectionModel());
+		charactersTable.setDefaultRenderer(Object.class, new PlaceholderRenderer("None"));
+		charactersTable.putClientProperty("Quaqua.Table.style", "striped");
+		new TableColumnPrefsSaver(charactersTable, this.getClass().getName());
+		final TableComparatorChooser<Character> sortChooser = new TableComparatorChooser<Character>(charactersTable, this.getController().getSortedCharacters(), false);
+		sortChooser.addSortActionListener(new SortDisabler());
+		this.add(new JScrollPane(charactersTable), BorderLayout.CENTER);
+		this.add(this.createToolBar(), BorderLayout.NORTH);
+		this.getController().getCharactersSelectionModel().addListSelectionListener(new CharacterSelectionListener());
+	}
 
-    private void addCharacter() {
-        this.getController().getDataSet().newCharacter();
-    }
+	private void addCharacter() {
+		this.getController().getDataSet().newCharacter();
+	}
 
-    private void deleteSelectedCharacter() {
-        final Character character = this.getSelectedCharacter();
-        if (character != null) { this.getController().getDataSet().removeCharacter(character); }
-    }
+	private void deleteSelectedCharacter() {
+		final Character character = this.getSelectedCharacter();
+		if (character != null) { this.getController().getDataSet().removeCharacter(character); }
+	}
 
-    private Character getSelectedCharacter() {
-        final EventList<Character> selected = this.getController().getCharactersSelectionModel().getSelected();
-        if (selected.size() == 1) {
-            return selected.get(0);
-        } else {
-            return null;
-        }
-    }
+	private Character getSelectedCharacter() {
+		final EventList<Character> selected = this.getController().getCharactersSelectionModel().getSelected();
+		if (selected.size() == 1) {
+			return selected.get(0);
+		} else {
+			return null;
+		}
+	}
 
-    private void updateButtonStates() {
-        this.deleteCharacterButton.setEnabled(this.getSelectedCharacter() != null);
-    }
+	private void updateButtonStates() {
+		this.deleteCharacterButton.setEnabled(this.getSelectedCharacter() != null);
+	}
 
-    private void selectFirstState() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                if (!getController().getStatesForCurrentCharacterSelection().isEmpty()) {
-                    getController().getCurrentStatesSelectionModel().setSelectionInterval(0, 0);
-                }
-            }
-        });
-    }
+	private void selectFirstState() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (!getController().getStatesForCurrentCharacterSelection().isEmpty()) {
+					getController().getCurrentStatesSelectionModel().setSelectionInterval(0, 0);
+				}
+			}
+		});
+	}
 
-    private JToolBar createToolBar() {
-        final JToolBar toolBar = new JToolBar();
-        this.addCharacterButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
-            public void actionPerformed(ActionEvent e) {
-                addCharacter();
-            }
-        });
-        this.addCharacterButton.setToolTipText("Add Character");
-        toolBar.add(this.addCharacterButton);
-        this.deleteCharacterButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
-            public void actionPerformed(ActionEvent e) {
-                deleteSelectedCharacter();
-            }
-        });
-        this.deleteCharacterButton.setToolTipText("Delete Character");
-        toolBar.add(this.deleteCharacterButton);
-        toolBar.setFloatable(false);
-        return toolBar;
-    }
+	private JToolBar createToolBar() {
+		final JToolBar toolBar = new JToolBar();
+		this.addCharacterButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				addCharacter();
+			}
+		});
+		this.addCharacterButton.setToolTipText("Add Character");
+		toolBar.add(this.addCharacterButton);
+		this.deleteCharacterButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteSelectedCharacter();
+			}
+		});
+		this.deleteCharacterButton.setToolTipText("Delete Character");
+		toolBar.add(this.deleteCharacterButton);
+		toolBar.setFloatable(false);
+		return toolBar;
+	}
 
-    private class CharactersTableFormat implements WritableTableFormat<Character>, AdvancedTableFormat<Character> {
+	private class CharactersTableFormat implements WritableTableFormat<Character>, AdvancedTableFormat<Character> {
 
-        public boolean isEditable(Character character, int column) {
-            return column != 0;
-        }
+		@Override
+		public boolean isEditable(Character character, int column) {
+			return column != 0;
+		}
 
-        public Character setColumnValue(Character character, Object editedValue, int column) {
-            switch(column) {
-            case 0: break;
-            case 1: character.setLabel(editedValue.toString()); break;
-            case 2: character.setComment(editedValue.toString()); break;
-            case 3: character.setFigure(editedValue.toString()); break;
-            }
-            return character;
-        }
+		@Override
+		public Character setColumnValue(Character character, Object editedValue, int column) {
+			switch(column) {
+			case 0: break;
+			case 1: character.setLabel(editedValue.toString()); break;
+			case 2: character.setComment(editedValue.toString()); break;
+			case 3: character.setFigure(editedValue.toString()); break;
+			case 4: character.setDiscussion(editedValue.toString()); break;
+			}
+			return character;
+		}
 
-        public int getColumnCount() {
-            return 4;
-        }
+		@Override
+		public int getColumnCount() {
+			return 5;
+		}
 
-        public String getColumnName(int column) {
-            switch(column) {
-            case 0: return " ";
-            case 1: return "Character Description";
-            case 2: return "Comment";
-            case 3: return "Figure";
-            default: return null;
-            }
-        }
+		@Override
+		public String getColumnName(int column) {
+			switch(column) {
+			case 0: return " ";
+			case 1: return "Character Description";
+			case 2: return "Comment";
+			case 3: return "Figure";
+			case 4: return "Discussion";
+			default: return null;
+			}
+		}
 
-        public Object getColumnValue(Character character, int column) {
-            switch(column) {
-            case 0: return getController().getDataSet().getCharacters().indexOf(character) + 1;
-            case 1: return character.getLabel();
-            case 2: return character.getComment();
-            case 3: return character.getFigure();
-            default: return null;
-            }
-        }
+		@Override
+		public Object getColumnValue(Character character, int column) {
+			switch(column) {
+			case 0: return getController().getDataSet().getCharacters().indexOf(character) + 1;
+			case 1: return character.getLabel();
+			case 2: return character.getComment();
+			case 3: return character.getFigure();
+			case 4: return character.getDiscussion();
+			default: return null;
+			}
+		}
 
-        public Class<?> getColumnClass(int column) {
-            switch(column) {
-            case 0: return Integer.class;
-            case 1: return String.class;
-            case 2: return String.class;
-            case 3: return String.class;
-            default: return null;
-            }
-        }
+		@Override
+		public Class<?> getColumnClass(int column) {
+			switch(column) {
+			case 0: return Integer.class;
+			case 1: return String.class;
+			case 2: return String.class;
+			case 3: return String.class;
+			case 4: return String.class;
+			default: return null;
+			}
+		}
 
-        public Comparator<?> getColumnComparator(int column) {
-            switch(column) {
-            case 0: return GlazedLists.comparableComparator();
-            case 1: return Strings.getNaturalComparator();
-            case 2: return Strings.getNaturalComparator();
-            case 3: return Strings.getNaturalComparator();
-            default: return null;
-            }
-        }
+		@Override
+		public Comparator<?> getColumnComparator(int column) {
+			switch(column) {
+			case 0: return GlazedLists.comparableComparator();
+			case 1: return Strings.getNaturalComparator();
+			case 2: return Strings.getNaturalComparator();
+			case 3: return Strings.getNaturalComparator();
+			case 4: return Strings.getNaturalComparator();
+			default: return null;
+			}
+		}
 
-    }
+	}
 
-    private class CharacterSelectionListener implements ListSelectionListener {
+	private class CharacterSelectionListener implements ListSelectionListener {
 
-        public CharacterSelectionListener() {
-            updateButtonStates();
-        }
+		public CharacterSelectionListener() {
+			updateButtonStates();
+		}
 
-        public void valueChanged(ListSelectionEvent e) {
-            updateButtonStates();
-            selectFirstState();
-        }
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			updateButtonStates();
+			selectFirstState();
+		}
 
-    }
+	}
 
-    @SuppressWarnings("unused")
-    protected Logger log() {
-        return Logger.getLogger(this.getClass());
-    }
+	@Override
+	protected Logger log() {
+		return Logger.getLogger(this.getClass());
+	}
 
 }

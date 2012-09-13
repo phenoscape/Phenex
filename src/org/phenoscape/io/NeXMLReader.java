@@ -36,6 +36,7 @@ import org.nexml.schema_2009.StandardChar;
 import org.nexml.schema_2009.StandardFormat;
 import org.nexml.schema_2009.StandardStates;
 import org.nexml.schema_2009.Taxa;
+import org.obo.datamodel.DanglingObject;
 import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOSession;
@@ -354,7 +355,7 @@ public class NeXMLReader {
 			if (oboClass.isObsolete()) {
 				if (!oboClass.getReplacedBy().isEmpty()) {
 					final ObsoletableObject replacement = oboClass.getReplacedBy().iterator().next();
-					if (replacement instanceof OBOClass) {
+					if ((replacement instanceof OBOClass) && (!(replacement instanceof DanglingObject))) {
 						this.replacedIDs.add(id);
 						return (OBOClass)replacement;
 					} else {

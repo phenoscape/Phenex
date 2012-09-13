@@ -20,6 +20,7 @@ import org.bioontologies.obd.schema.pheno.TyperefDocument.Typeref;
 import org.bioontologies.obd.schema.pheno.UnitDocument.Unit;
 import org.obo.annotation.base.OBOUtil;
 import org.obo.annotation.base.OBOUtil.Differentium;
+import org.obo.datamodel.DanglingObject;
 import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.LinkedObject;
@@ -200,7 +201,7 @@ public class PhenoXMLAdapter {
 			if (oboClass.isObsolete()) {
 				if (!oboClass.getReplacedBy().isEmpty()) {
 					final ObsoletableObject replacement = oboClass.getReplacedBy().iterator().next();
-					if (replacement instanceof OBOClass) {
+					if ((replacement instanceof OBOClass) && (!(replacement instanceof DanglingObject))) {
 						this.replacedIDs.add(id);
 						return (OBOClass)replacement;
 					} else {

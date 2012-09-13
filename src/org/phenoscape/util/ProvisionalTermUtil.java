@@ -60,30 +60,26 @@ public class ProvisionalTermUtil {
 		final OBOClass newTerm = new OBOClassImpl(termID);
 		newTerm.setName(label);
 		newTerm.setDefinition(definition);
-		if (parentURI != null) {
-			final String parentOBOID = toOBOID(parentURI);
-			final OBOClass parent;
-			if (session.getObject(parentOBOID) != null) {
-				parent = (OBOClass)(session.getObject(parentOBOID));
-			} else {
-				parent = new DanglingClassImpl(parentOBOID);
-				session.addObject(parent);
-			}
-			newTerm.addParent(new OBORestrictionImpl(newTerm, parent, (OBOProperty)(session.getObject("OBO_REL:is_a"))));
-		}		
-		final String permanentID = findEntry(element, "provisionalPermanentId");
+		final String permanentID = findPermanentID(element);
 		if (permanentID != null) {
 			newTerm.setObsolete(true);
-			//TODO add replaced_by link
+			final String replacedByID = toOBOID(permanentID);
+			final OBOClass replacedBy = findClassOrCreateDangler(replacedByID, session);
+			newTerm.addReplacedBy(replacedBy);
 		}
+		if ((!newTerm.isObsolete()) && (parentURI != null)) {
+			final String parentOBOID = toOBOID(parentURI);
+			final OBOClass parent = findClassOrCreateDangler(parentOBOID, session);
+			newTerm.addParent(new OBORestrictionImpl(newTerm, parent, (OBOProperty)(session.getObject("OBO_REL:is_a"))));
+		}		
 		newTerm.setNamespace(new Namespace("bioportal_provisional"));
 		return newTerm;
 	}
-	
+
 	public static String toURI(String oboID) {
 		return "http://purl.obolibrary.org/obo/" + oboID.replaceAll(":", "_");
 	}
-	
+
 	public static String toOBOID(String uri) {
 		if (uri.contains("http://purl.obolibrary.org/obo/")) {
 			final String id = uri.split("http://purl.obolibrary.org/obo/")[1];
@@ -92,22 +88,35 @@ public class ProvisionalTermUtil {
 		} else {
 			return uri;
 		}
-		
+
 	}
-	
-	private static String findEntry(Element element, String key) {
+
+	private static OBOClass findClassOrCreateDangler(String oboID, OBOSession session) {
+		final OBOClass term;
+		if (session.getObject(oboID) != null) {
+			term = (OBOClass)(session.getObject(oboID));
+		} else {
+			term = new DanglingClassImpl(oboID);
+			session.addObject(term);
+		}
+		return term;
+	}
+
+	private static String findPermanentID(Element element) {
 		for (Object item : element.getChild("relations").getChildren("entry")) {
 			final Element entry = (Element)item;
 			final String entryKey = entry.getChild("string").getValue();
-			if (entryKey.equals(key)) {
+			if (entryKey.equals("provisionalPermanentId")) {
 				if (entry.getChild("null") != null) {
 					return null;
+				} else {
+					return ((Element)(entry.getChildren("string").get(1))).getValue();
 				}
 			}
 		}
-		return "hi";
+		return null;
 	}
-	
+
 	private static String findParentURI(Element term) {
 		for (Object item : term.getChild("relations").getChildren("entry")) {
 			final Element entry = (Element)item;

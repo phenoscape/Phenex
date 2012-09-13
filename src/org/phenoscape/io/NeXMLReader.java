@@ -39,11 +39,10 @@ import org.nexml.schema_2009.Taxa;
 import org.obo.datamodel.IdentifiedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOSession;
+import org.obo.datamodel.ObsoletableObject;
 import org.obo.datamodel.impl.DanglingClassImpl;
-import org.phenoscape.io.NeXMLUtil;
 import org.phenoscape.io.NeXMLUtil.LiteralContents;
 import org.phenoscape.io.NeXMLUtil.OBOURISyntaxException;
-import org.phenoscape.io.PhenoXMLAdapter;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.MultipleState;
@@ -63,6 +62,7 @@ public class NeXMLReader {
 	private final OBOSession session;
 	private final Set<String> danglers = new HashSet<String>();
 	private final Set<String> secondaryIDs = new HashSet<String>();
+	private final Set<String> replacedIDs = new HashSet<String>();
 	private String charactersBlockID = UUID.randomUUID().toString();
 	private final Map<String, State> allStates = new HashMap<String, State>();
 
@@ -117,6 +117,14 @@ public class NeXMLReader {
 	public Collection<String> getMigratedSecondaryIDsList() {
 		return this.secondaryIDs;
 	}
+	
+	public boolean didReplaceObsoleteTerms() {
+    	return !this.replacedIDs.isEmpty();
+    }
+    
+    public Collection<String> getReplacedIDsList() {
+    	return this.replacedIDs;
+    }
 
 	private void parseNeXML() {
 		this.parseMetadata(this.xmlDoc.getNexml());
@@ -188,6 +196,7 @@ public class NeXMLReader {
 								}
 								this.danglers.addAll(adapter.getDanglersList());
 								this.secondaryIDs.addAll(adapter.getMigratedSecondaryIDsList());
+								this.replacedIDs.addAll(adapter.getReplacedIDsList());
 							} catch (XmlException e) {
 								log().error("Failed to parse OBO phenotype", e);
 							}
@@ -335,9 +344,28 @@ public class NeXMLReader {
 	}
 
 	private OBOClass getTerm(String id) {
+		log().debug("Term id: " + id);
+		if (id.equals("http://purl.bioontology.org/ontology/provisional/d0267b99-ff52-4a4c-bd31-ff6dbf4dafcc")) {
+			log().debug("Provisional term");
+		}
 		final IdentifiedObject term = this.session.getObject(id);
 		if (term instanceof OBOClass) {
-			return (OBOClass)term;
+			final OBOClass oboClass = (OBOClass)term;
+			if (oboClass.isObsolete()) {
+				if (!oboClass.getReplacedBy().isEmpty()) {
+					final ObsoletableObject replacement = oboClass.getReplacedBy().iterator().next();
+					if (replacement instanceof OBOClass) {
+						this.replacedIDs.add(id);
+						return (OBOClass)replacement;
+					} else {
+						return oboClass;
+					}
+				} else {
+					return oboClass;
+				}
+			} else {
+				return oboClass;	
+			}
 		} else {
 			final OBOClass altTerm = this.findTermByAltID(id);
 			if (altTerm != null) {

@@ -26,6 +26,7 @@ import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
+import org.obo.datamodel.ObsoletableObject;
 import org.obo.datamodel.impl.DanglingClassImpl;
 import org.obo.datamodel.impl.DanglingPropertyImpl;
 
@@ -33,6 +34,7 @@ public class PhenoXMLAdapter {
 
     private final Set<String> danglers = new HashSet<String>();
     private final Set<String> secondaryIDs = new HashSet<String>();
+    private final Set<String> replacedIDs = new HashSet<String>();
     private final OBOSession session;
 
     public PhenoXMLAdapter(OBOSession session) {
@@ -53,6 +55,14 @@ public class PhenoXMLAdapter {
 
     public Collection<String> getMigratedSecondaryIDsList() {
         return this.secondaryIDs;
+    }
+    
+    public boolean didReplaceObsoleteTerms() {
+    	return !this.replacedIDs.isEmpty();
+    }
+    
+    public Collection<String> getReplacedIDsList() {
+    	return this.replacedIDs;
     }
 
     public static PhenotypeCharacter createPhenotypeCharacter(org.phenoscape.model.Phenotype phenoCharacter) {
@@ -180,21 +190,40 @@ public class PhenoXMLAdapter {
     }
 
     private OBOClass getTerm(String id) {
-        final IdentifiedObject term = this.session.getObject(id);
-        if (term instanceof OBOClass) {
-            return (OBOClass)term;
-        } else {
-            final OBOClass altTerm = this.findTermByAltID(id);
-            if (altTerm != null) {
-                return altTerm;
-            } else {
-                log().warn("Term not found; creating dangler for " + id);
-                this.danglers.add(id);
-                final OBOClass dangler = new DanglingClassImpl(id.trim());
-                return dangler;
-            }
-        }
-    }
+		log().debug("Term id: " + id);
+		if (id.equals("http://purl.bioontology.org/ontology/provisional/d0267b99-ff52-4a4c-bd31-ff6dbf4dafcc")) {
+			log().debug("Provisional term");
+		}
+		final IdentifiedObject term = this.session.getObject(id);
+		if (term instanceof OBOClass) {
+			final OBOClass oboClass = (OBOClass)term;
+			if (oboClass.isObsolete()) {
+				if (!oboClass.getReplacedBy().isEmpty()) {
+					final ObsoletableObject replacement = oboClass.getReplacedBy().iterator().next();
+					if (replacement instanceof OBOClass) {
+						this.replacedIDs.add(id);
+						return (OBOClass)replacement;
+					} else {
+						return oboClass;
+					}
+				} else {
+					return oboClass;
+				}
+			} else {
+				return oboClass;	
+			}
+		} else {
+			final OBOClass altTerm = this.findTermByAltID(id);
+			if (altTerm != null) {
+				return altTerm;
+			} else {
+				log().warn("Term not found; creating dangler for " + id);
+				this.danglers.add(id);
+				final OBOClass dangler = new DanglingClassImpl(id.trim());
+				return dangler;
+			}
+		}
+	}
 
     private OBOClass findTermByAltID(String id) {
         final Collection<IdentifiedObject> terms = this.session.getObjects();

@@ -215,6 +215,12 @@ public class PhenexController extends DocumentController {
                 throw new UserCancelledReadException();
             }
         }
+        if (reader.didReplaceObsoleteTerms()) {
+            final boolean result = this.runReplacedIDsAlert(aFile, reader.getReplacedIDsList());
+            if (!result) {
+                throw new UserCancelledReadException();
+            }
+        }
         this.xmlDoc = reader.getXMLDoc();
         this.charactersBlockID = reader.getCharactersBlockID();
         this.dataSet.getCharacters().clear(); //TODO this is not well encapsulated
@@ -517,6 +523,13 @@ public class PhenexController extends DocumentController {
         final String[] options = {"Continue Opening", "Cancel"};
         final String message = "The file \"" + file.getName() + "\" contains references to ontology term IDs which could not be found. You can safely edit other values in the file, but fields referring to \"dangling\" terms should not be edited. Proceed with caution.";
         final int result = JOptionPane.showOptionDialog(null, message, "Missing Terms", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        return result == JOptionPane.YES_OPTION;
+    }
+    
+    private boolean runReplacedIDsAlert(File file, Collection<String> replacedIDs) {
+        final String[] options = {"Continue Opening", "Cancel"};
+        final String message = "The file \"" + file.getName() + "\" contains references to obsolete term IDs which have been automatically updated using the replaced_by tag.";
+        final int result = JOptionPane.showOptionDialog(null, message, "Replaced Obsolete Terms", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         return result == JOptionPane.YES_OPTION;
     }
 

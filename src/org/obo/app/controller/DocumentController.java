@@ -27,7 +27,7 @@ public abstract class DocumentController {
 	private File currentFile;
 	private final UndoController undo = new UndoController();
 	private final DirtyDocumentIndicator dirtyIndicator = new DirtyDocumentIndicator();
-	private boolean shouldAutosave = true;
+	private boolean shouldAutosave = false;
 	private final Autosaver autosaver = new Autosaver();
 	private final List<AutosaveChangeListener> autoSaveListeners = new ArrayList<AutosaveChangeListener>();
 

@@ -27,6 +27,7 @@ import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.impl.OBOPropertyImpl;
+import org.obo.datamodel.impl.OBOSessionImpl;
 import org.obo.filters.Filter;
 import org.oboedit.controller.SessionManager;
 import org.phenoscape.util.ProvisionalTermUtil;
@@ -71,6 +72,7 @@ public class OntologyController {
 		} catch (DataAdapterException e) {
 			//TODO alert user?
 			log().fatal("Failed to load ontologies", e);
+			SessionManager.getManager().setSession(new OBOSessionImpl());
 		}
 		this.addVisibleBuiltinTerms();
 		this.loadProvisionalTerms();

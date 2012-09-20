@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
@@ -70,7 +71,7 @@ public class OntologyController {
 		try {
 			SessionManager.getManager().setSession(fileAdapter.doOperation(OBOAdapter.READ_ONTOLOGY, adapterConfig, null));
 		} catch (DataAdapterException e) {
-			//TODO alert user?
+			JOptionPane.showMessageDialog(null, "An error occurred while loading ontologies: " + e.getLocalizedMessage(), "Error Loading Ontologies", JOptionPane.ERROR_MESSAGE);
 			log().fatal("Failed to load ontologies", e);
 			SessionManager.getManager().setSession(new OBOSessionImpl());
 		}

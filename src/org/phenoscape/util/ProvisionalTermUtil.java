@@ -35,6 +35,7 @@ public class ProvisionalTermUtil {
 		final List<NameValuePair> values = new ArrayList<NameValuePair>();
 		values.add(new BasicNameValuePair("apikey", APIKEY));
 		values.add(new BasicNameValuePair("submittedby", "39814"));
+		values.add(new BasicNameValuePair("pagesize", "9999"));
 		final String paramString = URLEncodedUtils.format(values, "utf-8");
 		final HttpGet get = new HttpGet(SERVICE + "?" + paramString);
 		final DefaultHttpClient client = new DefaultHttpClient();

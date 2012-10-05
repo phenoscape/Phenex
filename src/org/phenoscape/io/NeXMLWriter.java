@@ -303,7 +303,7 @@ public class NeXMLWriter {
 			final AbstractPolymorphicStateSet[] oldStates = block.getPolymorphicStateSetArray();
 			final List<AbstractPolymorphicStateSet> newStates = new ArrayList<AbstractPolymorphicStateSet>();
 			newStates.addAll(Arrays.asList(oldStates));
-			newStates.add(polymorphicSet);
+			
 			final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
 			for (State substate : state.getStates()) {
 				final StandardMapping mapping = StandardMapping.Factory.newInstance();
@@ -311,6 +311,7 @@ public class NeXMLWriter {
 				mappings.add(mapping);
 			}
 			set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
+			newStates.add(polymorphicSet);
 			block.setPolymorphicStateSetArray(newStates.toArray(new AbstractPolymorphicStateSet[] {}));
 			//log().debug("Added polymorphic state to states set.");
 		} else {
@@ -320,7 +321,7 @@ public class NeXMLWriter {
 			final AbstractUncertainStateSet[] oldStates = block.getUncertainStateSetArray();
 			final List<AbstractUncertainStateSet> newStates = new ArrayList<AbstractUncertainStateSet>();
 			newStates.addAll(Arrays.asList(oldStates));
-			newStates.add(uncertainSet);
+			
 			final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
 			for (State substate : state.getStates()) {
 				final StandardMapping mapping = StandardMapping.Factory.newInstance();
@@ -328,6 +329,7 @@ public class NeXMLWriter {
 				mappings.add(mapping);
 			}
 			set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
+			newStates.add(uncertainSet);
 			block.setUncertainStateSetArray(newStates.toArray(new AbstractUncertainStateSet[] {}));
 			//log().debug("Added uncertain state to states set.");
 		}

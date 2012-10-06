@@ -127,10 +127,6 @@ public class NeXMLWriter {
 		}
 		final Taxa taxaBlock = NeXMLUtil.findOrCreateTaxa(newDoc, taxaID);
 		this.writeTaxa(taxaBlock);
-		for (AbstractStates statesBlock : charBlock.getFormat().getStatesArray()) {
-			statesBlock.setPolymorphicStateSetArray(statesBlock.getPolymorphicStateSetArray());
-			statesBlock.setUncertainStateSetArray(statesBlock.getUncertainStateSetArray());
-		}
 		// move taxa ahead of characters
 		final XmlCursor firstCharCursor = newDoc.getNexml().getCharactersArray()[0].newCursor();
 		final XmlCursor taxaCursor = taxaBlock.newCursor();

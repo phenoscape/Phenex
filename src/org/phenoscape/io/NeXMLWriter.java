@@ -82,10 +82,8 @@ public class NeXMLWriter {
 		this.options.setSaveSuggestedPrefixes(suggestedPrefixes);
 		this.options.setSaveNamespacesFirst();
 		this.options.setUseDefaultNamespace();
-
 		final Map<String, String> implicitNamespaces = new HashMap<String, String>();
 		implicitNamespaces.put("http://www.nexml.org/2009", "nex");
-		//this.options.setSaveImplicitNamespaces(implicitNamespaces);
 	}
 
 	public void setDataSet(DataSet data) {
@@ -129,6 +127,10 @@ public class NeXMLWriter {
 		}
 		final Taxa taxaBlock = NeXMLUtil.findOrCreateTaxa(newDoc, taxaID);
 		this.writeTaxa(taxaBlock);
+		for (AbstractStates statesBlock : charBlock.getFormat().getStatesArray()) {
+			statesBlock.setPolymorphicStateSetArray(statesBlock.getPolymorphicStateSetArray());
+			statesBlock.setUncertainStateSetArray(statesBlock.getUncertainStateSetArray());
+		}
 		// move taxa ahead of characters
 		final XmlCursor firstCharCursor = newDoc.getNexml().getCharactersArray()[0].newCursor();
 		final XmlCursor taxaCursor = taxaBlock.newCursor();
@@ -175,12 +177,12 @@ public class NeXMLWriter {
 			usableStatesBlock.setStateArray(newStates.toArray(new AbstractState[] {}));
 		}
 		charBlock.getFormat().setCharArray(newCharacters.toArray(new AbstractChar[] {}));
-		charBlock.getFormat().setStatesArray(newStatesBlocks.toArray(new AbstractStates[] {}));
 		if (charBlock instanceof StandardCells) {
 			final StandardCells cells = (StandardCells)charBlock;
 			final AbstractObsMatrix matrix = cells.getMatrix() != null ? cells.getMatrix() : cells.addNewMatrix();
 			this.writeMatrix(matrix);
 		}
+		charBlock.getFormat().setStatesArray(newStatesBlocks.toArray(new AbstractStates[] {}));
 	}
 
 	private void writeMatrix(AbstractObsMatrix matrix) {
@@ -296,14 +298,13 @@ public class NeXMLWriter {
 		final AbstractUncertainStateSet set;
 		if (state.getMode() == MODE.POLYMORPHIC) {
 			log().debug(block.getStateArray());
-			log().debug(block.getPolymorphicStateSetArray().length);
 			final StandardPolymorphicStateSet polymorphicSet = StandardPolymorphicStateSet.Factory.newInstance(); 
 			set = polymorphicSet;
 			polymorphicSet.setId(UUID.randomUUID().toString());
 			final AbstractPolymorphicStateSet[] oldStates = block.getPolymorphicStateSetArray();
 			final List<AbstractPolymorphicStateSet> newStates = new ArrayList<AbstractPolymorphicStateSet>();
 			newStates.addAll(Arrays.asList(oldStates));
-			
+
 			final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
 			for (State substate : state.getStates()) {
 				final StandardMapping mapping = StandardMapping.Factory.newInstance();
@@ -313,7 +314,6 @@ public class NeXMLWriter {
 			set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
 			newStates.add(polymorphicSet);
 			block.setPolymorphicStateSetArray(newStates.toArray(new AbstractPolymorphicStateSet[] {}));
-			//log().debug("Added polymorphic state to states set.");
 		} else {
 			final StandardUncertainStateSet uncertainSet = StandardUncertainStateSet.Factory.newInstance(); 
 			set = uncertainSet;
@@ -321,7 +321,7 @@ public class NeXMLWriter {
 			final AbstractUncertainStateSet[] oldStates = block.getUncertainStateSetArray();
 			final List<AbstractUncertainStateSet> newStates = new ArrayList<AbstractUncertainStateSet>();
 			newStates.addAll(Arrays.asList(oldStates));
-			
+
 			final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
 			for (State substate : state.getStates()) {
 				final StandardMapping mapping = StandardMapping.Factory.newInstance();
@@ -331,15 +331,7 @@ public class NeXMLWriter {
 			set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
 			newStates.add(uncertainSet);
 			block.setUncertainStateSetArray(newStates.toArray(new AbstractUncertainStateSet[] {}));
-			//log().debug("Added uncertain state to states set.");
 		}
-//		final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
-//		for (State substate : state.getStates()) {
-//			final StandardMapping mapping = StandardMapping.Factory.newInstance();
-//			mapping.setState(substate.getNexmlID());
-//			mappings.add(mapping);
-//		}
-//		set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
 		log().debug(block.toString());
 		return set;
 	}
@@ -401,7 +393,7 @@ public class NeXMLWriter {
 			NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.FIGURE_PREDICATE, figure);
 		}
 	}
-	
+
 	private void writeDiscussion(Annotated node, String discussion) {
 		final Annotatable annotatableNode = new Annotatable(node);
 		if ((discussion == null) || (discussion.equals(""))) {

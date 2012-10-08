@@ -10,7 +10,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -37,6 +39,8 @@ import org.obo.app.util.EverythingEqualComparator;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
+import org.phenoscape.model.MultipleState;
+import org.phenoscape.model.MultipleState.MODE;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
 
@@ -437,20 +441,60 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 					currentValue = null;
 					setInvalid(false);
 				} else {
-					boolean found = false;
-					for (State state : states) {
-						if (text.equals(state.getSymbol())) {
-							currentValue = state;
-							found = true;
-							break;
-						}
-					}
-					if (found) {
+					final State foundState = this.interpretEntry(text);
+					if (foundState != null) {
+						currentValue = foundState;
 						setInvalid(false);
 					} else {
 						setInvalid(true);
 					}
 				}
+			}
+
+			private State interpretEntry(String text) {
+				log().debug("Interpret entry: " + text);
+				if (text.contains("&")) {
+					final Set<State> multipleStates = this.interpretStateSymbols(text.split("&"));
+					if (multipleStates != null) {
+						return new MultipleState(multipleStates, MODE.POLYMORPHIC);
+					} else {
+						return null;
+					}
+				} else if (text.contains("/")) {
+					final Set<State> multipleStates = this.interpretStateSymbols(text.split("/"));
+					if (multipleStates != null) {
+						return new MultipleState(multipleStates, MODE.UNCERTAIN);
+					} else {
+						return null;
+					}
+				} else {
+					for (State state : states) {
+						if (text.equals(state.getSymbol())) {
+							return state;
+						}
+					}
+				}
+				return null;
+			}
+
+			private Set<State> interpretStateSymbols(String[] symbols) {
+				if (symbols.length == 1) {
+					return null;
+				}
+				final Set<State> multipleStates = new HashSet<State>();
+				for (String symbol : symbols) {
+					for (State state : states) {
+						if (symbol.equals(state.getSymbol())) {
+							multipleStates.add(state);
+						}
+					}
+				}
+				if (symbols.length == multipleStates.size()) {
+					return multipleStates;
+				} else {
+					return null;
+				}
+
 			}
 
 		}

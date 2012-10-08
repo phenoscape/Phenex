@@ -59,17 +59,11 @@ public class MenuFactory {
 		};
 		openAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		menu.add(new JMenuItem(openAction));
-		final Action mergeNEXUSAction = new AbstractAction("NEXUS...") {
-			//TODO use import methods instead
-			@Override
-			public void actionPerformed(ActionEvent e) { controller.openMergeNEXUS(); }
-		};
 		final Action importPhenotypeProposals = new AbstractAction("Phenotype proposals...") {
 			@Override
 			public void actionPerformed(ActionEvent e) { controller.openImportPhenotypeProposals(); }
 		};
 		final JMenu mergeMenu = new JMenu("Import");
-		mergeMenu.add(new JMenuItem(mergeNEXUSAction));
 		mergeMenu.add(new JMenuItem(importPhenotypeProposals));
 		menu.add(mergeMenu);
 		menu.addSeparator();

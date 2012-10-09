@@ -27,10 +27,6 @@ import com.eekboom.utils.Strings;
 
 public class TabDelimitedWriter {
 
-	private static final String TTO = "http://bioportal.bioontology.org/virtual/1081/";
-	private static final String TAO = "http://bioportal.bioontology.org/virtual/1110/";
-	private static final String PATO = "http://bioportal.bioontology.org/virtual/1107/";
-	private static final String LINK_FORMAT = "=HYPERLINK(\"%s\", \"%s\")";
 	private DataSet data;
 
 	public void setDataSet(DataSet data) {
@@ -76,36 +72,36 @@ public class TabDelimitedWriter {
 					this.writeState(state, writer);
 					writer.write("\t");
 					if (phenotype.getEntity() != null) {
-						if (!OBOUtil.isPostCompTerm(phenotype.getEntity())) {
-							writer.write(String.format(LINK_FORMAT, TAO + phenotype.getEntity().getID(), phenotype.getEntity().getName()));
-						} else {
-							writer.write(StringUtils.defaultString(phenotype.getEntity().getName()));
-						}
+						writer.write(phenotype.getEntity().getID());
+						writer.write("\t");
+						writer.write(phenotype.getEntity().getName());
+					} else {
+						writer.write("\t");
 					}
 					writer.write("\t");
 					if (phenotype.getQuality() != null) {
-						if (!OBOUtil.isPostCompTerm(phenotype.getQuality())) {
-							writer.write(String.format(LINK_FORMAT, PATO + phenotype.getQuality().getID(), phenotype.getQuality().getName()));
-						} else {
-							writer.write(StringUtils.defaultString(phenotype.getQuality().getName()));
-						}
+						writer.write(phenotype.getQuality().getID());
+						writer.write("\t");
+						writer.write(phenotype.getQuality().getName());
+					} else {
+						writer.write("\t");
 					}
 					writer.write("\t");
 					if (phenotype.getQuality() != null) {
 						final OBOClass characterAttribute = this.getCharacterAttributeForValue(phenotype.getQuality());
-						if (!OBOUtil.isPostCompTerm(characterAttribute)) {
-							writer.write(String.format(LINK_FORMAT, PATO + characterAttribute.getID(), characterAttribute.getName()));
-						} else {
-							writer.write(StringUtils.defaultString(characterAttribute.getName()));
-						}
+						writer.write(characterAttribute.getID());
+						writer.write("\t");
+						writer.write(characterAttribute.getName());
+					} else {
+						writer.write("\t");
 					}
 					writer.write("\t");
 					if (phenotype.getRelatedEntity() != null) {
-						if (!OBOUtil.isPostCompTerm(phenotype.getRelatedEntity())) {
-							writer.write(String.format(LINK_FORMAT, TAO + phenotype.getRelatedEntity().getID(), phenotype.getRelatedEntity().getName()));
-						} else {
-							writer.write(StringUtils.defaultString(phenotype.getRelatedEntity().getName()));
-						}
+						writer.write(phenotype.getRelatedEntity().getID());
+						writer.write("\t");
+						writer.write(phenotype.getRelatedEntity().getName());
+					} else {
+						writer.write("\t");
 					}
 					writer.write("\t");
 					writer.write(phenotype.getCount() != null ? phenotype.getCount().toString() : "");
@@ -135,7 +131,7 @@ public class TabDelimitedWriter {
 	}
 
 	private String getTaxonHeader() {
-		return "Publication Taxon\tTTO Taxon\tMatrix Taxon\tTaxon Comment\tSpecimens\t" + this.getColumnHeadings();
+		return "Publication Taxon\tValid Taxon\tValid Taxon label\tMatrix Taxon\tTaxon Comment\tSpecimens\t" + this.getColumnHeadings();
 	}
 
 	private String getColumnHeadings() {
@@ -152,7 +148,11 @@ public class TabDelimitedWriter {
 		sb.append(taxon.getPublicationName());
 		sb.append("\t");
 		if (taxon.getValidName() != null) {
-			sb.append(String.format(LINK_FORMAT, TTO + taxon.getValidName().getID(), taxon.getValidName().getName()));
+			sb.append(taxon.getValidName().getID());
+			sb.append("\t");
+			sb.append(taxon.getValidName().getName());
+		} else {
+			sb.append("\t");
 		}
 		sb.append("\t");
 		sb.append(taxon.getMatrixTaxonName());
@@ -190,7 +190,7 @@ public class TabDelimitedWriter {
 	}
 
 	private String getCharacterHeader() {
-		return "Character Number\tCharacter Description\tCharacter Comment\tState Number\tState Description\tState Comment\tEntity\tQuality\tCharacter Attribute\tRelated Entity\tCount\tComment";
+		return "Character Number\tCharacter Description\tCharacter Comment\tState Number\tState Description\tState Comment\tEntity\tEntity label\tQuality\tQuality label\tCharacter Attribute\tAttribute label\tRelated Entity\tRelated Entity label\tCount\tComment";
 	}
 
 	private OBOClass getCharacterAttributeForValue(OBOClass valueTerm) {

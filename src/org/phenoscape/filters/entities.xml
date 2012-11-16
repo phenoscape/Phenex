@@ -194,6 +194,19 @@
         </void> 
        </object> 
       </void> 
+      <void method="add"> 
+       <object class="org.obo.filters.ObjectFilterImpl"> 
+        <void property="comparison"> 
+         <object class="org.obo.filters.StartsWithComparison"/> 
+        </void> 
+        <void property="criterion"> 
+         <object class="org.obo.filters.IDSearchCriterion"/> 
+        </void> 
+        <void property="value"> 
+         <string>UBERON</string> 
+        </void> 
+       </object> 
+      </void> 
      </void> 
     </object> 
    </void> 

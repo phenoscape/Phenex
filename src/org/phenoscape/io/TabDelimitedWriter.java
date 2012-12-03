@@ -74,7 +74,7 @@ public class TabDelimitedWriter {
 					if (phenotype.getEntity() != null) {
 						writer.write(phenotype.getEntity().getID());
 						writer.write("\t");
-						writer.write(phenotype.getEntity().getName());
+						writer.write(StringUtils.stripToEmpty(phenotype.getEntity().getName()));
 					} else {
 						writer.write("\t");
 					}
@@ -82,7 +82,7 @@ public class TabDelimitedWriter {
 					if (phenotype.getQuality() != null) {
 						writer.write(phenotype.getQuality().getID());
 						writer.write("\t");
-						writer.write(phenotype.getQuality().getName());
+						writer.write(StringUtils.stripToEmpty(phenotype.getQuality().getName()));
 					} else {
 						writer.write("\t");
 					}
@@ -91,7 +91,7 @@ public class TabDelimitedWriter {
 						final OBOClass characterAttribute = this.getCharacterAttributeForValue(phenotype.getQuality());
 						writer.write(characterAttribute.getID());
 						writer.write("\t");
-						writer.write(characterAttribute.getName());
+						writer.write(StringUtils.stripToEmpty(characterAttribute.getName()));
 					} else {
 						writer.write("\t");
 					}
@@ -99,7 +99,7 @@ public class TabDelimitedWriter {
 					if (phenotype.getRelatedEntity() != null) {
 						writer.write(phenotype.getRelatedEntity().getID());
 						writer.write("\t");
-						writer.write(phenotype.getRelatedEntity().getName());
+						writer.write(StringUtils.stripToEmpty(phenotype.getRelatedEntity().getName()));
 					} else {
 						writer.write("\t");
 					}

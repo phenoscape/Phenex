@@ -2,6 +2,7 @@ package org.phenoscape.view;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JEditorPane;
@@ -10,8 +11,14 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.obo.app.util.Collections;
+import org.obo.datamodel.LinkedObject;
+import org.obo.datamodel.OBOClass;
+import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.TermSubset;
+import org.obo.filters.LinkFilter;
+import org.obo.filters.LinkFilterImpl;
+import org.obo.util.TermUtil;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Phenotype;
 
@@ -20,6 +27,9 @@ import ca.odell.glazedlists.EventList;
 public class AnnotationCheckerComponent extends PhenoscapeGUIComponent {
 
 	private JEditorPane warningsField;
+	private static final String STRUCTURE = "PATO:0000141";
+	private static final String POSITION = "PATO:0000140";
+	private static final String SIZE = "PATO:0000117";
 
 	public AnnotationCheckerComponent(String id, PhenexController controller) {
 		super(id, controller);
@@ -83,7 +93,7 @@ public class AnnotationCheckerComponent extends PhenoscapeGUIComponent {
 						errors.add("<b>Warning:</b> Relational quality has been used without a related entity.");
 					}
 				} else {
-					if (phenotype.getRelatedEntity() != null) {
+					if ((phenotype.getRelatedEntity() != null) && (!this.isOptionallyRelationalQuality(phenotype.getQuality()))) {
 						errors.add("<b>Warning:</b> Related entity requires a relational quality.");
 					}
 				}
@@ -91,6 +101,18 @@ public class AnnotationCheckerComponent extends PhenoscapeGUIComponent {
 
 		}
 		return errors;
+	}
+	
+	private boolean isOptionallyRelationalQuality(OBOClass quality) {
+		if ((quality.getID().equals(STRUCTURE)) || (quality.getID().equals(POSITION))) {
+			return true;
+		} else {
+			final OBOSession session = this.getController().getOntologyController().getOBOSession();
+			final OBOClass size = (OBOClass)(session.getObject(SIZE));
+			final LinkFilter filter = new LinkFilterImpl((OBOProperty)(session.getObject("OBO_REL:is_a")));
+			final Collection<LinkedObject> sizes = TermUtil.getDescendants(size, true, filter);
+			return sizes.contains(quality);
+		}
 	}
 
 	private class PhenotypeSelectionListener implements ListSelectionListener {

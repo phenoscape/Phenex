@@ -2,7 +2,10 @@ package org.phenoscape.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.obo.annotation.base.OBOUtil;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOProperty;
@@ -35,6 +38,7 @@ public class AnnotationConsistencyChecker {
 
 	public Collection<ConsistencyIssue> checkCharacter(Character character) {
 		final Collection<ConsistencyIssue> issues = new ArrayList<ConsistencyIssue>();
+		final Set<OBOClass> attributesUsed = new HashSet<OBOClass>();
 		for (State state : character.getStates()) {
 			if (state.getPhenotypes().isEmpty()) {
 				issues.add(new ConsistencyIssue(character, state, "State not annotated."));
@@ -45,6 +49,9 @@ public class AnnotationConsistencyChecker {
 				}
 				if (phenotype.getQuality() == null) {
 					issues.add(new ConsistencyIssue(character, state, "No quality has been entered."));
+				}
+				if (phenotype.getQuality() != null) {
+					attributesUsed.add(OBOUtil.getAttributeForValue(phenotype.getQuality()));
 				}
 				if (relation_slim != null) {
 					if ((phenotype.getQuality() != null) && (phenotype.getQuality().getSubsets() != null)) {
@@ -61,6 +68,9 @@ public class AnnotationConsistencyChecker {
 
 				}
 			}
+		}
+		if (attributesUsed.size() > 1) {
+			issues.add(new ConsistencyIssue(character, null, "Qualities used descend from multiple attributes."));
 		}
 		return issues;
 	}

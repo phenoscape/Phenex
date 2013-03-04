@@ -33,27 +33,34 @@ public class AnnotationConsistencyChecker {
 		}
 	}
 
-	public Collection<ConsistencyIssue> checkAnnotation(Character character, State state, Phenotype phenotype) {
+	public Collection<ConsistencyIssue> checkCharacter(Character character) {
 		final Collection<ConsistencyIssue> issues = new ArrayList<ConsistencyIssue>();
-		if (phenotype.getEntity() == null) {
-			issues.add(new ConsistencyIssue(character, state, "No entity has been entered."));
-		}
-		if (phenotype.getQuality() == null) {
-			issues.add(new ConsistencyIssue(character, state, "No quality has been entered."));
-		}
-		if (relation_slim != null) {
-			if ((phenotype.getQuality() != null) && (phenotype.getQuality().getSubsets() != null)) {
-				if (phenotype.getQuality().getSubsets().contains(relation_slim)) {
-					if (phenotype.getRelatedEntity() == null) {
-						issues.add(new ConsistencyIssue(character, state, "Relational quality has been used without a related entity."));
+		for (State state : character.getStates()) {
+			if (state.getPhenotypes().isEmpty()) {
+				issues.add(new ConsistencyIssue(character, state, "State not annotated."));
+			}
+			for (Phenotype phenotype : state.getPhenotypes()) {
+				if (phenotype.getEntity() == null) {
+					issues.add(new ConsistencyIssue(character, state, "No entity has been entered."));
+				}
+				if (phenotype.getQuality() == null) {
+					issues.add(new ConsistencyIssue(character, state, "No quality has been entered."));
+				}
+				if (relation_slim != null) {
+					if ((phenotype.getQuality() != null) && (phenotype.getQuality().getSubsets() != null)) {
+						if (phenotype.getQuality().getSubsets().contains(relation_slim)) {
+							if (phenotype.getRelatedEntity() == null) {
+								issues.add(new ConsistencyIssue(character, state, "Relational quality has been used without a related entity."));
+							}
+						} else {
+							if ((phenotype.getRelatedEntity() != null) && (!this.isOptionallyRelationalQuality(phenotype.getQuality()))) {
+								issues.add(new ConsistencyIssue(character, state, "Related entity requires a relational quality."));
+							}
+						}
 					}
-				} else {
-					if ((phenotype.getRelatedEntity() != null) && (!this.isOptionallyRelationalQuality(phenotype.getQuality()))) {
-						issues.add(new ConsistencyIssue(character, state, "Related entity requires a relational quality."));
-					}
+
 				}
 			}
-
 		}
 		return issues;
 	}

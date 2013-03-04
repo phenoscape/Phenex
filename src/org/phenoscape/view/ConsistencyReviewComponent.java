@@ -14,8 +14,6 @@ import javax.swing.JToolBar;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Character;
-import org.phenoscape.model.Phenotype;
-import org.phenoscape.model.State;
 import org.phenoscape.util.AnnotationConsistencyChecker;
 import org.phenoscape.util.ConsistencyIssue;
 
@@ -67,11 +65,7 @@ public class ConsistencyReviewComponent extends PhenoscapeGUIComponent {
 	private void refresh() {
 		this.issues.clear();
 		for (Character character : this.getController().getDataSet().getCharacters()) {
-			for (State state : character.getStates()) {
-				for (Phenotype phenotype : state.getPhenotypes()) {
-					this.issues.addAll(checker.checkAnnotation(character, state, phenotype));
-				}
-			}
+			this.issues.addAll(checker.checkCharacter(character));
 		}
 	}
 
@@ -98,7 +92,7 @@ public class ConsistencyReviewComponent extends PhenoscapeGUIComponent {
 			switch (column) {
 			case 0: return getController().getDataSet().getCharacters().indexOf(issue.getCharacter()) + 1;
 			case 1: return issue.getCharacter().getLabel();
-			case 2: return issue.getState().getLabel();
+			case 2: return issue.getState() == null ? "" : issue.getState().getLabel();
 			case 3: return issue.getIssue();
 			default: return null;
 			}

@@ -34,7 +34,10 @@ public class AnnotationConsistencyChecker {
 	}
 
 	public Collection<ConsistencyIssue> checkAnnotation(Character character, State state, Phenotype phenotype) {
-		final Collection<ConsistencyIssue> issues = new ArrayList<ConsistencyIssue>(); 
+		final Collection<ConsistencyIssue> issues = new ArrayList<ConsistencyIssue>();
+		if (phenotype.getEntity() == null) {
+			issues.add(new ConsistencyIssue(character, state, "No entity has been entered."));
+		}
 		if (phenotype.getQuality() == null) {
 			issues.add(new ConsistencyIssue(character, state, "No quality has been entered."));
 		}

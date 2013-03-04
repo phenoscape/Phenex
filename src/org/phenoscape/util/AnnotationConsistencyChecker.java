@@ -3,9 +3,11 @@ package org.phenoscape.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.obo.annotation.base.OBOUtil;
+import org.obo.datamodel.Link;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOProperty;
@@ -25,6 +27,8 @@ public class AnnotationConsistencyChecker {
 	private static final String STRUCTURE = "PATO:0000141";
 	private static final String POSITION = "PATO:0000140";
 	private static final String SIZE = "PATO:0000117";
+	private static final String BIOLOGICAL_PROCESS = "GO:0008150";
+	private static final String PROCESS_QUALITY = "PATO:0001236";
 
 	public AnnotationConsistencyChecker(OBOSession session) {
 		this.session = session;
@@ -46,9 +50,23 @@ public class AnnotationConsistencyChecker {
 			for (Phenotype phenotype : state.getPhenotypes()) {
 				if (phenotype.getEntity() == null) {
 					issues.add(new ConsistencyIssue(character, state, "No entity has been entered."));
+				} else {
+					if (isPostCompositionWithMultipleDifferentiae(phenotype.getEntity())) {
+						issues.add(new ConsistencyIssue(character, state, "Entity post-composition used with more than one differentia (may be okay)."));
+					}
 				}
 				if (phenotype.getQuality() == null) {
 					issues.add(new ConsistencyIssue(character, state, "No quality has been entered."));
+
+				} else {
+					if (isPostCompositionWithMultipleDifferentiae(phenotype.getQuality())) {
+						issues.add(new ConsistencyIssue(character, state, "Quality post-composition used with more than one differentia (may be okay)."));
+					}
+				}
+				if (phenotype.getRelatedEntity() != null) {
+					if (isPostCompositionWithMultipleDifferentiae(phenotype.getRelatedEntity())) {
+						issues.add(new ConsistencyIssue(character, state, "Related entity post-composition used with more than one differentia (may be okay)."));
+					}
 				}
 				if (phenotype.getQuality() != null) {
 					attributesUsed.add(OBOUtil.getAttributeForValue(phenotype.getQuality()));
@@ -67,6 +85,15 @@ public class AnnotationConsistencyChecker {
 					}
 
 				}
+				final OBOClass biologicalProcess = (OBOClass)(this.session.getObject(BIOLOGICAL_PROCESS));
+				final OBOClass processQuality = (OBOClass)(this.session.getObject(PROCESS_QUALITY));
+				if ((phenotype.getEntity() != null) && (phenotype.getQuality() != null)) {
+					if ((biologicalProcess != null) && (processQuality != null) && TermUtil.hasIsAAncestor(phenotype.getEntity(), biologicalProcess)) {
+						if (!TermUtil.hasIsAAncestor(phenotype.getQuality(), processQuality)) {
+							issues.add(new ConsistencyIssue(character, state, "Biological process entities require a process quality."));
+						}
+					}
+				}
 			}
 		}
 		if (attributesUsed.size() > 1) {
@@ -83,6 +110,19 @@ public class AnnotationConsistencyChecker {
 			final LinkFilter filter = new LinkFilterImpl((OBOProperty)(session.getObject("OBO_REL:is_a")));
 			final Collection<LinkedObject> sizes = TermUtil.getDescendants(size, true, filter);
 			return sizes.contains(quality);
+		}
+	}
+
+	private boolean isPostCompositionWithMultipleDifferentiae(OBOClass term) {
+		if (OBOUtil.isPostCompTerm(term)) {
+			final List<Link> differentiae = OBOUtil.getAllDifferentia(term);
+			if (differentiae.size() > 1) {
+				return true;
+			} else {
+				return isPostCompositionWithMultipleDifferentiae((OBOClass)(differentiae.get(0).getParent()));
+			}
+		} else {
+			return false;
 		}
 	}
 

@@ -1,11 +1,11 @@
 package org.phenoscape.view;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.util.Comparator;
 
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -32,6 +32,7 @@ public class ConsistencyReviewComponent extends PhenoscapeGUIComponent {
 	private JButton refreshButton;
 	private EventList<ConsistencyIssue> issues = new BasicEventList<ConsistencyIssue>();
 	private AnnotationConsistencyChecker checker;
+	private static final String REFRESH_SYMBOL = "\u27f3";
 
 	public ConsistencyReviewComponent(String id, PhenexController controller) {
 		super(id, controller);
@@ -46,17 +47,21 @@ public class ConsistencyReviewComponent extends PhenoscapeGUIComponent {
 		this.table = new BugWorkaroundTable(phenotypesTableModel);
 		this.add(new JScrollPane(this.table), BorderLayout.CENTER);
 		this.add(this.createToolBar(), BorderLayout.NORTH);
+		this.refresh();
 	}
 
 	private JToolBar createToolBar() {
 		final JToolBar toolBar = new JToolBar();
-		this.refreshButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-add.png"))) {
+		this.refreshButton = new JButton(new AbstractAction(REFRESH_SYMBOL) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				refresh();
 			}
 		});
-		this.refreshButton.setToolTipText("Refresh");
+		this.refreshButton.setToolTipText("Refresh consistency report");
+		final Font font = this.refreshButton.getFont();
+		final Float size = font.getSize2D();
+		this.refreshButton.setFont(font.deriveFont(size + 20.0f));
 		toolBar.add(this.refreshButton);
 		toolBar.setFloatable(false);
 		return toolBar;

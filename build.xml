@@ -15,7 +15,7 @@
 	<tstamp>
 		<format property="NOW" pattern="yyyy-MM-dd_HH:mm:ss"/>
 	</tstamp>
-	<property name="phenex.version" value="1.5.1"/>
+	<property name="phenex.version" value="1.8"/>
 	<property name="phenex.build" value="${NOW}"/>
 	<property name="java-minimum" value="1.5"/>
 	
@@ -225,7 +225,7 @@
 	<target name="dist-mac" depends="jar, dist-init">
 		<property name="mac-folder" value="${dist}/macosx"/>
 		<mkdir dir="${mac-folder}"/>
-		<jarbundler dir="${mac-folder}" name="Phenex" mainclass="${main-class}" jvmversion="1.5+" vmoptions="-Xmx1024M" version="${phenex.version}" build="${phenex.build}" icon="launchers/macosx/Seal-of-Phenex.icns" splashfile="$JAVAROOT/Seal-of-Phenex-medium.png">
+		<jarbundler dir="${mac-folder}" name="Phenex" mainclass="${main-class}" jvmversion="1.5+" vmoptions="-Xmx2G" version="${phenex.version}" build="${phenex.build}" icon="launchers/macosx/Seal-of-Phenex.icns" splashfile="$JAVAROOT/Seal-of-Phenex-medium.png">
 			<jarfileset file="${jarfile}"/>
 			<jarfileset dir="${lib}"/>
 			<javafilelist dir="src/org/phenoscape/view/images" files="Seal-of-Phenex-medium.png"/>

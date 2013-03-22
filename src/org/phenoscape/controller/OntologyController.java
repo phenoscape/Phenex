@@ -23,11 +23,8 @@ import org.obo.app.util.URLProxy;
 import org.obo.dataadapter.OBOAdapter;
 import org.obo.dataadapter.OBOFileAdapter;
 import org.obo.datamodel.IdentifiedObject;
-import org.obo.datamodel.Namespace;
 import org.obo.datamodel.OBOClass;
-import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
-import org.obo.datamodel.impl.OBOPropertyImpl;
 import org.obo.datamodel.impl.OBOSessionImpl;
 import org.obo.filters.Filter;
 import org.oboedit.controller.SessionManager;
@@ -75,7 +72,6 @@ public class OntologyController {
 			log().fatal("Failed to load ontologies", e);
 			SessionManager.getManager().setSession(new OBOSessionImpl());
 		}
-		this.addVisibleBuiltinTerms();
 		this.loadProvisionalTerms();
 		this.prefetchTermSets();
 	}
@@ -235,15 +231,6 @@ public class OntologyController {
 		 final Filter<IdentifiedObject> result = (Filter<IdentifiedObject>) d.readObject();
 		 d.close();
 		 return result;
-	 }
-
-	 private void addVisibleBuiltinTerms() {
-		 final OBOProperty newDisjointFrom = new OBOPropertyImpl("PHENOSCAPE:complement_of");
-		 newDisjointFrom.setName("not");
-		 final Namespace namespace = (this.getOBOSession().getNamespace("relationship") != null) ? this.getOBOSession().getNamespace("relationship") : new Namespace("relationship");
-		 this.getOBOSession().addNamespace(namespace);
-		 newDisjointFrom.setNamespace(namespace);
-		 this.getOBOSession().addObject(newDisjointFrom);
 	 }
 	 
 	 private void loadProvisionalTerms() {

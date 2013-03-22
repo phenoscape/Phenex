@@ -1,1 +1,1 @@
-java -Xmx1024m -Dphenex.version="@@phenex.version@@" -Dphenex.build="@@phenex.build@@" -jar lib/phenex.jar
+java -Xmx2g -Dphenex.version="@@phenex.version@@" -Dphenex.build="@@phenex.build@@" -jar lib/phenex.jar

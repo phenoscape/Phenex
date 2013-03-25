@@ -3,7 +3,7 @@ Phenex - Ontological Annotation of Phenotypic Diversity
 
 Phenex is an application for annotating character matrix files with ontology terms. Character states can be annotated using the Entity-Quality syntax for ontologically describing phenotypes. In addition, taxon entries can be annotated with identifiers from a taxonomy ontology. Phenex saves ontology annotations alongside traditional character matrix data using the new [NeXML](http://www.nexml.org) format standard for evolutionary data. 
 
-More information can be obtained at the [Phenex website](http://phenoscape.org/wiki/Phenex).
+More information, including documentation of system requirements, installation, and usage, can be found at the [Phenex website](http://phenoscape.org/wiki/Phenex).
 
 History
 =======

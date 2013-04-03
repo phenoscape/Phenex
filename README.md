@@ -20,4 +20,4 @@ How to cite
 
 If you use Phenex in your research, please cite the following publication: 
 
-Balhoff, James P., Wasila M. Dahdul, Cartik R. Kothari, Hilmar Lapp, John G. Lundberg, Paula Mabee, Peter E. Midford, Monte Westerfield, and Todd J. Vision. 2010. Phenex: Ontological Annotation of Phenotypic Diversity. PLoS ONE 5:e10500. [doi:10.1371/journal.pone.0010500](http://dx.doi.org/10.1371/journal.pone.0010500).
+Balhoff, James P., Wasila M. Dahdul, Cartik R. Kothari, Hilmar Lapp, John G. Lundberg, Paula Mabee, Peter E. Midford, Monte Westerfield, and Todd J. Vision. 2010. Phenex: Ontological Annotation of Phenotypic Diversity. PLoS ONE 5:e10500. http://dx.doi.org/10.1371/journal.pone.0010500.

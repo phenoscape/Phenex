@@ -11,25 +11,19 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.obo.app.util.Collections;
-import org.obo.datamodel.LinkedObject;
-import org.obo.datamodel.OBOClass;
-import org.obo.datamodel.OBOProperty;
-import org.obo.datamodel.OBOSession;
-import org.obo.datamodel.TermSubset;
-import org.obo.filters.LinkFilter;
-import org.obo.filters.LinkFilterImpl;
-import org.obo.util.TermUtil;
 import org.phenoscape.controller.PhenexController;
+import org.phenoscape.model.Character;
 import org.phenoscape.model.Phenotype;
+import org.phenoscape.model.State;
+import org.phenoscape.util.AnnotationConsistencyChecker;
+import org.phenoscape.util.ConsistencyIssue;
 
 import ca.odell.glazedlists.EventList;
 
 public class AnnotationCheckerComponent extends PhenoscapeGUIComponent {
 
 	private JEditorPane warningsField;
-	private static final String STRUCTURE = "PATO:0000141";
-	private static final String POSITION = "PATO:0000140";
-	private static final String SIZE = "PATO:0000117";
+	private AnnotationConsistencyChecker checker;
 
 	public AnnotationCheckerComponent(String id, PhenexController controller) {
 		super(id, controller);
@@ -38,6 +32,7 @@ public class AnnotationCheckerComponent extends PhenoscapeGUIComponent {
 	@Override
 	public void init() {
 		super.init();
+		this.checker = new AnnotationConsistencyChecker(this.getController().getOntologyCoordinator().getOBOSession());
 		this.initializeInterface();
 	}
 
@@ -53,14 +48,20 @@ public class AnnotationCheckerComponent extends PhenoscapeGUIComponent {
 
 	private void phenotypeSelectionDidChange() {
 		final Phenotype phenotype = this.getSelectedPhenotype();
+		final State state = this.getSelectedState();
+		final Character character = this.getSelectedCharacter();
 		if (phenotype == null) {
-
+			return;
 		} else {
-			final List<String> errors = this.checkForErrors(phenotype);
+			final Collection<ConsistencyIssue> issues = this.checker.checkPhenotype(phenotype, state, character);
+			final List<String> errors = new ArrayList<String>();
+			for (ConsistencyIssue issue : issues) {
+				errors.add("<b>Warning:</b> " + issue.getIssue());
+			}
 			if (errors.isEmpty()) {
 				this.warningsField.setText("");
 			} else {
-				this.warningsField.setText("<html>" + Collections.join(errors, "\n\n") + "</html>");	
+				this.warningsField.setText("<html>" + Collections.join(errors, "<br>") + "</html>");	
 			}
 		}
 	}
@@ -74,44 +75,21 @@ public class AnnotationCheckerComponent extends PhenoscapeGUIComponent {
 		}
 	}
 
-	private List<String> checkForErrors(Phenotype phenotype) {
-		final List<String> errors = new ArrayList<String>();
-		final OBOSession session = this.getController().getOntologyController().getOBOSession();
-		TermSubset relation_slim = null;
-		for (TermSubset subset : session.getSubsets()) {
-			if ((subset.getName() != null) && (subset.getName().equals("relational_slim"))) {
-				relation_slim = subset;
-			}
-		}
-		if (phenotype.getQuality() == null) {
-			errors.add("<b>Warning:</b> No quality has been entered.");
-		}
-		if (relation_slim != null) {
-			if (phenotype.getQuality() != null) {
-				if (phenotype.getQuality().getSubsets().contains(relation_slim)) {
-					if (phenotype.getRelatedEntity() == null) {
-						errors.add("<b>Warning:</b> Relational quality has been used without a related entity.");
-					}
-				} else {
-					if ((phenotype.getRelatedEntity() != null) && (!this.isOptionallyRelationalQuality(phenotype.getQuality()))) {
-						errors.add("<b>Warning:</b> Related entity requires a relational quality.");
-					}
-				}
-			}
-
-		}
-		return errors;
-	}
-	
-	private boolean isOptionallyRelationalQuality(OBOClass quality) {
-		if ((quality.getID().equals(STRUCTURE)) || (quality.getID().equals(POSITION))) {
-			return true;
+	private State getSelectedState() {
+		final EventList<State> selected = this.getController().getCurrentStatesSelectionModel().getSelected();
+		if (selected.size() == 1) {
+			return selected.get(0);
 		} else {
-			final OBOSession session = this.getController().getOntologyController().getOBOSession();
-			final OBOClass size = (OBOClass)(session.getObject(SIZE));
-			final LinkFilter filter = new LinkFilterImpl((OBOProperty)(session.getObject("OBO_REL:is_a")));
-			final Collection<LinkedObject> sizes = TermUtil.getDescendants(size, true, filter);
-			return sizes.contains(quality);
+			return null;
+		}
+	}
+
+	private Character getSelectedCharacter() {
+		final EventList<Character> selected = this.getController().getCharactersSelectionModel().getSelected();
+		if (selected.size() == 1) {
+			return selected.get(0);
+		} else {
+			return null;
 		}
 	}
 

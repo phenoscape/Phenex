@@ -44,60 +44,79 @@ public class AnnotationConsistencyChecker {
 		final Collection<ConsistencyIssue> issues = new ArrayList<ConsistencyIssue>();
 		final Set<OBOClass> attributesUsed = new HashSet<OBOClass>();
 		for (State state : character.getStates()) {
-			if (state.getPhenotypes().isEmpty()) {
-				issues.add(new ConsistencyIssue(character, state, "State not annotated."));
-			}
+			issues.addAll(this.checkState(state, character));
 			for (Phenotype phenotype : state.getPhenotypes()) {
-				if (phenotype.getEntity() == null) {
-					issues.add(new ConsistencyIssue(character, state, "No entity has been entered."));
-				} else {
-					if (isPostCompositionWithMultipleDifferentiae(phenotype.getEntity())) {
-						issues.add(new ConsistencyIssue(character, state, "Entity post-composition used with more than one differentia (may be okay)."));
-					}
-				}
-				if (phenotype.getQuality() == null) {
-					issues.add(new ConsistencyIssue(character, state, "No quality has been entered."));
-
-				} else {
-					if (isPostCompositionWithMultipleDifferentiae(phenotype.getQuality())) {
-						issues.add(new ConsistencyIssue(character, state, "Quality post-composition used with more than one differentia (may be okay)."));
-					}
-				}
-				if (phenotype.getRelatedEntity() != null) {
-					if (isPostCompositionWithMultipleDifferentiae(phenotype.getRelatedEntity())) {
-						issues.add(new ConsistencyIssue(character, state, "Related entity post-composition used with more than one differentia (may be okay)."));
-					}
-				}
 				if (phenotype.getQuality() != null) {
 					attributesUsed.add(OBOUtil.getAttributeForValue(phenotype.getQuality()));
-				}
-				if (relation_slim != null) {
-					if ((phenotype.getQuality() != null) && (phenotype.getQuality().getSubsets() != null)) {
-						if (phenotype.getQuality().getSubsets().contains(relation_slim)) {
-							if (phenotype.getRelatedEntity() == null) {
-								issues.add(new ConsistencyIssue(character, state, "Relational quality has been used without a related entity."));
-							}
-						} else {
-							if ((phenotype.getRelatedEntity() != null) && (!this.isOptionallyRelationalQuality(phenotype.getQuality()))) {
-								issues.add(new ConsistencyIssue(character, state, "Related entity requires a relational quality."));
-							}
-						}
-					}
-
-				}
-				final OBOClass biologicalProcess = (OBOClass)(this.session.getObject(BIOLOGICAL_PROCESS));
-				final OBOClass processQuality = (OBOClass)(this.session.getObject(PROCESS_QUALITY));
-				if ((phenotype.getEntity() != null) && (phenotype.getQuality() != null)) {
-					if ((biologicalProcess != null) && (processQuality != null) && TermUtil.hasIsAAncestor(phenotype.getEntity(), biologicalProcess)) {
-						if (!TermUtil.hasIsAAncestor(phenotype.getQuality(), processQuality)) {
-							issues.add(new ConsistencyIssue(character, state, "Biological process entities require a process quality."));
-						}
-					}
 				}
 			}
 		}
 		if (attributesUsed.size() > 1) {
 			issues.add(new ConsistencyIssue(character, null, "Qualities used descend from multiple attributes."));
+		}
+		return issues;
+	}
+
+	public Collection<ConsistencyIssue> checkState(State state, Character character) {
+		final Collection<ConsistencyIssue> issues = new ArrayList<ConsistencyIssue>();
+		if (state.getPhenotypes().isEmpty()) {
+			issues.add(new ConsistencyIssue(character, state, "State not annotated."));
+		}
+		for (Phenotype phenotype : state.getPhenotypes()) {
+			issues.addAll(this.checkPhenotype(phenotype, state, character));
+		}
+		return issues;
+	}
+
+	public Collection<ConsistencyIssue> checkPhenotype(Phenotype phenotype, State state, Character character) {
+		final Collection<ConsistencyIssue> issues = new ArrayList<ConsistencyIssue>();
+		if (phenotype.getEntity() == null) {
+			issues.add(new ConsistencyIssue(character, state, "No entity has been entered."));
+		} else {
+			if (isPostCompositionWithMultipleDifferentiae(phenotype.getEntity())) {
+				issues.add(new ConsistencyIssue(character, state, "Entity post-composition used with more than one differentia (may be okay)."));
+			}
+		}
+		if (phenotype.getQuality() == null) {
+			issues.add(new ConsistencyIssue(character, state, "No quality has been entered."));
+
+		} else {
+			if (isPostCompositionWithMultipleDifferentiae(phenotype.getQuality())) {
+				issues.add(new ConsistencyIssue(character, state, "Quality post-composition used with more than one differentia (may be okay)."));
+			}
+		}
+		if (phenotype.getRelatedEntity() != null) {
+			if (isPostCompositionWithMultipleDifferentiae(phenotype.getRelatedEntity())) {
+				issues.add(new ConsistencyIssue(character, state, "Related entity post-composition used with more than one differentia (may be okay)."));
+			}
+		}
+		if (relation_slim != null) {
+			if ((phenotype.getQuality() != null) && (phenotype.getQuality().getSubsets() != null)) {
+				if (phenotype.getQuality().getSubsets().contains(relation_slim)) {
+					if (phenotype.getRelatedEntity() == null) {
+						issues.add(new ConsistencyIssue(character, state, "Relational quality has been used without a related entity."));
+					}
+				} else {
+					if ((phenotype.getRelatedEntity() != null) && (!this.isOptionallyRelationalQuality(phenotype.getQuality()))) {
+						issues.add(new ConsistencyIssue(character, state, "Related entity requires a relational quality."));
+					}
+				}
+			}
+
+		}
+		final OBOClass biologicalProcess = (OBOClass)(this.session.getObject(BIOLOGICAL_PROCESS));
+		final OBOClass processQuality = (OBOClass)(this.session.getObject(PROCESS_QUALITY));
+		if ((phenotype.getEntity() != null) && (phenotype.getQuality() != null)) {
+			if ((biologicalProcess != null) && (processQuality != null) && (TermUtil.hasIsAAncestor(phenotype.getEntity(), biologicalProcess) || (BIOLOGICAL_PROCESS.equals(phenotype.getEntity().getID())))) {
+				if (!(TermUtil.hasIsAAncestor(phenotype.getQuality(), processQuality) || (PROCESS_QUALITY.equals(phenotype.getQuality().getID())))) {
+					issues.add(new ConsistencyIssue(character, state, "Biological process entities require a process quality."));
+				}
+			}
+			if ((biologicalProcess != null) && (processQuality != null) && (TermUtil.hasIsAAncestor(phenotype.getQuality(), processQuality) || (PROCESS_QUALITY.equals(phenotype.getQuality().getID())))) {
+				if (!(TermUtil.hasIsAAncestor(phenotype.getEntity(), biologicalProcess) || (BIOLOGICAL_PROCESS.equals(phenotype.getEntity().getID())))) {
+					issues.add(new ConsistencyIssue(character, state, "Process qualities should only be used with biological process entities."));
+				}
+			}
 		}
 		return issues;
 	}

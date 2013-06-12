@@ -28,11 +28,11 @@ public class Character extends AbstractPropertyChangeObject {
     private String discussion;
 
     public Character() {
-        this(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        this("c" + UUID.randomUUID().toString(), "s" + UUID.randomUUID().toString());
     }
 
     public Character(String nexmlID) {
-        this(nexmlID, UUID.randomUUID().toString());
+        this(nexmlID, "s" + UUID.randomUUID().toString());
     }
 
     public Character(String nexmlID, String statesNexmlID) {

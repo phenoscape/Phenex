@@ -29,7 +29,7 @@ public class State extends AbstractPropertyChangeObject {
     private PhenotypeProposal proposal;
 
     public State() {
-        this(UUID.randomUUID().toString()); 
+        this("s" + UUID.randomUUID().toString()); 
     }
 
     public State(String nexmlID) {

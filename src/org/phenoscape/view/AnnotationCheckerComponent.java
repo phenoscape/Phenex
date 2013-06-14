@@ -56,7 +56,7 @@ public class AnnotationCheckerComponent extends PhenoscapeGUIComponent {
 			final Collection<ConsistencyIssue> issues = this.checker.checkPhenotype(phenotype, state, character);
 			final List<String> errors = new ArrayList<String>();
 			for (ConsistencyIssue issue : issues) {
-				errors.add("<b>Warning:</b> " + issue.getIssue());
+				errors.add("<b><font color=\"red\">Warning:</font></b> " + issue.getIssue());
 			}
 			if (errors.isEmpty()) {
 				this.warningsField.setText("");

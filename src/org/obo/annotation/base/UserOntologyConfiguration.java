@@ -25,15 +25,15 @@ public class UserOntologyConfiguration implements OntologyConfiguration {
 		try {
 			defaultSources.add(new OntologySource("Phenoscape Anatomy", new URL("http://purl.obolibrary.org/obo/uberon/phenoscape-ext-simple.obo")));
 			defaultSources.add(new OntologySource("Vertebrate Taxonomy", new URL("http://purl.obolibrary.org/obo/vto.obo")));
-			defaultSources.add(new OntologySource("Museum Collections", new URL("http://phenoscape.svn.sourceforge.net/viewvc/*checkout*/phenoscape/trunk/vocab/fish_collection_abbreviation.obo")));
+			defaultSources.add(new OntologySource("Museum Collections", new URL("http://svn.code.sf.net/p/phenoscape/code/trunk/vocab/fish_collection_abbreviation.obo")));
 			defaultSources.add(new OntologySource("Phenotypic Qualities", new URL("http://purl.obolibrary.org/obo/pato.obo")));
 			defaultSources.add(new OntologySource("Spatial Ontology", new URL("http://purl.obolibrary.org/obo/bspo.obo")));
 			defaultSources.add(new OntologySource("Unit Ontology", new URL("http://unit-ontology.googlecode.com/svn/trunk/unit.obo")));
 			defaultSources.add(new OntologySource("OBO Relations", new URL("http://purl.obolibrary.org/obo/ro.obo")));
 			// need this?
 			//defaultSources.add(new OntologySource("Gene Ontology", new URL("http://www.geneontology.org/ontology/obo_format_1_2/gene_ontology.1_2.obo")));
-			defaultSources.add(new OntologySource("PATO Character slim", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/character_slims.obo")));
-			defaultSources.add(new OntologySource("Phenex relations for post-composition", new URL("http://phenoscape.svn.sourceforge.net/viewvc/phenoscape/trunk/vocab/phenex_relations.obo")));
+			defaultSources.add(new OntologySource("PATO Character slim", new URL("http://svn.code.sf.net/p/phenoscape/code/trunk/vocab/character_slims.obo")));
+			defaultSources.add(new OntologySource("Phenex relations for post-composition", new URL("http://svn.code.sf.net/p/phenoscape/code/trunk/vocab/phenex_relations.obo")));
 		} catch (MalformedURLException e) {
 			log().error("One of the default URLs is malformed", e);
 		}

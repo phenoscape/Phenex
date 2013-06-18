@@ -2,12 +2,15 @@ package org.phenoscape.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpGet;
@@ -29,28 +32,61 @@ import org.xml.sax.SAXException;
 public class ProvisionalTermUtil {
 
 	private static final String SERVICE = "http://rest.bioontology.org/bioportal/provisional";
-	private static final String APIKEY = "37697970-f916-40fe-bfeb-46aadbd07dba";
+	private static final String APIKEYKEY = "apikey";
+	private static final String USERIDKEY = "userid";
+
+	public static String getAPIKey() {
+		//return "37697970-f916-40fe-bfeb-46aadbd07dba";
+		return getPrefsRoot().get(APIKEYKEY, null);
+	}
+
+	public static void setAPIKey(String key) {
+		if (StringUtils.isBlank(key)) {
+			getPrefsRoot().remove(APIKEYKEY);
+		} else {
+			getPrefsRoot().put(APIKEYKEY, key);
+		}
+	}
+
+	public static String getUserID() {
+		//return "39814";
+		return getPrefsRoot().get(USERIDKEY, null);
+	}
+
+	public static void setUserID(String id) {
+		if (StringUtils.isBlank(id)) {
+			getPrefsRoot().remove(USERIDKEY);
+		} else {
+			getPrefsRoot().put(USERIDKEY, id);
+		}
+
+	}
 
 	public static List<OBOClass> getProvisionalTerms(OBOSession session) throws IllegalStateException, SAXException, IOException, ParserConfigurationException {
-		final List<NameValuePair> values = new ArrayList<NameValuePair>();
-		values.add(new BasicNameValuePair("apikey", APIKEY));
-		values.add(new BasicNameValuePair("submittedby", "39814"));
-		values.add(new BasicNameValuePair("pagesize", "9999"));
-		final String paramString = URLEncodedUtils.format(values, "utf-8");
-		final HttpGet get = new HttpGet(SERVICE + "?" + paramString);
-		final DefaultHttpClient client = new DefaultHttpClient();
-		final HttpResponse response = new DefaultHttpClient().execute(get);
-		client.getConnectionManager().shutdown();
-		final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-		final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-		final Document xmlDoc = new DOMBuilder().build(docBuilder.parse(response.getEntity().getContent()));
-		@SuppressWarnings("unchecked")
-		final List<Element> termElements = xmlDoc.getRootElement().getChild("data").getChild("page").getChild("contents").getChild("classBeanResultList").getChildren("classBean");
-		final List<OBOClass> terms = new ArrayList<OBOClass>();
-		for (Element element : termElements) {
-			terms.add(createClassForProvisionalTerm(element, session));
+		if (ProvisionalTermUtil.getAPIKey() == null || ProvisionalTermUtil.getUserID() == null) {
+			//JOptionPane.showMessageDialog(null, "You need to set your prefs", "Error", JOptionPane.ERROR_MESSAGE);
+			return Collections.emptyList();
+		} else {
+			final List<NameValuePair> values = new ArrayList<NameValuePair>();
+			values.add(new BasicNameValuePair("apikey", getAPIKey()));
+			values.add(new BasicNameValuePair("submittedby", getUserID()));
+			values.add(new BasicNameValuePair("pagesize", "9999"));
+			final String paramString = URLEncodedUtils.format(values, "utf-8");
+			final HttpGet get = new HttpGet(SERVICE + "?" + paramString);
+			final DefaultHttpClient client = new DefaultHttpClient();
+			final HttpResponse response = new DefaultHttpClient().execute(get);
+			client.getConnectionManager().shutdown();
+			final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+			final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+			final Document xmlDoc = new DOMBuilder().build(docBuilder.parse(response.getEntity().getContent()));
+			@SuppressWarnings("unchecked")
+			final List<Element> termElements = xmlDoc.getRootElement().getChild("data").getChild("page").getChild("contents").getChild("classBeanResultList").getChildren("classBean");
+			final List<OBOClass> terms = new ArrayList<OBOClass>();
+			for (Element element : termElements) {
+				terms.add(createClassForProvisionalTerm(element, session));
+			}
+			return terms;
 		}
-		return terms;
 	}
 
 	public static OBOClass createClassForProvisionalTerm(Element element, OBOSession session) {
@@ -132,6 +168,10 @@ public class ProvisionalTermUtil {
 			}
 		}
 		return null;
+	}
+
+	private static Preferences getPrefsRoot() {
+		return Preferences.userNodeForPackage(ProvisionalTermUtil.class).node("orb");
 	}
 
 }

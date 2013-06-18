@@ -33,7 +33,6 @@ import org.xml.sax.SAXException;
 public class ORBController {
 
 	private static final String SERVICE = "http://rest.bioontology.org/bioportal/provisional";
-	private static final String APIKEY = "37697970-f916-40fe-bfeb-46aadbd07dba";
 	private final PhenexController controller;
 
 
@@ -42,29 +41,34 @@ public class ORBController {
 	}
 
 	public void runORBTermRequest() {
-		final ProvisionalTermRequestPanel panel = new ProvisionalTermRequestPanel(this.controller);
-		panel.init();
-		panel.setSize(400, 100);
-		final int result = JOptionPane.showConfirmDialog(null, panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-			final ORBTerm requestedTerm = panel.getTerm();
-			try {
-				this.requestTerm(requestedTerm);
-			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		if (ProvisionalTermUtil.getAPIKey() == null || ProvisionalTermUtil.getUserID() == null) {
+			JOptionPane.showMessageDialog(null, "Please first enter your ORB connection preferences using the ORB Connection Settings panel.", "ORB not configured", JOptionPane.ERROR_MESSAGE);
+			return;
+		} else {
+			final ProvisionalTermRequestPanel panel = new ProvisionalTermRequestPanel(this.controller);
+			panel.init();
+			panel.setSize(400, 100);
+			final int result = JOptionPane.showConfirmDialog(null, panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+			if (result == JOptionPane.OK_OPTION) {
+				final ORBTerm requestedTerm = panel.getTerm();
+				try {
+					this.requestTerm(requestedTerm);
+				} catch (ClientProtocolException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalStateException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ParserConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SAXException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -90,7 +94,7 @@ public class ORBController {
 
 	private HttpEntity createPostEntity(ORBTerm term) throws UnsupportedEncodingException {
 		final List<NameValuePair> values = new ArrayList<NameValuePair>();
-		values.add(new BasicNameValuePair("apikey", APIKEY));
+		values.add(new BasicNameValuePair("apikey", ProvisionalTermUtil.getAPIKey()));
 		values.add(new BasicNameValuePair("preferredname", term.getLabel()));
 		values.add(new BasicNameValuePair("definition", term.getDefinition()));
 		if (term.getParent() != null) {
@@ -100,7 +104,7 @@ public class ORBController {
 		if (!term.getSynonyms().isEmpty()) {
 			StringUtils.join(term.getSynonyms(), ",");
 		}
-		values.add(new BasicNameValuePair("submittedby", "39814"));
+		values.add(new BasicNameValuePair("submittedby", ProvisionalTermUtil.getUserID()));
 		return new UrlEncodedFormEntity(values);
 	}
 

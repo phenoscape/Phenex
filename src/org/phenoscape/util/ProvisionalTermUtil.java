@@ -36,7 +36,6 @@ public class ProvisionalTermUtil {
 	private static final String USERIDKEY = "userid";
 
 	public static String getAPIKey() {
-		//return "37697970-f916-40fe-bfeb-46aadbd07dba";
 		return getPrefsRoot().get(APIKEYKEY, null);
 	}
 
@@ -49,7 +48,6 @@ public class ProvisionalTermUtil {
 	}
 
 	public static String getUserID() {
-		//return "39814";
 		return getPrefsRoot().get(USERIDKEY, null);
 	}
 

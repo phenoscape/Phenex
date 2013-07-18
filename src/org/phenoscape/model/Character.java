@@ -1,5 +1,6 @@
 package org.phenoscape.model;
 
+import java.util.Collection;
 import java.util.UUID;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -57,9 +58,17 @@ public class Character extends AbstractPropertyChangeObject {
     public void addState(State aState) {
         this.states.add(aState);
     }
+    
+    public void addStates(Collection<State> states) {
+        this.states.addAll(states);
+    }
 
     public void removeState(State aState) {
         this.states.remove(aState);
+    }
+    
+    public void removeStates(Collection<State> states) {
+        this.states.removeAll(states);
     }
 
     public ObservableEventList<State> getStates() {

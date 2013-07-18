@@ -2,8 +2,11 @@ package org.phenoscape.view;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -21,7 +24,10 @@ import org.obo.app.swing.SortDisabler;
 import org.obo.app.swing.TableColumnPrefsSaver;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Character;
+import org.phenoscape.model.DataSet;
+import org.phenoscape.model.MultipleState;
 import org.phenoscape.model.State;
+import org.phenoscape.model.Taxon;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
@@ -62,16 +68,57 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 		this.getController().getCurrentStatesSelectionModel().addListSelectionListener(new StateSelectionListener());
 	}
 
+	public void createNewCharacterWithSelectedStates() {
+		final List<State> states = Collections.unmodifiableList(this.getSelectedStates());
+		final Character selectedCharacter = this.getSelectedCharacter();
+		final Character newCharacter = this.getController().getDataSet().newCharacter();
+		newCharacter.addStates(states);
+		final DataSet data = this.getController().getDataSet();
+		for (Taxon taxon : data.getTaxa()) {
+			final State stateValue = data.getStateForTaxon(taxon, selectedCharacter);
+			if (stateValue instanceof MultipleState) {
+				final MultipleState multiple = (MultipleState)stateValue;
+				if (!Collections.disjoint(states, multiple.getStates())) {
+					final Set<State> statesForOldCharacter = new HashSet<State>(multiple.getStates());
+					statesForOldCharacter.removeAll(states);
+					final Set<State> statesForNewCharacter = new HashSet<State>(multiple.getStates());
+					statesForNewCharacter.retainAll(states);
+					if (statesForOldCharacter.isEmpty()) {
+						data.setStateForTaxon(taxon, selectedCharacter, null);
+					} else if (statesForOldCharacter.size() == 1) {
+						data.setStateForTaxon(taxon, selectedCharacter, statesForOldCharacter.iterator().next());
+					} else {
+						data.setStateForTaxon(taxon, selectedCharacter, new MultipleState(statesForOldCharacter, multiple.getMode()));
+					}
+					if (statesForNewCharacter.isEmpty()) {
+						data.setStateForTaxon(taxon, newCharacter, null);
+					} else if (statesForNewCharacter.size() == 1) {
+						data.setStateForTaxon(taxon, newCharacter, statesForNewCharacter.iterator().next());
+					} else {
+						data.setStateForTaxon(taxon, newCharacter, new MultipleState(statesForNewCharacter, multiple.getMode()));
+					}
+				}
+			} else {
+				if (states.contains(stateValue)) {
+					log().debug("Moving state for taxon: " + stateValue + " " + taxon);
+					data.setStateForTaxon(taxon, newCharacter, stateValue);
+					data.setStateForTaxon(taxon, selectedCharacter, null);
+				}
+			}
+		}
+		selectedCharacter.removeStates(states);
+
+	}
+
 	private void addState() {
 		final Character character = this.getSelectedCharacter();
 		if (character != null) { character.newState(); }
 	}
 
-	private void deleteSelectedState() {
+	private void deleteSelectedStates() {
 		final Character character = this.getSelectedCharacter();
 		if (character != null) {
-			final State state = this.getSelectedState();
-			if (state != null) { character.removeState(state); }
+			character.removeStates(this.getSelectedStates());
 		}
 	}
 
@@ -84,13 +131,8 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 		}
 	}
 
-	private State getSelectedState() {
-		final EventList<State> selected = this.getController().getCurrentStatesSelectionModel().getSelected();
-		if (selected.size() == 1) {
-			return selected.get(0);
-		} else {
-			return null;
-		}
+	private List<State> getSelectedStates() {
+		return this.getController().getCurrentStatesSelectionModel().getSelected();
 	}
 
 	private void characterSelectionDidChange() {
@@ -112,7 +154,7 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 
 	private void updateButtonStates() {
 		this.addStateButton.setEnabled(this.getSelectedCharacter() != null);
-		this.deleteStateButton.setEnabled(this.getSelectedState() != null);
+		this.deleteStateButton.setEnabled(!this.getSelectedStates().isEmpty());
 	}
 
 	private void selectFirstPhenotype() {
@@ -139,7 +181,7 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 		this.deleteStateButton = new JButton(new AbstractAction(null, new ImageIcon(this.getClass().getResource("/org/phenoscape/view/images/list-remove.png"))) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				deleteSelectedState();
+				deleteSelectedStates();
 			}
 		});
 		this.deleteStateButton.setToolTipText("Delete State");

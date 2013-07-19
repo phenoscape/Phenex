@@ -132,7 +132,11 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 						final Set<State> oldStates = new HashSet<State>(multiple.getStates());
 						oldStates.removeAll(states);
 						oldStates.add(newState);
-						data.setStateForTaxon(taxon, selectedCharacter, new MultipleState(oldStates, multiple.getMode()));
+						if (oldStates.size() > 1) {
+							data.setStateForTaxon(taxon, selectedCharacter, new MultipleState(oldStates, multiple.getMode()));
+						} else {
+							data.setStateForTaxon(taxon, selectedCharacter, newState);
+						}
 					}
 				} else {
 					if (states.contains(stateValue)) {
@@ -150,10 +154,33 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 	}
 
 	private void deleteSelectedStates() {
-		//FIXME handle matrix references to these states
-		final Character character = this.getSelectedCharacter();
-		if (character != null) {
-			character.removeStates(this.getSelectedStates());
+		final List<State> states = Collections.unmodifiableList(this.getSelectedStates());
+		final Character selectedCharacter = this.getSelectedCharacter();
+		final DataSet data = this.getController().getDataSet();
+		for (Taxon taxon : data.getTaxa()) {
+			//FIXME some of this logic should be moved down into the model
+			final State stateValue = data.getStateForTaxon(taxon, selectedCharacter);
+			if (stateValue instanceof MultipleState) {
+				final MultipleState multiple = (MultipleState)stateValue;
+				if (!Collections.disjoint(states, multiple.getStates())) {
+					final Set<State> oldStates = new HashSet<State>(multiple.getStates());
+					oldStates.removeAll(states);
+					if (oldStates.size() > 1) {
+						data.setStateForTaxon(taxon, selectedCharacter, new MultipleState(oldStates, multiple.getMode()));
+					} else if (oldStates.size() == 1) {
+						data.setStateForTaxon(taxon, selectedCharacter, oldStates.iterator().next());
+					} else {
+						data.setStateForTaxon(taxon, selectedCharacter, null);
+					}
+				}
+			} else {
+				if (states.contains(stateValue)) {
+					data.setStateForTaxon(taxon, selectedCharacter, null);
+				}
+			}
+		}
+		if (selectedCharacter != null) {
+			selectedCharacter.removeStates(this.getSelectedStates());
 		}
 	}
 

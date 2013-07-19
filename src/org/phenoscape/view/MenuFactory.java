@@ -139,6 +139,8 @@ public class MenuFactory {
 		menu.addSeparator();
 		final Action newCharacterWithSelectedStatesAction = new ResponderChainAction("createNewCharacterWithSelectedStates", "New Character With Selected States");
 		menu.add(new JMenuItem(newCharacterWithSelectedStatesAction));
+		final Action consolidateSelectedStatesAction = new ResponderChainAction("consolidateSelectedStates", "Consolidate Selected States");
+		menu.add(new JMenuItem(consolidateSelectedStatesAction));
 		return menu;
 	}
 

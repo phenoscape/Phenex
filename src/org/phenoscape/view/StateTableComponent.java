@@ -2,6 +2,7 @@ package org.phenoscape.view;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -70,44 +71,77 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 
 	public void createNewCharacterWithSelectedStates() {
 		final List<State> states = Collections.unmodifiableList(this.getSelectedStates());
-		final Character selectedCharacter = this.getSelectedCharacter();
-		final Character newCharacter = this.getController().getDataSet().newCharacter();
-		newCharacter.addStates(states);
-		final DataSet data = this.getController().getDataSet();
-		for (Taxon taxon : data.getTaxa()) {
-			final State stateValue = data.getStateForTaxon(taxon, selectedCharacter);
-			if (stateValue instanceof MultipleState) {
-				final MultipleState multiple = (MultipleState)stateValue;
-				if (!Collections.disjoint(states, multiple.getStates())) {
-					final Set<State> statesForOldCharacter = new HashSet<State>(multiple.getStates());
-					statesForOldCharacter.removeAll(states);
-					final Set<State> statesForNewCharacter = new HashSet<State>(multiple.getStates());
-					statesForNewCharacter.retainAll(states);
-					if (statesForOldCharacter.isEmpty()) {
+		if (!states.isEmpty()) {
+			final Character selectedCharacter = this.getSelectedCharacter();
+			final Character newCharacter = this.getController().getDataSet().newCharacter();
+			newCharacter.addStates(states);
+			final DataSet data = this.getController().getDataSet();
+			for (Taxon taxon : data.getTaxa()) {
+				//FIXME some of this logic should be moved down into the model
+				final State stateValue = data.getStateForTaxon(taxon, selectedCharacter);
+				if (stateValue instanceof MultipleState) {
+					final MultipleState multiple = (MultipleState)stateValue;
+					if (!Collections.disjoint(states, multiple.getStates())) {
+						final Set<State> statesForOldCharacter = new HashSet<State>(multiple.getStates());
+						statesForOldCharacter.removeAll(states);
+						final Set<State> statesForNewCharacter = new HashSet<State>(multiple.getStates());
+						statesForNewCharacter.retainAll(states);
+						if (statesForOldCharacter.isEmpty()) {
+							data.setStateForTaxon(taxon, selectedCharacter, null);
+						} else if (statesForOldCharacter.size() == 1) {
+							data.setStateForTaxon(taxon, selectedCharacter, statesForOldCharacter.iterator().next());
+						} else {
+							data.setStateForTaxon(taxon, selectedCharacter, new MultipleState(statesForOldCharacter, multiple.getMode()));
+						}
+						if (statesForNewCharacter.isEmpty()) {
+							data.setStateForTaxon(taxon, newCharacter, null);
+						} else if (statesForNewCharacter.size() == 1) {
+							data.setStateForTaxon(taxon, newCharacter, statesForNewCharacter.iterator().next());
+						} else {
+							data.setStateForTaxon(taxon, newCharacter, new MultipleState(statesForNewCharacter, multiple.getMode()));
+						}
+					}
+				} else {
+					if (states.contains(stateValue)) {
+						data.setStateForTaxon(taxon, newCharacter, stateValue);
 						data.setStateForTaxon(taxon, selectedCharacter, null);
-					} else if (statesForOldCharacter.size() == 1) {
-						data.setStateForTaxon(taxon, selectedCharacter, statesForOldCharacter.iterator().next());
-					} else {
-						data.setStateForTaxon(taxon, selectedCharacter, new MultipleState(statesForOldCharacter, multiple.getMode()));
 					}
-					if (statesForNewCharacter.isEmpty()) {
-						data.setStateForTaxon(taxon, newCharacter, null);
-					} else if (statesForNewCharacter.size() == 1) {
-						data.setStateForTaxon(taxon, newCharacter, statesForNewCharacter.iterator().next());
-					} else {
-						data.setStateForTaxon(taxon, newCharacter, new MultipleState(statesForNewCharacter, multiple.getMode()));
-					}
-				}
-			} else {
-				if (states.contains(stateValue)) {
-					log().debug("Moving state for taxon: " + stateValue + " " + taxon);
-					data.setStateForTaxon(taxon, newCharacter, stateValue);
-					data.setStateForTaxon(taxon, selectedCharacter, null);
 				}
 			}
+			selectedCharacter.removeStates(states);
 		}
-		selectedCharacter.removeStates(states);
+	}
 
+	public void consolidateSelectedStates() {
+		final List<State> states = Collections.unmodifiableList(this.getSelectedStates());
+		if (states.size() > 1) {
+			final Character selectedCharacter = this.getSelectedCharacter();
+			final State newState = selectedCharacter.newState();
+			final List<String> labels = new ArrayList<String>();
+			for (State state : states) {
+				labels.add(state.getLabel());
+			}
+			newState.setLabel(org.obo.app.util.Collections.join(labels, "; "));
+			final DataSet data = this.getController().getDataSet();
+			for (Taxon taxon : data.getTaxa()) {
+				//FIXME some of this logic should be moved down into the model
+				final State stateValue = data.getStateForTaxon(taxon, selectedCharacter);
+				if (stateValue instanceof MultipleState) {
+					final MultipleState multiple = (MultipleState)stateValue;
+					if (!Collections.disjoint(states, multiple.getStates())) {
+						final Set<State> oldStates = new HashSet<State>(multiple.getStates());
+						oldStates.removeAll(states);
+						oldStates.add(newState);
+						data.setStateForTaxon(taxon, selectedCharacter, new MultipleState(oldStates, multiple.getMode()));
+					}
+				} else {
+					if (states.contains(stateValue)) {
+						data.setStateForTaxon(taxon, selectedCharacter, newState);
+					}
+				}
+			}
+			selectedCharacter.removeStates(states);
+		}
 	}
 
 	private void addState() {
@@ -116,6 +150,7 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 	}
 
 	private void deleteSelectedStates() {
+		//FIXME handle matrix references to these states
 		final Character character = this.getSelectedCharacter();
 		if (character != null) {
 			character.removeStates(this.getSelectedStates());

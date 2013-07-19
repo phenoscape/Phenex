@@ -127,7 +127,7 @@ public class DataSet extends AbstractPropertyChangeObject {
         this.matrix.put(taxon.getNexmlID(), states);
         states.put(character.getNexmlID(), state);
         this.firePropertyChange(MATRIX_CELL, oldValue, new MatrixCellValue(taxon, character, state));
-    }
+    }    
     
     @Override
     public Class<?> getClass(String propertyKey) throws UndefinedKeyException {

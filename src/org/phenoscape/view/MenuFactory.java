@@ -136,6 +136,11 @@ public class MenuFactory {
 		final Action selectAllAction = new ResponderChainAction("selectAll", "Select All");
 		selectAllAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		menu.add(new JMenuItem(selectAllAction));
+		menu.addSeparator();
+		final Action newCharacterWithSelectedStatesAction = new ResponderChainAction("createNewCharacterWithSelectedStates", "New Character With Selected States");
+		menu.add(new JMenuItem(newCharacterWithSelectedStatesAction));
+		final Action consolidateSelectedStatesAction = new ResponderChainAction("consolidateSelectedStates", "Consolidate Selected States");
+		menu.add(new JMenuItem(consolidateSelectedStatesAction));
 		return menu;
 	}
 

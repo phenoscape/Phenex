@@ -124,7 +124,7 @@ public class PhenexController extends DocumentController {
 				), new EverythingEqualComparator<State>());
 		this.currentStatesSelectionModel = new EventSelectionModel<State>(this.currentStates);
 		new ListSelectionMaintainer<State>(this.currentStates, this.currentStatesSelectionModel);
-		this.currentStatesSelectionModel.setSelectionMode(EventSelectionModel.SINGLE_SELECTION);
+		this.currentStatesSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		this.currentPhenotypes = new SortedList<Phenotype>(new CollectionList<State, Phenotype>(this.currentStatesSelectionModel.getSelected(),
 				new CollectionList.Model<State, Phenotype>() {
 			@Override

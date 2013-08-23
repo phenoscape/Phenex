@@ -1,5 +1,6 @@
 package org.phenoscape.model;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +39,10 @@ public class DataSet extends AbstractPropertyChangeObject {
 
     public void removeCharacter(Character aCharacter) {
         this.characters.remove(aCharacter);
+    }
+    
+    public void removeCharacters(Collection<Character> characters) {
+    	this.characters.removeAll(characters);
     }
 
     public ObservableEventList<Character> getCharacters() {

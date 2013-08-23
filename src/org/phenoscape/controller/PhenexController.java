@@ -99,7 +99,7 @@ public class PhenexController extends DocumentController {
 		this.sortedCharacters = new SortedList<Character>(this.dataSet.getCharacters(), new EverythingEqualComparator<Character>());
 		this.charactersSelectionModel = new EventSelectionModel<Character>(this.sortedCharacters);
 		new ListSelectionMaintainer<Character>(this.sortedCharacters, this.charactersSelectionModel);
-		this.charactersSelectionModel.setSelectionMode(EventSelectionModel.SINGLE_SELECTION);
+		this.charactersSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		this.sortedTaxa = new SortedList<Taxon>(this.dataSet.getTaxa(), new EverythingEqualComparator<Taxon>());
 		this.taxaSelectionModel = new EventSelectionModel<Taxon>(this.sortedTaxa);
 		new ListSelectionMaintainer<Taxon>(this.sortedTaxa, this.taxaSelectionModel);

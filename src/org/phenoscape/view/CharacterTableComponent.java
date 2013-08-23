@@ -2,7 +2,12 @@ package org.phenoscape.view;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -21,8 +26,12 @@ import org.obo.app.swing.SortDisabler;
 import org.obo.app.swing.TableColumnPrefsSaver;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Character;
+import org.phenoscape.model.DataSet;
+import org.phenoscape.model.MultipleState;
+import org.phenoscape.model.MultipleState.MODE;
+import org.phenoscape.model.State;
+import org.phenoscape.model.Taxon;
 
-import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.gui.WritableTableFormat;
@@ -46,6 +55,45 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 		this.initializeInterface();
 	}
 
+	public void consolidateSelectedCharacters() {
+		//FIXME some of this logic should be moved down into the model
+		final List<Character> characters = Collections.unmodifiableList(this.getSelectedCharacters());
+		if (characters.size() > 1) {
+			final DataSet data = this.getController().getDataSet();
+			final Character newCharacter = data.newCharacter();;
+			final List<String> labels = new ArrayList<String>();
+			for (Character character : characters) {
+				labels.add(character.getLabel());
+				newCharacter.addStates(character.getStates());
+			}
+			newCharacter.setLabel(org.obo.app.util.Collections.join(labels, "; "));
+			for (Taxon taxon : data.getTaxa()) {
+				final Set<State> statesForTaxon = new HashSet<State>();
+				for (Character character : characters) {
+					final State stateValue = data.getStateForTaxon(taxon, character);
+					if (stateValue instanceof MultipleState) {
+						statesForTaxon.addAll(((MultipleState)stateValue).getStates());
+					} else {
+						statesForTaxon.add(stateValue);
+					}
+				}
+				final State newStateValue;
+				if (statesForTaxon.size() > 1) {
+					newStateValue = new MultipleState(statesForTaxon, MODE.POLYMORPHIC);
+				} else {
+					newStateValue = statesForTaxon.iterator().next();
+				}
+				data.setStateForTaxon(taxon, newCharacter, newStateValue);
+			}
+			data.removeCharacters(characters);
+			int i = 0;
+			for (State state : newCharacter.getStates()) {
+				state.setSymbol("" + i);
+				i += 1;
+			}
+		}
+	}
+
 	private void initializeInterface() {
 		this.setLayout(new BorderLayout());
 		final EventTableModel<Character> charactersTableModel = new EventTableModel<Character>(this.getController().getSortedCharacters(), new CharactersTableFormat());
@@ -66,21 +114,17 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 	}
 
 	private void deleteSelectedCharacter() {
-		final Character character = this.getSelectedCharacter();
-		if (character != null) { this.getController().getDataSet().removeCharacter(character); }
+		final List<Character> characters = Collections.unmodifiableList(this.getSelectedCharacters());
+		final DataSet data = this.getController().getDataSet();
+		data.getCharacters().removeAll(characters);
 	}
 
-	private Character getSelectedCharacter() {
-		final EventList<Character> selected = this.getController().getCharactersSelectionModel().getSelected();
-		if (selected.size() == 1) {
-			return selected.get(0);
-		} else {
-			return null;
-		}
+	private List<Character> getSelectedCharacters() {
+		return this.getController().getCharactersSelectionModel().getSelected();
 	}
 
 	private void updateButtonStates() {
-		this.deleteCharacterButton.setEnabled(this.getSelectedCharacter() != null);
+		this.deleteCharacterButton.setEnabled(!this.getSelectedCharacters().isEmpty());
 	}
 
 	private void selectFirstState() {

@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
 import org.obo.app.swing.SortDisabler;
@@ -116,12 +117,19 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 		final List<State> states = Collections.unmodifiableList(this.getSelectedStates());
 		if (states.size() > 1) {
 			final Character selectedCharacter = this.getSelectedCharacter();
+			if (selectedCharacter == null) return; // don't consolidate states across different characters
 			final State newState = selectedCharacter.newState();
 			final List<String> labels = new ArrayList<String>();
+			final List<String> comments = new ArrayList<String>();
+			final List<String> figures = new ArrayList<String>();
 			for (State state : states) {
 				labels.add(state.getLabel());
+				comments.add(state.getComment());
+				figures.add(state.getFigure());
 			}
-			newState.setLabel(org.obo.app.util.Collections.join(labels, "; "));
+			newState.setLabel(StringUtils.stripToNull(org.obo.app.util.Collections.join(labels, "; ")));
+			newState.setComment(StringUtils.stripToNull(org.obo.app.util.Collections.join(comments, "; ")));
+			newState.setFigure(StringUtils.stripToNull(org.obo.app.util.Collections.join(figures, "; ")));
 			final DataSet data = this.getController().getDataSet();
 			for (Taxon taxon : data.getTaxa()) {
 				//FIXME some of this logic should be moved down into the model

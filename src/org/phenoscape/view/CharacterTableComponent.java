@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
@@ -62,11 +63,20 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 			final DataSet data = this.getController().getDataSet();
 			final Character newCharacter = data.newCharacter();;
 			final List<String> labels = new ArrayList<String>();
+			final List<String> comments = new ArrayList<String>();
+			final List<String> figures = new ArrayList<String>();
+			final List<String> discussions = new ArrayList<String>();
 			for (Character character : characters) {
 				labels.add(character.getLabel());
+				comments.add(character.getComment());
+				figures.add(character.getFigure());
+				discussions.add(character.getDiscussion());
 				newCharacter.addStates(character.getStates());
 			}
-			newCharacter.setLabel(org.obo.app.util.Collections.join(labels, "; "));
+			newCharacter.setLabel(StringUtils.stripToNull(org.obo.app.util.Collections.join(labels, "; ")));
+			newCharacter.setComment(StringUtils.stripToNull(org.obo.app.util.Collections.join(comments, "; ")));
+			newCharacter.setFigure(StringUtils.stripToNull(org.obo.app.util.Collections.join(figures, "; ")));
+			newCharacter.setDiscussion(StringUtils.stripToNull(org.obo.app.util.Collections.join(discussions, "; ")));
 			for (Taxon taxon : data.getTaxa()) {
 				final Set<State> statesForTaxon = new HashSet<State>();
 				for (Character character : characters) {

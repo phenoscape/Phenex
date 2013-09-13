@@ -83,15 +83,21 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 					final State stateValue = data.getStateForTaxon(taxon, character);
 					if (stateValue instanceof MultipleState) {
 						statesForTaxon.addAll(((MultipleState)stateValue).getStates());
-					} else {
+					} else if (stateValue != null) {
 						statesForTaxon.add(stateValue);
 					}
 				}
 				final State newStateValue;
 				if (statesForTaxon.size() > 1) {
+					if (statesForTaxon.contains(null)) {
+						log().debug("We created a null state?");
+						log().debug(statesForTaxon);
+					}
 					newStateValue = new MultipleState(statesForTaxon, MODE.POLYMORPHIC);
-				} else {
+				} else if (statesForTaxon.size() == 1) {
 					newStateValue = statesForTaxon.iterator().next();
+				} else {
+					newStateValue = null;
 				}
 				data.setStateForTaxon(taxon, newCharacter, newStateValue);
 			}

@@ -143,6 +143,12 @@ public class MenuFactory {
 		menu.add(new JMenuItem(consolidateSelectedStatesAction));
 		final Action newCharacterWithSelectedStatesAction = new ResponderChainAction("createNewCharacterWithSelectedStates", "New Character With Selected States");
 		menu.add(new JMenuItem(newCharacterWithSelectedStatesAction));
+		menu.addSeparator();
+		final Action generateTreeAction = new AbstractAction("Generate Tree From Taxonomy Ontology") {
+			@Override
+			public void actionPerformed(ActionEvent e) { controller.generateTree(); }
+		};
+		menu.add(new JMenuItem(generateTreeAction));
 		return menu;
 	}
 

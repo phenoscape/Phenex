@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.swing.JDialog;
@@ -45,6 +46,7 @@ import org.obo.app.controller.DocumentController;
 import org.obo.app.controller.UserCancelledReadException;
 import org.obo.app.swing.ListSelectionMaintainer;
 import org.obo.app.util.EverythingEqualComparator;
+import org.obo.datamodel.LinkedObject;
 import org.phenoscape.io.BioCreativeTabFormat;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.NeXMLReader;
@@ -60,9 +62,11 @@ import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
+import org.phenoscape.model.Tree;
 import org.phenoscape.model.UndoObserver;
 import org.phenoscape.orb.ORBController;
 import org.phenoscape.util.DataMerger;
+import org.phenoscape.util.TreeBuilder;
 
 import ca.odell.glazedlists.CollectionList;
 import ca.odell.glazedlists.SortedList;
@@ -436,6 +440,13 @@ public class PhenexController extends DocumentController {
 		//       panel.setSize(400, 250);
 		//       final int result = JOptionPane.showConfirmDialog(this.getWindow(), panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
+	}
+
+	public void generateTree() {
+		final Map<LinkedObject, LinkedObject> topology = TreeBuilder.buildTree(this.dataSet, this.getOntologyController().getOBOSession());
+		final Tree tree = new Tree();
+		tree.setTopology(topology);
+		this.dataSet.addTree(tree);
 	}
 
 	private void fireDataChanged() {

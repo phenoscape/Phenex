@@ -23,6 +23,7 @@ import org.nexml.schema_2009.ResourceMeta;
 import org.nexml.schema_2009.StandardCells;
 import org.nexml.schema_2009.StandardFormat;
 import org.nexml.schema_2009.Taxa;
+import org.nexml.schema_2009.Trees;
 import org.obo.datamodel.OBOObject;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
@@ -68,6 +69,16 @@ public class NeXMLUtil {
         final Taxa newTaxa = doc.getNexml().insertNewOtus(0);
         newTaxa.setId(id);
         return newTaxa;
+    }
+    
+    public static Trees findOrCreateTreesBlock(NexmlDocument doc, String id) {
+    	for (Trees treesBlock : doc.getNexml().getTreesArray()) {
+    		if (treesBlock.getId().equals(id)) return treesBlock;
+    	}
+    	// no trees block was found, so create one for that id
+    	final Trees newTreesBlock = doc.getNexml().insertNewTrees(0);
+    	newTreesBlock.setId(id);
+    	return newTreesBlock;
     }
 
     public static AbstractBlock findOrCreateCharactersBlock(NexmlDocument doc, String id) {

@@ -11,11 +11,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlAnySimpleType;
 import org.apache.xmlbeans.XmlCursor;
@@ -31,8 +33,10 @@ import org.nexml.schema_2009.AbstractObsRow;
 import org.nexml.schema_2009.AbstractPolymorphicStateSet;
 import org.nexml.schema_2009.AbstractState;
 import org.nexml.schema_2009.AbstractStates;
+import org.nexml.schema_2009.AbstractTree;
 import org.nexml.schema_2009.AbstractUncertainStateSet;
 import org.nexml.schema_2009.Annotated;
+import org.nexml.schema_2009.IntTree;
 import org.nexml.schema_2009.NexmlDocument;
 import org.nexml.schema_2009.StandardCells;
 import org.nexml.schema_2009.StandardChar;
@@ -44,6 +48,10 @@ import org.nexml.schema_2009.StandardState;
 import org.nexml.schema_2009.StandardStates;
 import org.nexml.schema_2009.StandardUncertainStateSet;
 import org.nexml.schema_2009.Taxa;
+import org.nexml.schema_2009.TreeIntEdge;
+import org.nexml.schema_2009.TreeNode;
+import org.nexml.schema_2009.Trees;
+import org.obo.datamodel.LinkedObject;
 import org.phenoscape.io.NeXMLUtil.Annotatable;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
@@ -53,6 +61,7 @@ import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.Specimen;
 import org.phenoscape.model.State;
 import org.phenoscape.model.Taxon;
+import org.phenoscape.model.Tree;
 import org.w3c.dom.Attr;
 
 public class NeXMLWriter {
@@ -63,6 +72,8 @@ public class NeXMLWriter {
 	private String generator;
 	private final XmlOptions options = new XmlOptions();
 	private final Map<Character, AbstractStates> statesBlocksByCharacter = new HashMap<Character, AbstractStates>();
+	private final Map<Taxon, String> otuIDsByTaxon = new HashMap<Taxon, String>();
+	private final Set<String> usedUncertainStateSets = new HashSet<String>();
 
 	public NeXMLWriter(String charactersBlockID) {
 		this(charactersBlockID, NexmlDocument.Factory.newInstance());
@@ -89,6 +100,8 @@ public class NeXMLWriter {
 	public void setDataSet(DataSet data) {
 		this.data = data;
 		this.statesBlocksByCharacter.clear();
+		this.otuIDsByTaxon.clear();
+		this.usedUncertainStateSets.clear();
 	}
 
 	public void setGenerator(String appName) {
@@ -120,7 +133,7 @@ public class NeXMLWriter {
 		this.writeCharacters(charBlock);
 		final String taxaID;
 		if ((charBlock.getOtus() == null) || (charBlock.getOtus().equals(""))) {
-			taxaID = UUID.randomUUID().toString();
+			taxaID = "t" + UUID.randomUUID().toString();
 			charBlock.setOtus(taxaID);
 		} else {
 			taxaID = charBlock.getOtus();
@@ -131,6 +144,29 @@ public class NeXMLWriter {
 		final XmlCursor firstCharCursor = newDoc.getNexml().getCharactersArray()[0].newCursor();
 		final XmlCursor taxaCursor = taxaBlock.newCursor();
 		taxaCursor.moveXml(firstCharCursor);
+		for (AbstractStates statesBlock : charBlock.getFormat().getStatesArray()) {
+			final AbstractPolymorphicStateSet[] existingSets = statesBlock.getPolymorphicStateSetArray();
+			final List<AbstractPolymorphicStateSet> usedSets = new ArrayList<AbstractPolymorphicStateSet>();
+			for (AbstractPolymorphicStateSet stateSet : existingSets) {
+				if (this.usedUncertainStateSets.contains(stateSet.getId())) {
+					usedSets.add(stateSet);
+				}
+			}
+			statesBlock.setPolymorphicStateSetArray(usedSets.toArray(new AbstractPolymorphicStateSet[] {}));
+		}
+		for (AbstractStates statesBlock : charBlock.getFormat().getStatesArray()) {
+			final AbstractUncertainStateSet[] existingSets = statesBlock.getUncertainStateSetArray();
+			final List<AbstractUncertainStateSet> usedSets = new ArrayList<AbstractUncertainStateSet>();
+			for (AbstractUncertainStateSet stateSet : existingSets) {
+				if (this.usedUncertainStateSets.contains(stateSet.getId())) {
+					usedSets.add(stateSet);
+				}
+			}
+			statesBlock.setUncertainStateSetArray(usedSets.toArray(new AbstractUncertainStateSet[] {}));
+		}
+		final Trees treesBlock = NeXMLUtil.findOrCreateTreesBlock(newDoc, "t" + UUID.randomUUID().toString());
+		treesBlock.setOtus(taxaID);
+		this.writeTrees(treesBlock);
 		return newDoc;
 	}
 
@@ -221,8 +257,68 @@ public class NeXMLWriter {
 			this.writeComment(otu, taxon.getComment());
 			this.writeFigure(otu, taxon.getFigure());
 			this.writeMatrixTaxon(otu, taxon.getMatrixTaxonName());
+			this.otuIDsByTaxon.put(taxon, taxon.getNexmlID());
 		}
 		taxaBlock.setOtuArray(newOTUs.toArray(new org.nexml.schema_2009.Taxon[] {}));
+	}
+
+	private void writeTrees(Trees treesBlock) {
+		final List<IntTree> treeList = new ArrayList<IntTree>();
+		for (Tree tree : this.data.getTrees()) {
+			final IntTree treeXML = IntTree.Factory.newInstance();
+			treeList.add(treeXML);
+			treeXML.setLabel(StringUtils.stripToNull(tree.getLabel()));
+			treeXML.setId(tree.getNexmlID());
+			final Map<LinkedObject, TreeNode> treeNodes = new HashMap<LinkedObject, TreeNode>();
+			final Map<LinkedObject, LinkedObject> topology = tree.getTopology();
+			final List<TreeIntEdge> edges = new ArrayList<TreeIntEdge>();
+			for (Entry<LinkedObject, LinkedObject> entry : topology.entrySet()) {
+				final LinkedObject source = entry.getKey();
+				final LinkedObject target = entry.getValue();
+				final TreeNode sourceNode;
+				if (treeNodes.containsKey(source)) {
+					sourceNode = treeNodes.get(source);
+				} else {
+					sourceNode = TreeNode.Factory.newInstance();
+					sourceNode.setLabel(source.getName());
+					sourceNode.setId(source.getID() + "#" + UUID.randomUUID().toString());
+					treeNodes.put(source, sourceNode);
+				}
+				final TreeNode targetNode;
+				if (treeNodes.containsKey(target)) {
+					targetNode = treeNodes.get(target);
+				} else {
+					targetNode = TreeNode.Factory.newInstance();
+					targetNode.setLabel(target.getName());
+					targetNode.setId(target.getID() + "#" + UUID.randomUUID().toString());
+					treeNodes.put(target, targetNode);
+				}
+				final TreeIntEdge newEdge = TreeIntEdge.Factory.newInstance();
+				newEdge.setTarget(sourceNode.getId());
+				newEdge.setSource(targetNode.getId());
+				final XmlAnySimpleType oneXML = XmlAnySimpleType.Factory.newInstance();
+				oneXML.setStringValue("1");
+				newEdge.setLength(oneXML);
+				edges.add(newEdge);
+			}
+			System.out.println(this.otuIDsByTaxon);
+			for (Taxon taxon : this.data.getTaxa()) {
+				final String otu = this.otuIDsByTaxon.get(taxon);
+				if (otu == null) {
+					System.out.println(taxon);
+				}
+				if (taxon.getValidName() != null) {
+					final TreeNode treeNode = treeNodes.get(taxon.getValidName());
+					if (treeNode == null) {
+						System.out.println(taxon);
+					}
+					treeNode.setOtu(otu);
+				}
+			}
+			treeXML.setNodeArray(treeNodes.values().toArray(new TreeNode[] {}));
+			treeXML.setEdgeArray(edges.toArray(new TreeIntEdge[] {}));
+		}
+		treesBlock.setTreeArray(treeList.toArray(new IntTree[] {}));
 	}
 
 	private AbstractObsRow findOrCreateRowForTaxon(List<AbstractObsRow> list, String id) {
@@ -288,6 +384,7 @@ public class NeXMLWriter {
 		for (AbstractUncertainStateSet set : sets) {
 			if (this.multipleStateSetMatches(state, set)) {
 				log().debug("Found matching set.");
+				this.usedUncertainStateSets.add(set.getId());
 				return set;
 			}
 		}
@@ -329,6 +426,7 @@ public class NeXMLWriter {
 			block.setUncertainStateSetArray(newStates.toArray(new AbstractUncertainStateSet[] {}));
 		}
 		log().debug(block.toString());
+		this.usedUncertainStateSets.add(set.getId());
 		return set;
 	}
 

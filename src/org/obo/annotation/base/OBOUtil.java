@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.obo.app.model.AbstractPropertyChangeObject;
+import org.obo.app.util.Collections;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
@@ -19,22 +20,27 @@ import org.obo.datamodel.impl.OBORestrictionImpl;
 
 public class OBOUtil {
 
-	public static OBOClass createPostComposition(OBOClass genus, List<Differentium> differentia) {
+	public static OBOClass createPostComposition(OBOClass genus,
+			List<Differentium> differentia) {
 		final String id = createPostcompositionID(genus, differentia);
 		final String name = createPostcompositionName(genus, differentia);
 		final OBOClass postComposition = new OBOClassImpl(name, id);
-		final OBORestrictionImpl genusRelation = new OBORestrictionImpl(postComposition, OBOProperty.IS_A, genus);
+		final OBORestrictionImpl genusRelation = new OBORestrictionImpl(
+				postComposition, OBOProperty.IS_A, genus);
 		genusRelation.setCompletes(true);
 		postComposition.addParent(genusRelation);
 		for (Differentium differentium : differentia) {
-			final OBORestrictionImpl differentiumRelation = new OBORestrictionImpl(postComposition, differentium.getRelation(), differentium.getTerm());
+			final OBORestrictionImpl differentiumRelation = new OBORestrictionImpl(
+					postComposition, differentium.getRelation(),
+					differentium.getTerm());
 			differentiumRelation.setCompletes(true);
 			postComposition.addParent(differentiumRelation);
 		}
 		return postComposition;
 	}
 
-	private static String createPostcompositionID(OBOClass genus, List<Differentium> differentia) {
+	private static String createPostcompositionID(OBOClass genus,
+			List<Differentium> differentia) {
 		final StringBuffer sb = new StringBuffer();
 		sb.append(genus.getID());
 		for (Differentium differentium : differentia) {
@@ -43,7 +49,87 @@ public class OBOUtil {
 		return sb.toString();
 	}
 
-	private static String createPostcompositionName(OBOClass genus, List<Differentium> differentia) {
+	public static String generateManchesterIDExpression(OBOClass term) {
+		if (!isPostCompTerm(term)) {
+			return term.getID();
+		} else {
+			final List<String> differentiae = new ArrayList<String>();
+			for (Link diff : getAllDifferentia(term)) {
+				differentiae.add(generateManchesterIDExpression(diff));
+			}
+			final String diffs = Collections.join(differentiae, " and ");
+			final OBOClass genus = getGenusTerm(term);
+			final String fillerFormat;
+			if (isPostCompTerm(genus)) {
+				fillerFormat = "(%s)";
+			} else {
+				fillerFormat = "%s";
+			}
+			return String.format(fillerFormat,
+					generateManchesterIDExpression(getGenusTerm(term)))
+					+ " and " + diffs;
+		}
+	}
+
+	private static String generateManchesterIDExpression(Link diff) {
+		final OBOClass parent = (OBOClass) (diff.getParent());
+		final String fillerFormat;
+		if (isPostCompTerm(parent)) {
+			fillerFormat = "(%s)";
+		} else {
+			fillerFormat = "%s";
+		}
+		return "("
+				+ diff.getType().getID()
+				+ " some "
+				+ String.format(fillerFormat,
+						generateManchesterIDExpression(parent)) + ")";
+	}
+
+	public static String generateManchesterLabelExpression(OBOClass term) {
+		if (!isPostCompTerm(term)) {
+			final String name = term.getName();
+			if (name.contains(" ")) {
+				return "'" + name + "'";
+			} else {
+				return name;
+			}
+		} else {
+			final List<String> differentiae = new ArrayList<String>();
+			for (Link diff : getAllDifferentia(term)) {
+				differentiae.add(generateManchesterLabelExpression(diff));
+			}
+			final String diffs = Collections.join(differentiae, " and ");
+			final OBOClass genus = getGenusTerm(term);
+			final String fillerFormat;
+			if (isPostCompTerm(genus)) {
+				fillerFormat = "(%s)";
+			} else {
+				fillerFormat = "%s";
+			}
+			return String.format(fillerFormat,
+					generateManchesterLabelExpression(getGenusTerm(term)))
+					+ " and " + diffs;
+		}
+	}
+
+	private static String generateManchesterLabelExpression(Link diff) {
+		final OBOClass parent = (OBOClass) (diff.getParent());
+		final String fillerFormat;
+		if (isPostCompTerm(parent)) {
+			fillerFormat = "(%s)";
+		} else {
+			fillerFormat = "%s";
+		}
+		return "("
+				+ diff.getType().getName()
+				+ " some "
+				+ String.format(fillerFormat,
+						generateManchesterLabelExpression(parent)) + ")";
+	}
+
+	private static String createPostcompositionName(OBOClass genus,
+			List<Differentium> differentia) {
 		final StringBuffer sb = new StringBuffer();
 		sb.append(genus.getName());
 		for (Differentium differentium : differentia) {
@@ -53,24 +139,26 @@ public class OBOUtil {
 	}
 
 	private static String relationDifferentiumFormat(String r, String d) {
-		return "^"+r+"("+d+")";
+		return "^" + r + "(" + d + ")";
 	}
 
 	private static String createDifferentiumID(Differentium differentium) {
-		return relationDifferentiumFormat(differentium.getRelation().getID(), differentium.getTerm().getID());
+		return relationDifferentiumFormat(differentium.getRelation().getID(),
+				differentium.getTerm().getID());
 	}
 
 	private static String createDifferentiumName(Differentium differentium) {
-		return relationDifferentiumFormat(differentium.getRelation().getName(), differentium.getTerm().getName());
+		return relationDifferentiumFormat(differentium.getRelation().getName(),
+				differentium.getTerm().getName());
 	}
 
 	/** for non post comp returns term itself */
 	public static OBOClass getGenusTerm(OBOClass term) {
 		if (isPostCompTerm(term)) {
 			for (Object o : term.getParents()) {
-				OBORestriction r = (OBORestriction)o;
+				OBORestriction r = (OBORestriction) o;
 				if (r.getCompletes() && r.getType().equals(OBOProperty.IS_A))
-					return (OBOClass)r.getParent(); // check downcast?
+					return (OBOClass) r.getParent(); // check downcast?
 			}
 			// error msg?
 		}
@@ -78,15 +166,20 @@ public class OBOUtil {
 	}
 
 	public static boolean isPostCompTerm(OBOObject term) {
-		if (term.getID().indexOf('^') < 0) { return false; }
+		if (term.getID().indexOf('^') < 0) {
+			return false;
+		}
 		for (Link l : term.getParents()) {
-			if (isLinkToDiff(l)) { return true; }
+			if (isLinkToDiff(l)) {
+				return true;
+			}
 		}
 		return false;
 	}
 
 	public static boolean isLinkToDiff(Link l) {
-		if (!isOboRestriction(l)) return false;
+		if (!isOboRestriction(l))
+			return false;
 		return isLinkToDiff(getOboRestriction(l));
 	}
 
@@ -100,21 +193,24 @@ public class OBOUtil {
 	}
 
 	public static OBORestriction getOboRestriction(Link l) {
-		if (!isOboRestriction(l)) return null;
-		return (OBORestriction)l;
+		if (!isOboRestriction(l))
+			return null;
+		return (OBORestriction) l;
 	}
 
 	public static List<Link> getAllDifferentia(OBOClass postComp) {
 		final List<Link> restrictions = new ArrayList<Link>();
 		for (Link l : postComp.getParents()) {
-			if (isLinkToDiff(l)) restrictions.add(l);
+			if (isLinkToDiff(l))
+				restrictions.add(l);
 		}
 		return restrictions;
 	}
 
 	/**
-	 * Finds and returns the closest attribute ancestor for a value term from PATO.
-	 * Returns the input term if it is itself an attribute, or null if no attribute is found.
+	 * Finds and returns the closest attribute ancestor for a value term from
+	 * PATO. Returns the input term if it is itself an attribute, or null if no
+	 * attribute is found.
 	 */
 	public static OBOClass getAttributeForValue(OBOClass valueTerm) {
 		final Set<TermSubset> categories = valueTerm.getSubsets();
@@ -139,16 +235,16 @@ public class OBOUtil {
 		final Collection<Link> parents = term.getParents();
 		for (Link link : parents) {
 			if (link.getType().getName().equals("is_a")) {
-				return (OBOClass)(link.getParent());
+				return (OBOClass) (link.getParent());
 			}
 		}
 		return null;
 	}
 
-	//    if (ObjectUtils.equals(this.validName, validName)) return;
-	//    final OBOClass oldValue = this.validName;
-	//    this.validName = validName;
-	//    this.firePropertyChange(VALID_NAME, oldValue, validName);
+	// if (ObjectUtils.equals(this.validName, validName)) return;
+	// final OBOClass oldValue = this.validName;
+	// this.validName = validName;
+	// this.firePropertyChange(VALID_NAME, oldValue, validName);
 
 	public static class Differentium extends AbstractPropertyChangeObject {
 
@@ -162,7 +258,8 @@ public class OBOUtil {
 		}
 
 		public void setRelation(OBOProperty relation) {
-			if (ObjectUtils.equals(this.relation, relation)) return;
+			if (ObjectUtils.equals(this.relation, relation))
+				return;
 			final OBOProperty oldValue = this.relation;
 			this.relation = relation;
 			this.firePropertyChange(RELATION, oldValue, relation);
@@ -173,7 +270,8 @@ public class OBOUtil {
 		}
 
 		public void setTerm(OBOClass term) {
-			if (ObjectUtils.equals(this.term, term)) return;
+			if (ObjectUtils.equals(this.term, term))
+				return;
 			final OBOClass oldValue = this.term;
 			this.term = term;
 			this.firePropertyChange(TERM, oldValue, term);
@@ -184,7 +282,8 @@ public class OBOUtil {
 		}
 
 		@Override
-		public Class<?> getClass(String propertyKey) throws UndefinedKeyException {
+		public Class<?> getClass(String propertyKey)
+				throws UndefinedKeyException {
 			if (propertyKey.equals(TERM)) {
 				return OBOClass.class;
 			} else if (propertyKey.equals(RELATION)) {

@@ -49,6 +49,7 @@ import org.obo.app.util.EverythingEqualComparator;
 import org.obo.datamodel.LinkedObject;
 import org.phenoscape.io.BioCreativeTabFormat;
 import org.phenoscape.io.CharacterTabReader;
+import org.phenoscape.io.CharaparserEvaluationTabFormat;
 import org.phenoscape.io.NeXMLReader;
 import org.phenoscape.io.NeXMLWriter;
 import org.phenoscape.io.PhenotypeProposalsLoader;
@@ -375,6 +376,15 @@ public class PhenexController extends DocumentController {
 			this.writeForBioCreative(file);
 		}
 	}
+	
+	public void exportForCharaparserEvaluation() {
+		final JFileChooser fileChooser = this.createFileChooser();
+		final int result = fileChooser.showSaveDialog(GUIManager.getManager().getFrame());
+		if (result == JFileChooser.APPROVE_OPTION) {
+			final File file = fileChooser.getSelectedFile();
+			this.writeForCharaparserEvaluation(file);
+		}
+	}
 
 	public void openImportPhenotypeProposals() {
 		final JFileChooser fileChooser = this.createFileChooser();
@@ -498,6 +508,15 @@ public class PhenexController extends DocumentController {
 
 	private void writeForBioCreative(File aFile) {
 		final BioCreativeTabFormat writer = new BioCreativeTabFormat(this.getDataSet());
+		try {
+			writer.write(aFile);
+		} catch (IOException e) {
+			log().error("Error writing to tab-delimited file", e);
+		}
+	}
+	
+	private void writeForCharaparserEvaluation(File aFile) {
+		final CharaparserEvaluationTabFormat writer = new CharaparserEvaluationTabFormat(this.getDataSet());
 		try {
 			writer.write(aFile);
 		} catch (IOException e) {

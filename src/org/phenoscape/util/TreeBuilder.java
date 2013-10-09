@@ -35,7 +35,6 @@ public class TreeBuilder {
 				logger().error("Should only be one taxon root.");
 			}
 			final LinkedObject taxonRoot = TermUtil.getRoot(allAncestors.iterator().next());
-			//final LinkedObject taxonRoot = roots.iterator().next();
 			logger().debug("Root taxon: " + taxonRoot);
 			final Set<LinkedObject> retainTaxa = new HashSet<LinkedObject>();
 			for (Taxon taxon : data.getTaxa()) {

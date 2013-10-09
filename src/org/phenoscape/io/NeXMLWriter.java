@@ -52,6 +52,7 @@ import org.nexml.schema_2009.TreeIntEdge;
 import org.nexml.schema_2009.TreeNode;
 import org.nexml.schema_2009.Trees;
 import org.obo.datamodel.LinkedObject;
+import org.obo.datamodel.impl.OBOClassImpl;
 import org.phenoscape.io.NeXMLUtil.Annotatable;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
@@ -273,25 +274,25 @@ public class NeXMLWriter {
 			final Map<LinkedObject, LinkedObject> topology = tree.getTopology();
 			final List<TreeIntEdge> edges = new ArrayList<TreeIntEdge>();
 			for (Entry<LinkedObject, LinkedObject> entry : topology.entrySet()) {
-				final LinkedObject source = entry.getKey();
-				final LinkedObject target = entry.getValue();
+				final LinkedObject childNode = entry.getKey();
+				final LinkedObject parentNode = entry.getValue();
 				final TreeNode sourceNode;
-				if (treeNodes.containsKey(source)) {
-					sourceNode = treeNodes.get(source);
+				if (treeNodes.containsKey(childNode)) {
+					sourceNode = treeNodes.get(childNode);
 				} else {
 					sourceNode = TreeNode.Factory.newInstance();
-					sourceNode.setLabel(source.getName());
-					sourceNode.setId(source.getID() + "#" + UUID.randomUUID().toString());
-					treeNodes.put(source, sourceNode);
+					sourceNode.setLabel(childNode.getName());
+					sourceNode.setId(childNode.getID() + "#" + UUID.randomUUID().toString());
+					treeNodes.put(childNode, sourceNode);
 				}
 				final TreeNode targetNode;
-				if (treeNodes.containsKey(target)) {
-					targetNode = treeNodes.get(target);
+				if (treeNodes.containsKey(parentNode)) {
+					targetNode = treeNodes.get(parentNode);
 				} else {
 					targetNode = TreeNode.Factory.newInstance();
-					targetNode.setLabel(target.getName());
-					targetNode.setId(target.getID() + "#" + UUID.randomUUID().toString());
-					treeNodes.put(target, targetNode);
+					targetNode.setLabel(parentNode.getName());
+					targetNode.setId(parentNode.getID() + "#" + UUID.randomUUID().toString());
+					treeNodes.put(parentNode, targetNode);
 				}
 				final TreeIntEdge newEdge = TreeIntEdge.Factory.newInstance();
 				newEdge.setTarget(sourceNode.getId());
@@ -301,18 +302,34 @@ public class NeXMLWriter {
 				newEdge.setLength(oneXML);
 				edges.add(newEdge);
 			}
-			System.out.println(this.otuIDsByTaxon);
 			for (Taxon taxon : this.data.getTaxa()) {
 				final String otu = this.otuIDsByTaxon.get(taxon);
 				if (otu == null) {
-					System.out.println(taxon);
+					log().error("No otu for taxon: " + taxon);
 				}
 				if (taxon.getValidName() != null) {
 					final TreeNode treeNode = treeNodes.get(taxon.getValidName());
 					if (treeNode == null) {
-						System.out.println(taxon);
+						log().error("No tree node for taxon: " + taxon);
 					}
-					treeNode.setOtu(otu);
+					if (topology.containsValue(taxon.getValidName())) {
+						// this taxon is an internal node
+						final TreeNode extraNode = TreeNode.Factory.newInstance();
+						extraNode.setLabel(taxon.getValidName().getName() + " species");
+						final String uuid = UUID.randomUUID().toString();
+						extraNode.setId(taxon.getValidName().getID() + "#" + uuid);
+						treeNodes.put(new OBOClassImpl(uuid), extraNode);
+						extraNode.setOtu(otu);
+						final TreeIntEdge newEdge = TreeIntEdge.Factory.newInstance();
+						newEdge.setTarget(extraNode.getId());
+						newEdge.setSource(treeNode.getId());
+						final XmlAnySimpleType oneXML = XmlAnySimpleType.Factory.newInstance();
+						oneXML.setStringValue("1");
+						newEdge.setLength(oneXML);
+						edges.add(newEdge);
+					} else {
+						treeNode.setOtu(otu);
+					}
 				}
 			}
 			treeXML.setNodeArray(treeNodes.values().toArray(new TreeNode[] {}));

@@ -233,7 +233,6 @@ public class NeXMLWriter {
 					final XmlAnySimpleType xmlState = XmlAnySimpleType.Factory.newInstance();
 					if (state instanceof MultipleState) {
 						xmlState.setStringValue(this.findOrCreateMultiValueState(character, (MultipleState)state).getId());
-						log().debug("Set multiple state value for a taxon: " + xmlState.getStringValue());
 					} else {
 						xmlState.setStringValue(state.getNexmlID());	
 					}
@@ -400,14 +399,12 @@ public class NeXMLWriter {
 		final AbstractUncertainStateSet[] sets = (state.getMode() == MODE.POLYMORPHIC) ? block.getPolymorphicStateSetArray() : block.getUncertainStateSetArray(); 
 		for (AbstractUncertainStateSet set : sets) {
 			if (this.multipleStateSetMatches(state, set)) {
-				log().debug("Found matching set.");
 				this.usedUncertainStateSets.add(set.getId());
 				return set;
 			}
 		}
 		final AbstractUncertainStateSet set;
 		if (state.getMode() == MODE.POLYMORPHIC) {
-			log().debug(block.getStateArray());
 			final StandardPolymorphicStateSet polymorphicSet = StandardPolymorphicStateSet.Factory.newInstance(); 
 			set = polymorphicSet;
 			polymorphicSet.setId(UUID.randomUUID().toString());
@@ -442,7 +439,6 @@ public class NeXMLWriter {
 			newStates.add(uncertainSet);
 			block.setUncertainStateSetArray(newStates.toArray(new AbstractUncertainStateSet[] {}));
 		}
-		log().debug(block.toString());
 		this.usedUncertainStateSets.add(set.getId());
 		return set;
 	}

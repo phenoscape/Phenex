@@ -24,7 +24,6 @@ import org.jdesktop.swingworker.SwingWorker;
 import org.obo.annotation.base.UserOntologyConfiguration;
 import org.obo.annotation.view.LogViewComponentFactory;
 import org.obo.annotation.view.NativeDockingTheme;
-import org.obo.annotation.view.PhenoteGraphViewFactory;
 import org.obo.annotation.view.PhenoteOntologyTreeEditorFactory;
 import org.obo.annotation.view.SelectionBridge;
 import org.obo.annotation.view.TermInfoComponentFactory;
@@ -76,7 +75,6 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
 		factories.add(new ORBPreferencesComponentFactory());
 		factories.add(new TermInfoComponentFactory(this.controller.getOntologyCoordinator()));
 		factories.add(new PhenoteOntologyTreeEditorFactory());
-		factories.add(new PhenoteGraphViewFactory());
 		factories.add(new SearchComponentFactory() {
 			@Override
 			public FactoryCategory getCategory() {

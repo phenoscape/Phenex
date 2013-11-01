@@ -1,36 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.5.0_13" class="java.beans.XMLDecoder"> 
- <object class="java.util.LinkedList"> 
-  <void method="add"> 
-   <object id="Perspective0" class="org.bbop.framework.dock.Perspective"> 
-    <void property="ID"> 
-     <string>default</string> 
-    </void> 
-    <void property="name"> 
-     <string>Default</string> 
-    </void> 
-   </object> 
-  </void>
-    <void method="add"> 
-   <object class="org.bbop.framework.dock.Perspective"> 
-    <void property="ID"> 
-     <string>character</string> 
-    </void> 
-    <void property="name"> 
-     <string>Character</string> 
-    </void> 
-   </object> 
-  </void> 
-  <void method="add"> 
-   <object class="org.bbop.framework.dock.Perspective"> 
-    <void property="ID"> 
-     <string>taxon</string> 
-    </void> 
-    <void property="name"> 
-     <string>Taxon</string> 
-    </void> 
-   </object> 
-  </void> 
- </object> 
- <object idref="Perspective0"/> 
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.5.0_13" class="java.beans.XMLDecoder">
+	<object class="java.util.LinkedList">
+		<void method="add">
+			<object id="Perspective0" class="org.bbop.framework.dock.Perspective">
+				<void property="ID">
+					<string>character</string>
+				</void>
+				<void property="name">
+					<string>Character</string>
+				</void>
+			</object>
+		</void>
+		<void method="add">
+			<object class="org.bbop.framework.dock.Perspective">
+				<void property="ID">
+					<string>taxon</string>
+				</void>
+				<void property="name">
+					<string>Taxon</string>
+				</void>
+			</object>
+		</void>
+	</object>
+	<object idref="Perspective0" />
 </java> 

@@ -120,7 +120,7 @@ public class ProvisionalTermRequestPanel extends AbstractGUIComponent {
 		constraints.gridx += 1;
 		constraints.fill = GridBagConstraints.HORIZONTAL;
 		constraints.weightx = 1.0;
-		this.parentBox = TermAutocompleteFieldFactory.createAutocompleteBox(this.controller.getOntologyController().getAllTermsSet(), this.controller.getOntologyCoordinator());
+		this.parentBox = TermAutocompleteFieldFactory.createAutocompleteBox(this.controller.getOntologyController().getAllTermsSetWithoutProvisional(), this.controller.getOntologyCoordinator());
 		this.add(this.parentBox, constraints);
 		this.definitionField = new JTextArea();
 	    this.definitionField.setLineWrap(true);

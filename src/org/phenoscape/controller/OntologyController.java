@@ -44,6 +44,7 @@ public class OntologyController {
 	private static final String MUSEUM_FILTER = "museums";
 	private static final String PC_FILLERS_FILTER = "postcomposition";
 	private static final String ALL_TERMS = "allterms";
+	private static final String ALL_TERMS_WITHOUT_PROVISIONAL = "allpublicterms";
 	private File overridingFiltersFolder = new File(GUIManager.getPrefsDir(), "Filters");
 
 	private TermSet entityTermSet = null;
@@ -54,6 +55,7 @@ public class OntologyController {
 	private TermSet relationsTermSet = null;
 	private TermSet pcFillersTermSet = null;
 	private TermSet allTermsSet = null;
+	private TermSet allTermsWithoutProvisionalSet = null;
 
 	private final OntologyConfiguration config;
 
@@ -170,6 +172,15 @@ public class OntologyController {
 			this.allTermsSet = set;
 		}
 		return this.allTermsSet;
+	}
+	
+	public TermSet getAllTermsSetWithoutProvisional() {
+		if (this.allTermsWithoutProvisionalSet == null) {
+			final TermSet set =  this.makeTermSet();
+			set.setTermFilter(this.loadFilterWithName(ALL_TERMS_WITHOUT_PROVISIONAL));
+			this.allTermsWithoutProvisionalSet = set;
+		}
+		return this.allTermsWithoutProvisionalSet;
 	}
 
 	public File getOverridingFiltersFolder() {

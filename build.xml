@@ -216,6 +216,17 @@
 		</jar>
 	</target>
 	
+	<target name="one-jar" depends="compile">
+		<taskdef name="onejar" classname="com.simontuffs.onejar.ant.OneJarTask" classpath="${build-lib}/one-jar-ant-task-0.97.jar" />
+		<onejar destfile="phenex-combined.jar">  
+			<main jar="${jarfile}">  
+			</main>  
+			<lib>  
+				<fileset dir="${lib}" />  
+			</lib>  
+		</onejar>
+	</target>
+	
 	<target name="dist-init">
 		<mkdir dir="${dist}"/>
 	</target>
@@ -257,6 +268,11 @@
 				<attribute name="Class-Path" value="${jar.classpath}"/>
 			</manifest>
 		</jar>
+	</target>
+	
+	<target name="exe" depends="one-jar">
+		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="launch4j/launch4j.jar:launch4j/lib/xstream.jar" />
+		<launch4j configFile="launchers/windows/phenex-launch4j.xml" />
 	</target>
 	
 <!-- Create a shell-script package for Unix in "dist/Phenex".  Jars are placed in a nested lib folder. -->

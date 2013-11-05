@@ -25,6 +25,9 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
 
 	private JTextField curatorsField;
 	private JTextField publicationField;
+	private JTextField publicationLabelField;
+	private JTextField publicationURIField;
+	private JTextField publicationCitationField;
 	private JTextArea pubNotesField;
 
 	public DataSetComponent(String id, PhenexController controller) {
@@ -56,6 +59,33 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
 				getController().getDataSet().setPublication(StringUtils.stripToNull(publicationField.getText()));
 			}
 		});
+		this.publicationLabelField = new TabActionTextField();
+		PromptSupport.setPrompt("None", this.publicationLabelField);
+		this.publicationLabelField.setBackground(new JTextField().getBackground());
+		this.publicationLabelField.setAction(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getController().getDataSet().setPublicationLabel(StringUtils.stripToNull(publicationLabelField.getText()));
+			}
+		});
+		this.publicationURIField = new TabActionTextField();
+		PromptSupport.setPrompt("None", this.publicationURIField);
+		this.publicationURIField.setBackground(new JTextField().getBackground());
+		this.publicationURIField.setAction(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getController().getDataSet().setPublicationURI(StringUtils.stripToNull(publicationURIField.getText()));
+			}
+		});
+		this.publicationCitationField = new TabActionTextField();
+		PromptSupport.setPrompt("None", this.publicationCitationField);
+		this.publicationCitationField.setBackground(new JTextField().getBackground());
+		this.publicationCitationField.setAction(new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				getController().getDataSet().setPublicationCitation(StringUtils.stripToNull(publicationCitationField.getText()));
+			}
+		});
 		this.pubNotesField = new JTextArea();
 		this.pubNotesField.setLineWrap(true);
 		this.pubNotesField.setWrapStyleWord(true);
@@ -69,25 +99,47 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
 		curatorsFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
 		curatorsFieldConstraints.weightx = 1.0;
 		this.add(this.curatorsField, curatorsFieldConstraints);
-
-		final GridBagConstraints pubLabelConstraints = new GridBagConstraints();
-		pubLabelConstraints.anchor = GridBagConstraints.EAST;
-		pubLabelConstraints.gridy = 1;
-		this.add(new JLabel("Publication:"), pubLabelConstraints);
-		final GridBagConstraints pubFieldConstraints = new GridBagConstraints();
-		pubFieldConstraints.gridx = 1;
-		pubFieldConstraints.gridy = 1;
-		pubFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
-		pubFieldConstraints.weightx = 1.0;
-		this.add(this.publicationField, pubFieldConstraints);
+		
+		final GridBagConstraints pubLabelLabelConstraints = new GridBagConstraints();
+		pubLabelLabelConstraints.anchor = GridBagConstraints.EAST;
+		pubLabelLabelConstraints.gridy = 1;
+		this.add(new JLabel("Publication Label:"), pubLabelLabelConstraints);
+		final GridBagConstraints pubLabelFieldConstraints = new GridBagConstraints();
+		pubLabelFieldConstraints.gridx = 1;
+		pubLabelFieldConstraints.gridy = 1;
+		pubLabelFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
+		pubLabelFieldConstraints.weightx = 1.0;
+		this.add(this.publicationLabelField, pubLabelFieldConstraints);
+		
+		final GridBagConstraints pubDOILabelConstraints = new GridBagConstraints();
+		pubDOILabelConstraints.anchor = GridBagConstraints.EAST;
+		pubDOILabelConstraints.gridy = 2;
+		this.add(new JLabel("Publication DOI/URI:"), pubDOILabelConstraints);
+		final GridBagConstraints pubDOIFieldConstraints = new GridBagConstraints();
+		pubDOIFieldConstraints.gridx = 1;
+		pubDOIFieldConstraints.gridy = 2;
+		pubDOIFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
+		pubDOIFieldConstraints.weightx = 1.0;
+		this.add(this.publicationURIField, pubDOIFieldConstraints);
+		
+		final GridBagConstraints fullCitationLabelConstraints = new GridBagConstraints();
+		fullCitationLabelConstraints.anchor = GridBagConstraints.EAST;
+		fullCitationLabelConstraints.gridy = 3;
+		this.add(new JLabel("Publication Citation:"), fullCitationLabelConstraints);
+		final GridBagConstraints fullCitationFieldConstraints = new GridBagConstraints();
+		fullCitationFieldConstraints.gridx = 1;
+		fullCitationFieldConstraints.gridy = 3;
+		fullCitationFieldConstraints.fill = GridBagConstraints.HORIZONTAL;
+		fullCitationFieldConstraints.weightx = 1.0;
+		this.add(this.publicationCitationField, fullCitationFieldConstraints);
 
 		final GridBagConstraints pubNotesLabelConstraints = new GridBagConstraints();
-		pubNotesLabelConstraints.gridy = 2;
+		pubNotesLabelConstraints.gridy = 4;
 		pubNotesLabelConstraints.gridwidth = 2;
 		pubNotesLabelConstraints.anchor = GridBagConstraints.WEST;
 		this.add(new JLabel("Publication Notes:"), pubNotesLabelConstraints);
 		final GridBagConstraints pubNotesFieldConstraints = new GridBagConstraints();
-		pubNotesFieldConstraints.gridy = 3;
+		pubNotesFieldConstraints.gridy = 5;
 		pubNotesFieldConstraints.gridwidth = 2;
 		pubNotesFieldConstraints.fill = GridBagConstraints.BOTH;
 		pubNotesFieldConstraints.weightx = 1.0;
@@ -107,6 +159,24 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
 				publicationField.setText(getController().getDataSet().getPublication());
 			}
 		});
+		this.getController().getDataSet().addPropertyChangeListener(DataSet.PUBLICATION_LABEL, new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				publicationLabelField.setText(getController().getDataSet().getPublicationLabel());
+			}
+		});
+		this.getController().getDataSet().addPropertyChangeListener(DataSet.PUBLICATION_URI, new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				publicationURIField.setText(getController().getDataSet().getPublicationURI());
+			}
+		});
+		this.getController().getDataSet().addPropertyChangeListener(DataSet.PUBLICATION_CITATION, new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				publicationCitationField.setText(getController().getDataSet().getPublicationCitation());
+			}
+		});
 		this.getController().getDataSet().addPropertyChangeListener(DataSet.PUBLICATION_NOTES, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -122,6 +192,9 @@ public class DataSetComponent extends PhenoscapeGUIComponent {
 	private void updateInterface() {
 		this.curatorsField.setText(this.getController().getDataSet().getCurators());
 		this.publicationField.setText(this.getController().getDataSet().getPublication());
+		this.publicationLabelField.setText(this.getController().getDataSet().getPublicationLabel());
+		this.publicationURIField.setText(this.getController().getDataSet().getPublicationURI());
+		this.publicationCitationField.setText(this.getController().getDataSet().getPublicationCitation());
 		this.pubNotesField.setText(this.getController().getDataSet().getPublicationNotes());
 	}
 

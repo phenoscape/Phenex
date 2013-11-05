@@ -36,6 +36,9 @@ public class UndoObserver {
 	private class DataSetObserver implements Observer<DataSet> {
 
 		private final PropertyChangeListener publicationListener = new PropertyUndoer("Edit Publication");
+		private final PropertyChangeListener publicationLabelListener = new PropertyUndoer("Edit Publication Label");
+		private final PropertyChangeListener publicationCitationListener = new PropertyUndoer("Edit Publication Citation");
+		private final PropertyChangeListener publicationURIListener = new PropertyUndoer("Edit Publication URI");
 		private final PropertyChangeListener pubNotesListener = new PropertyUndoer("Edit Publication Notes");
 		private final PropertyChangeListener curatorsListener = new PropertyUndoer("Edit Curators");
 		private final PropertyChangeListener matrixListener = new MatrixCellUndoer();
@@ -47,6 +50,9 @@ public class UndoObserver {
 		@Override
 		public void startObserving(DataSet data) {
 			data.addPropertyChangeListener(DataSet.PUBLICATION, this.publicationListener);
+			data.addPropertyChangeListener(DataSet.PUBLICATION_LABEL, this.publicationLabelListener);
+			data.addPropertyChangeListener(DataSet.PUBLICATION_CITATION, this.publicationCitationListener);
+			data.addPropertyChangeListener(DataSet.PUBLICATION_URI, this.publicationURIListener);
 			data.addPropertyChangeListener(DataSet.PUBLICATION_NOTES, this.pubNotesListener);
 			data.addPropertyChangeListener(DataSet.CURATORS, this.curatorsListener);
 			data.addPropertyChangeListener(DataSet.MATRIX_CELL, this.matrixListener);
@@ -64,6 +70,9 @@ public class UndoObserver {
 		@Override
 		public void stopObserving(DataSet data) {
 			data.removePropertyChangeListener(DataSet.PUBLICATION, this.publicationListener);
+			data.removePropertyChangeListener(DataSet.PUBLICATION_LABEL, this.publicationLabelListener);
+			data.removePropertyChangeListener(DataSet.PUBLICATION_CITATION, this.publicationCitationListener);
+			data.removePropertyChangeListener(DataSet.PUBLICATION_URI, this.publicationURIListener);
 			data.removePropertyChangeListener(DataSet.PUBLICATION_NOTES, this.pubNotesListener);
 			data.removePropertyChangeListener(DataSet.CURATORS, this.curatorsListener);
 			data.removePropertyChangeListener(DataSet.MATRIX_CELL, this.matrixListener);

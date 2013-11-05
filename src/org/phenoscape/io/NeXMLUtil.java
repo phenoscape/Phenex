@@ -45,7 +45,10 @@ public class NeXMLUtil {
     public static final String DUBLIN_CORE_NAMESPACE = "http://purl.org/dc/terms/";
     public static final String DUBLIN_CORE_PREFIX = "dc";    
     public static final QName CURATORS_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "creator", DUBLIN_CORE_PREFIX);
-    public static final QName PUBLICATION_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "references", DUBLIN_CORE_PREFIX);
+    public static final QName PUBLICATION_SOURCE_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "source", DUBLIN_CORE_PREFIX);
+    public static final QName PUBLICATION_LABEL_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "title", DUBLIN_CORE_PREFIX);
+    public static final QName PUBLICATION_URI_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "identifier", DUBLIN_CORE_PREFIX);
+    public static final QName PUBLICATION_CITATION_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "bibliographicCitation", DUBLIN_CORE_PREFIX);
     public static final QName PUBLICATION_NOTES_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "description", DUBLIN_CORE_PREFIX);
 
     public static final String DARWIN_CORE_NAMESPACE = "http://rs.tdwg.org/dwc/terms/";

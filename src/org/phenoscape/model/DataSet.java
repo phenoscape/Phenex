@@ -15,6 +15,9 @@ public class DataSet extends AbstractPropertyChangeObject {
 	public static final String CURATORS = "curators";
 	public static final String PUBLICATION_NOTES = "publicationNotes";
 	public static final String PUBLICATION = "publication";
+	public static final String PUBLICATION_LABEL = "publicationLabel";
+	public static final String PUBLICATION_CITATION = "publicationCitation";
+	public static final String PUBLICATION_URI = "publicationURI";
 	public static final String MATRIX_CELL = "matrixCell";
 	private final ObservableEventList<Character> characters = new ObservableEventList<Character>(new BasicEventList<Character>());
 	private final ObservableEventList<Taxon> taxa = new ObservableEventList<Taxon>(new BasicEventList<Taxon>());
@@ -25,6 +28,9 @@ public class DataSet extends AbstractPropertyChangeObject {
 	 */
 	private final Map<String, Map<String, State>> matrix = new HashMap<String, Map<String, State>>();
 	private String publication;
+	private String publicationLabel;
+	private String publicationURI;
+	private String publicationCitation;
 	private String publicationNotes;
 	private String curators;
 
@@ -85,6 +91,39 @@ public class DataSet extends AbstractPropertyChangeObject {
 		final String oldPub = this.publication;
 		this.publication = aPublication;
 		this.firePropertyChange(PUBLICATION, oldPub, aPublication);
+	}
+	
+	public String getPublicationLabel() {
+		return this.publicationLabel;
+	}
+
+	public void setPublicationLabel(String aPublication) {
+		if (ObjectUtils.equals(this.publicationLabel, aPublication)) return;
+		final String oldPub = this.publicationLabel;
+		this.publicationLabel = aPublication;
+		this.firePropertyChange(PUBLICATION_LABEL, oldPub, aPublication);
+	}
+	
+	public String getPublicationURI() {
+		return this.publicationURI;
+	}
+
+	public void setPublicationURI(String aPublication) {
+		if (ObjectUtils.equals(this.publicationURI, aPublication)) return;
+		final String oldPub = this.publicationURI;
+		this.publicationURI = aPublication;
+		this.firePropertyChange(PUBLICATION_URI, oldPub, aPublication);
+	}
+	
+	public String getPublicationCitation() {
+		return this.publicationCitation;
+	}
+
+	public void setPublicationCitation(String aPublication) {
+		if (ObjectUtils.equals(this.publicationCitation, aPublication)) return;
+		final String oldPub = this.publicationCitation;
+		this.publicationCitation = aPublication;
+		this.firePropertyChange(PUBLICATION_CITATION, oldPub, aPublication);
 	}
 
 	public String getPublicationNotes() {
@@ -148,6 +187,12 @@ public class DataSet extends AbstractPropertyChangeObject {
 		if (propertyKey.equals(CURATORS)) {
 			return String.class;
 		} else if (propertyKey.equals(PUBLICATION)) {
+			return String.class;
+		} else if (propertyKey.equals(PUBLICATION_LABEL)) {
+			return String.class;
+		} else if (propertyKey.equals(PUBLICATION_CITATION)) {
+			return String.class;
+		} else if (propertyKey.equals(PUBLICATION_URI)) {
 			return String.class;
 		} else if (propertyKey.equals(PUBLICATION_NOTES)) {
 			return String.class;

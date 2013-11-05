@@ -118,14 +118,14 @@ public class NeXMLReader {
 	public Collection<String> getMigratedSecondaryIDsList() {
 		return this.secondaryIDs;
 	}
-	
+
 	public boolean didReplaceObsoleteTerms() {
-    	return !this.replacedIDs.isEmpty();
-    }
-    
-    public Collection<String> getReplacedIDsList() {
-    	return this.replacedIDs;
-    }
+		return !this.replacedIDs.isEmpty();
+	}
+
+	public Collection<String> getReplacedIDsList() {
+		return this.replacedIDs;
+	}
 
 	private void parseNeXML() {
 		this.parseMetadata(this.xmlDoc.getNexml());
@@ -266,8 +266,23 @@ public class NeXMLReader {
 	private void parseMetadata(Nexml nexml) {
 		final Object curatorsObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.CURATORS_PREDICATE);
 		this.data.setCurators(stringOrNull(curatorsObj));
-		final Object publicationObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.PUBLICATION_PREDICATE);
-		this.data.setPublication(stringOrNull(publicationObj));
+		final Object pubSourceObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.PUBLICATION_SOURCE_PREDICATE);
+		if (pubSourceObj instanceof Map<?,?>) {
+			@SuppressWarnings("unchecked")
+			final Map<QName, List<Object>> map = (Map<QName, List<Object>>)pubSourceObj;
+			if (map.containsKey(NeXMLUtil.PUBLICATION_LABEL_PREDICATE)) {
+				final List<Object> labelList = map.get(NeXMLUtil.PUBLICATION_LABEL_PREDICATE);
+				this.data.setPublicationLabel(stringOrNull(NeXMLUtil.first(labelList)));
+			}
+			if (map.containsKey(NeXMLUtil.PUBLICATION_CITATION_PREDICATE)) {
+				final List<Object> citationList = map.get(NeXMLUtil.PUBLICATION_CITATION_PREDICATE);
+				this.data.setPublicationCitation(stringOrNull(NeXMLUtil.first(citationList)));
+			}
+			if (map.containsKey(NeXMLUtil.PUBLICATION_URI_PREDICATE)) {
+				final List<Object> uriList = map.get(NeXMLUtil.PUBLICATION_URI_PREDICATE);
+				this.data.setPublicationURI(stringOrNull(NeXMLUtil.first(uriList)));
+			}
+		}
 		final Object pubNotesObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.PUBLICATION_NOTES_PREDICATE);
 		this.data.setPublicationNotes(stringOrNull(pubNotesObj));
 	}

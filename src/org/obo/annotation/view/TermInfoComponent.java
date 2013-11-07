@@ -70,7 +70,6 @@ import org.oboedit.gui.event.ExpandCollapseListener;
 import org.oboedit.gui.event.SelectionListener;
 
 import edu.stanford.ejalbert.BrowserLauncher;
-import edu.stanford.ejalbert.BrowserLauncherRunner;
 import edu.stanford.ejalbert.exception.BrowserLaunchingInitializingException;
 import edu.stanford.ejalbert.exception.UnsupportedOperatingSystemException;
 
@@ -888,8 +887,7 @@ public class TermInfoComponent extends AbstractGUIComponent {
 			if (url == null) return;
 			try {
 				BrowserLauncher bl = new BrowserLauncher(null); // no logger
-				BrowserLauncherRunner br = new BrowserLauncherRunner(bl, url.toString(), null);
-				new Thread(br).start();
+				bl.openURLinBrowser(url.toString());
 			} catch (BrowserLaunchingInitializingException be) {
 				LOG.error("cant launch browser ", be);
 			} catch (UnsupportedOperatingSystemException ue) {

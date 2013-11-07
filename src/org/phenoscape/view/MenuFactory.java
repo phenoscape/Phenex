@@ -23,7 +23,6 @@ import org.obo.app.util.CrossPlatform;
 import org.phenoscape.controller.PhenexController;
 
 import edu.stanford.ejalbert.BrowserLauncher;
-import edu.stanford.ejalbert.exception.BrowserLaunchingExecutionException;
 import edu.stanford.ejalbert.exception.BrowserLaunchingInitializingException;
 import edu.stanford.ejalbert.exception.UnsupportedOperatingSystemException;
 
@@ -174,8 +173,6 @@ public class MenuFactory {
 					e1.printStackTrace();
 				} catch (UnsupportedOperatingSystemException e1) {
 					log().error("Unable to open URL in browser", e1);
-				} catch (BrowserLaunchingExecutionException e1) {
-					log().error("Unable to open URL in browser", e1);
 				}
 			}
 		};
@@ -188,8 +185,6 @@ public class MenuFactory {
 					log().error("Unable to open URL in browser", e1);
 					e1.printStackTrace();
 				} catch (UnsupportedOperatingSystemException e1) {
-					log().error("Unable to open URL in browser", e1);
-				} catch (BrowserLaunchingExecutionException e1) {
 					log().error("Unable to open URL in browser", e1);
 				}
 			}

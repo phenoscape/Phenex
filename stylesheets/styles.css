@@ -12,6 +12,8 @@ img.screenshot {
 	margin-right: auto; 
 	display: block;
 	max-width: 80%;
+	margin-top: 1em;
+	margin-bottom: 1em;
 }
 
 h1, h2, h3, h4, h5, h6 {

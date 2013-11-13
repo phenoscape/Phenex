@@ -219,21 +219,6 @@
 	</jar>
 </target>
 
-<target name="one-jar" depends="compile">
-	<taskdef name="onejar" classname="com.simontuffs.onejar.ant.OneJarTask" classpath="${build-lib}/one-jar-ant-task-0.97.jar" />
-	<onejar destfile="phenex-combined.jar">
-		<manifest>
-			<attribute name="Publisher" value="Phenoscape Project" />
-			<attribute name="Permissions" value="all-permissions" />
-		</manifest>
-		<main jar="${jarfile}">
-		</main>
-		<lib>
-			<fileset dir="${lib}" />
-		</lib>
-	</onejar>
-</target>
-
 <target name="dist-init">
 	<mkdir dir="${dist}" />
 </target>
@@ -281,6 +266,7 @@
 	<property name="webstart-folder" value="${dist}/webstart" />
 	<mkdir dir="${webstart-folder}/lib" />
 	<copy todir="${webstart-folder}" file="launchers/webstart/phenex.jnlp" />
+	<copy todir="${webstart-folder}" file="launchers/webstart/phenex.png" />
 	<!-- add replace step to list jars -->
 	<copy todir="${webstart-folder}/lib">
 		<fileset dir="${lib}" />
@@ -298,11 +284,6 @@
 			<fileset dir="${webstart-folder}/lib" includes="*.jar" />
 		</path>
 	</signjar>
-</target>
-
-<target name="exe" depends="one-jar">
-	<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="launch4j/launch4j.jar:launch4j/lib/xstream.jar" />
-	<launch4j configFile="launchers/windows/phenex-launch4j.xml" />
 </target>
 
 <!-- Create a shell-script package for Unix in "dist/Phenex".  Jars are placed in a nested lib folder. -->

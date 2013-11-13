@@ -5,7 +5,7 @@
 		<title>Phenex</title>
 		<vendor>Phenoscape Team</vendor>
 		<homepage href="http://phenoscape.org/wiki/Phenex" />
-		<icon href="phenex.gif" />
+		<icon href="phenex.png" />
 		<shortcut>
 			<desktop />
 			<menu />

@@ -270,8 +270,11 @@
 	<copy todir="${webstart-folder}" file="launchers/webstart/phenex.png" />
 	<!-- add replace step to list jars -->
 	<copy todir="${webstart-folder}/lib">
-		<fileset dir="${lib}" />
+		<fileset dir="${lib}" includes="*.jar" />
 	</copy>
+	<jar destfile="${webstart-folder}/lib/nativelibs.jar">
+		<fileset dir="${lib}" includes="*.jnilib" />
+	</jar>
 	<copy todir="${webstart-folder}" file="${jarfile}" />
 	<jar destfile="${webstart-folder}/phenex.jar" update="yes">
 		<manifest>

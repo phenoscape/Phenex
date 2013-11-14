@@ -108,6 +108,7 @@
 		<jar href="lib/xml-apis.jar" />
 		<jar href="lib/xsdlib-1.5.jar" />
 		<jar href="lib/xsdlib.jar" />
+		<nativelib href="lib/nativelibs.jar" />
 	</resources>
 	<application-desc name="Phenex" main-class="org.phenoscape.main.Phenex" />
 	<update check="background" />

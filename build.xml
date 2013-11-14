@@ -273,7 +273,7 @@
 		<fileset dir="${lib}" includes="*.jar" />
 	</copy>
 	<jar destfile="${webstart-folder}/lib/nativelibs.jar">
-		<fileset dir="${lib}" includes="*.jnilib" />
+		<fileset dir="${lib}" includes="*.dylib" />
 	</jar>
 	<copy todir="${webstart-folder}" file="${jarfile}" />
 	<jar destfile="${webstart-folder}/phenex.jar" update="yes">

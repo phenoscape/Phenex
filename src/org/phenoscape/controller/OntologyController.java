@@ -13,6 +13,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.bbop.dataadapter.DataAdapterException;
 import org.bbop.framework.GUIManager;
@@ -73,6 +74,7 @@ public class OntologyController {
 			JOptionPane.showMessageDialog(null, "An error occurred while loading ontologies: " + e.getLocalizedMessage(), "Error Loading Ontologies", JOptionPane.ERROR_MESSAGE);
 			log().fatal("Failed to load ontologies", e);
 			SessionManager.getManager().setSession(new OBOSessionImpl());
+			this.eraseOntologyCache();
 		}
 		this.loadProvisionalTerms();
 		this.prefetchTermSets();
@@ -173,7 +175,7 @@ public class OntologyController {
 		}
 		return this.allTermsSet;
 	}
-	
+
 	public TermSet getAllTermsSetWithoutProvisional() {
 		if (this.allTermsWithoutProvisionalSet == null) {
 			final TermSet set =  this.makeTermSet();
@@ -201,51 +203,51 @@ public class OntologyController {
 	 * the blank time between that panel disappearing and the interface being
 	 * displayed.
 	 */
-	 private void prefetchTermSets() {
-		 this.getEntityTermSet().getTerms();
-		 this.getTaxonTermSet().getTerms();
-		 this.getCollectionTermSet().getTerms();
-		 this.getUnitTermSet().getTerms();
-		 this.getRelationsTermSet().getTerms();
-		 this.getQualityTermSet().getTerms();
-		 this.getRelatedEntityTermSet().getTerms();
-		 this.getPostCompositionFillersTermSet().getTerms();
-		 this.getAllTermsSet().getTerms();
-	 }
+	private void prefetchTermSets() {
+		this.getEntityTermSet().getTerms();
+		this.getTaxonTermSet().getTerms();
+		this.getCollectionTermSet().getTerms();
+		this.getUnitTermSet().getTerms();
+		this.getRelationsTermSet().getTerms();
+		this.getQualityTermSet().getTerms();
+		this.getRelatedEntityTermSet().getTerms();
+		this.getPostCompositionFillersTermSet().getTerms();
+		this.getAllTermsSet().getTerms();
+	}
 
-	 private Filter<IdentifiedObject> loadFilterWithName(String filterName) {
-		 final String filename = filterName + ".xml";
-		 final File filterFile = new File(this.getOverridingFiltersFolder(), filename);
-		 if (filterFile.exists()) {
-			 return this.loadFilter(filterFile);
-		 } else {
-			 return this.loadFilterFromResource("/org/phenoscape/filters/" + filename);
-		 }
-	 }
+	private Filter<IdentifiedObject> loadFilterWithName(String filterName) {
+		final String filename = filterName + ".xml";
+		final File filterFile = new File(this.getOverridingFiltersFolder(), filename);
+		if (filterFile.exists()) {
+			return this.loadFilter(filterFile);
+		} else {
+			return this.loadFilterFromResource("/org/phenoscape/filters/" + filename);
+		}
+	}
 
-	 private Filter<IdentifiedObject> loadFilterFromResource(String resourcePath) {
-		 return this.loadFilter(this.getClass().getResourceAsStream(resourcePath));
-	 }
+	private Filter<IdentifiedObject> loadFilterFromResource(String resourcePath) {
+		return this.loadFilter(this.getClass().getResourceAsStream(resourcePath));
+	}
 
-	 private Filter<IdentifiedObject> loadFilter(File xmlFile) {
-		 try {
-			 return this.loadFilter(new FileInputStream(xmlFile));
-		 } catch (FileNotFoundException e) {
-			 log().error("Could not find specified filter file", e);
-		 }
-		 return null;
-	 }
+	private Filter<IdentifiedObject> loadFilter(File xmlFile) {
+		try {
+			return this.loadFilter(new FileInputStream(xmlFile));
+		} catch (FileNotFoundException e) {
+			log().error("Could not find specified filter file", e);
+		}
+		return null;
+	}
 
-	 @SuppressWarnings("unchecked")
-	 private Filter<IdentifiedObject> loadFilter(InputStream stream) {
-		 final XMLDecoder d = new XMLDecoder(stream);
-		 final Filter<IdentifiedObject> result = (Filter<IdentifiedObject>) d.readObject();
-		 d.close();
-		 return result;
-	 }
-	 
-	 private void loadProvisionalTerms() {
-		 try {
+	@SuppressWarnings("unchecked")
+	private Filter<IdentifiedObject> loadFilter(InputStream stream) {
+		final XMLDecoder d = new XMLDecoder(stream);
+		final Filter<IdentifiedObject> result = (Filter<IdentifiedObject>) d.readObject();
+		d.close();
+		return result;
+	}
+
+	private void loadProvisionalTerms() {
+		try {
 			final List<OBOClass> terms = ProvisionalTermUtil.getProvisionalTerms(this.getOBOSession());
 			for (OBOClass term : terms) {
 				this.getOBOSession().addObject(term);	
@@ -263,22 +265,31 @@ public class OntologyController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	 }
+	}
 
-	 private Logger log() {
-		 return Logger.getLogger(this.getClass());
-	 }
+	private void eraseOntologyCache() {
+		final File cacheDir = new File(GUIManager.getPrefsDir(),"Ontology Cache");
+		try {
+			FileUtils.deleteDirectory(cacheDir);
+		} catch (IOException e) {
+			log().error("Failed to delete ontology cache after load error.", e);
+		}
+	}
 
-	 public void invalidateAllTermSets() {
-		 this.getEntityTermSet().invalidateTerms();
-		 this.getTaxonTermSet().invalidateTerms();
-		 this.getCollectionTermSet().invalidateTerms();
-		 this.getUnitTermSet().invalidateTerms();
-		 this.getRelationsTermSet().invalidateTerms();
-		 this.getQualityTermSet().invalidateTerms();
-		 this.getRelatedEntityTermSet().invalidateTerms();
-		 this.getPostCompositionFillersTermSet().invalidateTerms();
-		 this.getAllTermsSet().invalidateTerms();
-	 }
+	private Logger log() {
+		return Logger.getLogger(this.getClass());
+	}
+
+	public void invalidateAllTermSets() {
+		this.getEntityTermSet().invalidateTerms();
+		this.getTaxonTermSet().invalidateTerms();
+		this.getCollectionTermSet().invalidateTerms();
+		this.getUnitTermSet().invalidateTerms();
+		this.getRelationsTermSet().invalidateTerms();
+		this.getQualityTermSet().invalidateTerms();
+		this.getRelatedEntityTermSet().invalidateTerms();
+		this.getPostCompositionFillersTermSet().invalidateTerms();
+		this.getAllTermsSet().invalidateTerms();
+	}
 
 }

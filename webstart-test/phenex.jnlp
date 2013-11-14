@@ -109,7 +109,7 @@
 		<jar href="lib/xsdlib-1.5.jar" />
 		<jar href="lib/xsdlib.jar" />
 	</resources>
-    <resources os="MacOS">
+	<resources os="MacOS">
        <j2se version="1.7+"/>
 	   <nativelib href="lib/nativelibs.jar" />
      </resources> 

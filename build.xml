@@ -15,7 +15,7 @@
 	<tstamp>
 		<format property="NOW" pattern="yyyy-MM-dd_HH:mm:ss" />
 	</tstamp>
-	<property name="phenex.version" value="1.13" />
+	<property name="phenex.version" value="1.13.1" />
 	<property name="phenex.build" value="${NOW}" />
 	<property name="java-minimum" value="1.7" />
 
@@ -266,6 +266,7 @@
 	<property name="webstart-folder" value="${dist}/webstart" />
 	<mkdir dir="${webstart-folder}/lib" />
 	<copy todir="${webstart-folder}" file="launchers/webstart/phenex.jnlp" />
+	<replace file="${webstart-folder}/phenex.jnlp" token="@@phenex.version@@" value="${phenex.version}" />
 	<copy todir="${webstart-folder}" file="launchers/webstart/phenex.png" />
 	<!-- add replace step to list jars -->
 	<copy todir="${webstart-folder}/lib">

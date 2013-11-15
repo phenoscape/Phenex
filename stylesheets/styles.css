@@ -16,6 +16,23 @@ img.screenshot {
 	margin-bottom: 1em;
 }
 
+.download {
+	display: inline-block;
+	text-align: center;
+	font-weight: bold;
+}
+
+.download:hover {
+	color: #267299;
+}
+
+.download img {
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+
 h1, h2, h3, h4, h5, h6 {
   color:#222;
   margin:0 0 20px;

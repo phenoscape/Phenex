@@ -227,6 +227,25 @@ public class OBOUtil {
 		}
 		return null;
 	}
+	
+	public static OBOClass getCharacterForValue(OBOClass valueTerm) {
+		final Set<TermSubset> categories = valueTerm.getSubsets();
+		final Set<String> categoryNames = new HashSet<String>();
+		if (categories != null) {
+			for (TermSubset category : categories) {
+				categoryNames.add(category.getName());
+			}
+			if (categoryNames.contains("character_slim")) {
+				return valueTerm;
+			} else {
+				final OBOClass parent = getIsaParentForTerm(valueTerm);
+				if (parent != null) {
+					return getCharacterForValue(parent);
+				}
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Returns the "is_a" parent for an OBO term, or null if one is not found.

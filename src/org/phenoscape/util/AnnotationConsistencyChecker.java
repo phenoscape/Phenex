@@ -42,17 +42,20 @@ public class AnnotationConsistencyChecker {
 
 	public Collection<ConsistencyIssue> checkCharacter(Character character) {
 		final Collection<ConsistencyIssue> issues = new ArrayList<ConsistencyIssue>();
-		final Set<OBOClass> attributesUsed = new HashSet<OBOClass>();
+		final Set<OBOClass> charactersUsed = new HashSet<OBOClass>();
 		for (State state : character.getStates()) {
 			issues.addAll(this.checkState(state, character));
 			for (Phenotype phenotype : state.getPhenotypes()) {
 				if (phenotype.getQuality() != null) {
-					attributesUsed.add(OBOUtil.getAttributeForValue(phenotype.getQuality()));
+					charactersUsed.add(OBOUtil.getCharacterForValue(phenotype.getQuality()));
 				}
 			}
 		}
-		if (attributesUsed.size() > 1) {
-			issues.add(new ConsistencyIssue(character, null, "Qualities used descend from multiple attributes."));
+		if (charactersUsed.size() > 1) {
+			if (character.getLabel().startsWith("Scapulocoracoid, anterior margin")) {
+				System.err.println(charactersUsed);
+			}
+			issues.add(new ConsistencyIssue(character, null, "Qualities used descend from multiple character qualities."));
 		}
 		return issues;
 	}

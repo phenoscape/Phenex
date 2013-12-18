@@ -71,6 +71,7 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 	}
 
 	public void createNewCharacterWithSelectedStates() {
+		this.getController().getUndoController().beginCoalescingEdits("New Character With Selected States");
 		final List<State> states = Collections.unmodifiableList(this.getSelectedStates());
 		if (!states.isEmpty()) {
 			final Character selectedCharacter = this.getSelectedCharacter();
@@ -111,9 +112,11 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 			}
 			selectedCharacter.removeStates(states);
 		}
+		this.getController().getUndoController().endCoalescingEdits();
 	}
 
 	public void consolidateSelectedStates() {
+		this.getController().getUndoController().beginCoalescingEdits("Consolidate Selected States");
 		final List<State> states = Collections.unmodifiableList(this.getSelectedStates());
 		if (states.size() > 1) {
 			final Character selectedCharacter = this.getSelectedCharacter();
@@ -154,6 +157,7 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 			}
 			selectedCharacter.removeStates(states);
 		}
+		this.getController().getUndoController().endCoalescingEdits();
 	}
 
 	private void addState() {

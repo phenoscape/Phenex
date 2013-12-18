@@ -549,20 +549,6 @@ public class NeXMLWriter {
 			AbstractUncertainStateSet set) {
 		final Set<String> stateIDs = new HashSet<String>();
 		for (State substate : state.getStates()) {
-			if (substate == null) {
-				log().debug(state.getNexmlID());
-				log().debug(state.getStates().size());
-				for (State subbbbstate : state.getStates()) {
-					if (subbbbstate == null) {
-						log().debug("null");
-					} else {
-						log().debug(subbbbstate.getNexmlID());
-					}
-				}
-				log().debug(state.getStates());
-				log().debug(state.getLabel());
-				log().debug(substate.getLabel());
-			}
 			stateIDs.add(substate.getNexmlID());
 		}
 		final Set<String> setStateIDs = new HashSet<String>();

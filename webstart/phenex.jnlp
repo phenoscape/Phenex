@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="6.0+" version="1.13.3" codebase="http://phenoscape.github.io/Phenex/webstart/"
+<jnlp spec="6.0+" version="1.14" codebase="http://phenoscape.github.io/Phenex/webstart/"
 	href="phenex.jnlp">
 	<information>
 		<title>Phenex</title>

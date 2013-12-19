@@ -71,11 +71,11 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 	}
 
 	public void createNewCharacterWithSelectedStates() {
-		this.getController().getUndoController().beginCoalescingEdits("New Character With Selected States");
+		this.getController().getUndoController().beginCoalescingEdits("New Character With States");
 		final List<State> states = Collections.unmodifiableList(this.getSelectedStates());
 		if (!states.isEmpty()) {
 			final Character selectedCharacter = this.getSelectedCharacter();
-			final Character newCharacter = this.getController().getDataSet().newCharacter();
+			final Character newCharacter = new Character();
 			newCharacter.addStates(states);
 			final DataSet data = this.getController().getDataSet();
 			for (Taxon taxon : data.getTaxa()) {
@@ -111,17 +111,18 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 				}
 			}
 			selectedCharacter.removeStates(states);
+			data.addCharacter(newCharacter);
 		}
 		this.getController().getUndoController().endCoalescingEdits();
 	}
 
 	public void consolidateSelectedStates() {
-		this.getController().getUndoController().beginCoalescingEdits("Consolidate Selected States");
+		this.getController().getUndoController().beginCoalescingEdits("Consolidate States");
 		final List<State> states = Collections.unmodifiableList(this.getSelectedStates());
 		if (states.size() > 1) {
 			final Character selectedCharacter = this.getSelectedCharacter();
 			if (selectedCharacter == null) return; // don't consolidate states across different characters
-			final State newState = selectedCharacter.newState();
+			final State newState = new State();
 			final List<String> labels = new ArrayList<String>();
 			final List<String> comments = new ArrayList<String>();
 			final List<String> figures = new ArrayList<String>();
@@ -156,6 +157,7 @@ public class StateTableComponent extends PhenoscapeGUIComponent {
 				}
 			}
 			selectedCharacter.removeStates(states);
+			selectedCharacter.addState(newState);
 		}
 		this.getController().getUndoController().endCoalescingEdits();
 	}

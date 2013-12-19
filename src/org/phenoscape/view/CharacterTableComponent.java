@@ -58,11 +58,11 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 
 	public void consolidateSelectedCharacters() {
 		//FIXME some of this logic should be moved down into the model
-		this.getController().getUndoController().beginCoalescingEdits("Consolidate Selected Characters");
+		this.getController().getUndoController().beginCoalescingEdits("Consolidate Characters");
 		final List<Character> characters = Collections.unmodifiableList(this.getSelectedCharacters());
 		if (characters.size() > 1) {
 			final DataSet data = this.getController().getDataSet();
-			final Character newCharacter = data.newCharacter();;
+			final Character newCharacter = new Character();
 			final List<String> labels = new ArrayList<String>();
 			final List<String> comments = new ArrayList<String>();
 			final List<String> figures = new ArrayList<String>();
@@ -108,6 +108,7 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 				state.setSymbol("" + i);
 				i += 1;
 			}
+			data.addCharacter(newCharacter);
 		}
 		this.getController().getUndoController().endCoalescingEdits();
 	}

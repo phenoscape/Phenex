@@ -2,12 +2,9 @@ package org.phenoscape.view;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -19,7 +16,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
@@ -28,10 +24,7 @@ import org.obo.app.swing.TableColumnPrefsSaver;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
-import org.phenoscape.model.MultipleState;
-import org.phenoscape.model.MultipleState.MODE;
-import org.phenoscape.model.State;
-import org.phenoscape.model.Taxon;
+import org.phenoscape.util.ConsolidationUtil;
 
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
@@ -61,54 +54,7 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 		this.getController().getUndoController().beginCoalescingEdits("Consolidate Characters");
 		final List<Character> characters = Collections.unmodifiableList(this.getSelectedCharacters());
 		if (characters.size() > 1) {
-			final DataSet data = this.getController().getDataSet();
-			final Character newCharacter = new Character();
-			final List<String> labels = new ArrayList<String>();
-			final List<String> comments = new ArrayList<String>();
-			final List<String> figures = new ArrayList<String>();
-			final List<String> discussions = new ArrayList<String>();
-			for (Character character : characters) {
-				labels.add(character.getLabel());
-				comments.add(character.getComment());
-				figures.add(character.getFigure());
-				discussions.add(character.getDiscussion());
-				newCharacter.addStates(character.getStates());
-			}
-			newCharacter.setLabel(StringUtils.stripToNull(org.obo.app.util.Collections.join(labels, "; ")));
-			newCharacter.setComment(StringUtils.stripToNull(org.obo.app.util.Collections.join(comments, "; ")));
-			newCharacter.setFigure(StringUtils.stripToNull(org.obo.app.util.Collections.join(figures, "; ")));
-			newCharacter.setDiscussion(StringUtils.stripToNull(org.obo.app.util.Collections.join(discussions, "; ")));
-			for (Taxon taxon : data.getTaxa()) {
-				final Set<State> statesForTaxon = new HashSet<State>();
-				for (Character character : characters) {
-					final State stateValue = data.getStateForTaxon(taxon, character);
-					if (stateValue instanceof MultipleState) {
-						statesForTaxon.addAll(((MultipleState)stateValue).getStates());
-					} else if (stateValue != null) {
-						statesForTaxon.add(stateValue);
-					}
-				}
-				final State newStateValue;
-				if (statesForTaxon.size() > 1) {
-					if (statesForTaxon.contains(null)) {
-						log().debug("We created a null state?");
-						log().debug(statesForTaxon);
-					}
-					newStateValue = new MultipleState(statesForTaxon, MODE.POLYMORPHIC);
-				} else if (statesForTaxon.size() == 1) {
-					newStateValue = statesForTaxon.iterator().next();
-				} else {
-					newStateValue = null;
-				}
-				data.setStateForTaxon(taxon, newCharacter, newStateValue);
-			}
-			data.removeCharacters(characters);
-			int i = 0;
-			for (State state : newCharacter.getStates()) {
-				state.setSymbol("" + i);
-				i += 1;
-			}
-			data.addCharacter(newCharacter);
+			ConsolidationUtil.consolidateCharacters(characters, this.getController().getDataSet());
 		}
 		this.getController().getUndoController().endCoalescingEdits();
 	}

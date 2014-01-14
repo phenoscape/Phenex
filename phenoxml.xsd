@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.bioontologies.org/obd/schema/pheno" xmlns:pheno="http://www.bioontologies.org/obd/schema/pheno">
+  <!--
+    default namespace = ""
+    namespace geno = "http://www.gmod.org/schema/genotype"
+  -->
+  <!--
+    Changes: 
+    
+    Version: 0.11
+    
+        genetic_feature_set -> genotype_feature_link
+    
+    Version: 0.10
+    
+        complete revamp from 0_06
+  -->
+  <xs:element name="phenoset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:genotype"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:genetic_feature"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:phenotype"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:phenotype_manifestation"/>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="genotype">
+    <xs:annotation>
+      <xs:documentation>Each genotype record represents a single individual or group of genetically similar individuals</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="pheno:name"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:genotype_feature_link"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="pheno:identifier_Type"/>
+      <xs:attribute name="organism" type="pheno:identifier_Type">
+        <xs:annotation>
+          <xs:documentation>NCBI Taxon ID</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="background" type="pheno:identifier_Type">
+        <xs:annotation>
+          <xs:documentation>another genotype</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="name" type="pheno:name_Type"/>
+  <xs:element name="genotype_feature_link">
+    <xs:complexType>
+      <xs:attribute name="copy_count" type="xs:int"/>
+      <xs:attribute name="feature" type="pheno:identifier_Type">
+        <xs:annotation>
+          <xs:documentation>a reference to a genetic feature</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="genetic_feature">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="pheno:typeref"/>
+        <xs:element minOccurs="0" ref="pheno:name"/>
+      </xs:sequence>
+      <xs:attribute name="id" use="required" type="pheno:identifier_Type"/>
+      <xs:attribute name="organism" type="pheno:identifier_Type">
+        <xs:annotation>
+          <xs:documentation>optional: same as genotype.organism_id if not specified</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="manifest_in">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:typeref">
+          <xs:annotation>
+            <xs:documentation>may be from genetic context ontology</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="penetrance_percentage" type="xs:float"/>
+      <xs:attribute name="genotype" type="pheno:identifier_Type"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="phenotype_manifestation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="pheno:description">
+          <xs:annotation>
+            <xs:documentation>free text summary of the entire phenotype manifestation;</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element ref="pheno:manifest_in"/>
+        <xs:element ref="pheno:phenotype"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:provenance">
+          <xs:annotation>
+            <xs:documentation>support or evidence; experimental details</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:envirotype"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="pheno:identifier_Type"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="phenotype">
+    <xs:annotation>
+      <xs:documentation>a phenotype is a collection of phenotype characters</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="pheno:typeref"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:phenotype_character"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="phenotype_character">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="pheno:description">
+          <xs:annotation>
+            <xs:documentation>free text summary of the phenotype character</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element ref="pheno:bearer"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:quality"/>
+      </xs:sequence>
+      <xs:attribute name="expressivity_percentage" type="xs:float"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="bearer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="pheno:typeref"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="quality">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="pheno:typeref">
+          <xs:annotation>
+            <xs:documentation>quality type. comes from PATO</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element minOccurs="0" ref="pheno:description">
+          <xs:annotation>
+            <xs:documentation>optional free text</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:related_entity"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:on_condition"/>
+        <xs:element minOccurs="0" ref="pheno:in_comparison_to">
+          <xs:annotation>
+            <xs:documentation>for relative qualities we may want an explicit "yardstick"</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:measurement"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:temporal_qualifier"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:modifier"/>
+      </xs:sequence>
+      <xs:attribute name="determinable" type="pheno:classId_Type"/>
+      <xs:attribute name="count" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="related_entity">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="pheno:typeref"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="on_condition">
+    <xs:annotation>
+      <xs:documentation>sometimes a state is only instantiated if a certain condition holds</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="pheno:typeref"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="in_comparison_to">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:typeref"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:measurement"/>
+      </xs:sequence>
+      <xs:attribute name="relation" type="pheno:classId_Type"/>
+      <xs:attribute name="about" type="pheno:identifier_Type"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="modifier">
+    <xs:complexType>
+      <xs:attribute name="about" use="required" type="pheno:classId_Type"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="measurement">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="pheno:unit"/>
+      </xs:sequence>
+      <xs:attribute name="value" type="xs:float">
+        <xs:annotation>
+          <xs:documentation>  the only time this would be omitted is if we only have a range</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="min_value" type="xs:float"/>
+      <xs:attribute name="max_value" type="xs:float"/>
+      <xs:attribute name="standard_deviation" type="xs:float"/>
+      <xs:attribute name="standard_error" type="xs:float"/>
+      <xs:attribute name="assay" type="pheno:identifier_Type">
+        <xs:annotation>
+          <xs:documentation>TODO: reference to a particular experiment</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="unit">
+    <xs:annotation>
+      <xs:documentation>the unit should come from an SI unit ontology</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="pheno:typeref"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="provenance">
+    <xs:annotation>
+      <xs:documentation>evidence: could refer to papers, figures in papers, raw images, etc</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="pheno:identifier_Type"/>
+      <xs:attribute name="type" type="pheno:classId_Type"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="envirotype">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="pheno:typeref"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="typeref">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="pheno:qualifier"/>
+      </xs:sequence>
+      <xs:attribute name="about" use="required" type="pheno:classId_Type"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="qualifier">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="pheno:holds_in_relation_to"/>
+      </xs:sequence>
+      <xs:attribute name="relation" use="required" type="pheno:classId_Type"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="holds_in_relation_to">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="pheno:typeref"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="temporal_qualifier">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="pheno:time_range"/>
+      </xs:sequence>
+      <xs:attribute name="relation" type="pheno:classId_Type"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="time_range">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="pheno:typeref"/>
+        <xs:element minOccurs="0" ref="pheno:measurement"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="pheno:identifier_Type"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="description">
+    <xs:annotation>
+      <xs:documentation>an optionally-attributed textual description</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="id" type="xs:NMTOKEN"/>
+          <xs:attribute name="attribution" type="pheno:identifier_Type">
+            <xs:annotation>
+              <xs:documentation>e.g pubmed ID</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <!-- ++ basic types ++ -->
+  <xs:simpleType name="identifier_Type">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="name_Type">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="classId_Type">
+    <xs:restriction base="xs:NMTOKEN"/>
+  </xs:simpleType>
+</xs:schema>

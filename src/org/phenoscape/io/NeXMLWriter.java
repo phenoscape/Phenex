@@ -132,6 +132,10 @@ public class NeXMLWriter {
 			newDoc.getNexml().setGenerator(this.generator);
 		}
 		newDoc.getNexml().setVersion(BigDecimal.valueOf(0.9));
+		XmlCursor cursor = newDoc.newCursor();
+		if (cursor.toFirstChild()) {
+			cursor.setAttributeText(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), "http://www.nexml.org/2009 http://www.nexml.org/2009/nexml.xsd http://www.bioontologies.org/obd/schema/pheno http://purl.org/phenoscape/phenoxml.xsd");
+		}
 		final Annotatable annotatableNexml = new Annotatable(newDoc.getNexml());
 		NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.CURATORS_PREDICATE,
 				this.data.getCurators());

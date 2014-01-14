@@ -59,6 +59,7 @@ public class CrossPlatform {
     public static void setWindowModified(JFrame window, boolean modified) {
         if (CrossPlatform.getCurrentPlatform().equals(Platform.MAC)) {
             window.getRootPane().putClientProperty("windowModified", modified);
+            window.getRootPane().putClientProperty( "Window.documentModified", modified);
         } else {
             final String currentTitle = window.getTitle();
             final boolean currentModified = currentTitle.startsWith(BULLET);

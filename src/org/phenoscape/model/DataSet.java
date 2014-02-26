@@ -3,6 +3,7 @@ package org.phenoscape.model;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.obo.app.model.AbstractPropertyChangeObject;
@@ -27,6 +28,7 @@ public class DataSet extends AbstractPropertyChangeObject {
 	 * <taxonID, Map<characterID, stateID>>
 	 */
 	private final Map<String, Map<String, State>> matrix = new HashMap<String, Map<String, State>>();
+	private final Map<Association, Set<AssociationSupport>> associationSupport = new HashMap<Association, Set<AssociationSupport>>();
 	private String publication;
 	private String publicationLabel;
 	private String publicationURI;
@@ -92,7 +94,7 @@ public class DataSet extends AbstractPropertyChangeObject {
 		this.publication = aPublication;
 		this.firePropertyChange(PUBLICATION, oldPub, aPublication);
 	}
-	
+
 	public String getPublicationLabel() {
 		return this.publicationLabel;
 	}
@@ -103,7 +105,7 @@ public class DataSet extends AbstractPropertyChangeObject {
 		this.publicationLabel = aPublication;
 		this.firePropertyChange(PUBLICATION_LABEL, oldPub, aPublication);
 	}
-	
+
 	public String getPublicationURI() {
 		return this.publicationURI;
 	}
@@ -114,7 +116,7 @@ public class DataSet extends AbstractPropertyChangeObject {
 		this.publicationURI = aPublication;
 		this.firePropertyChange(PUBLICATION_URI, oldPub, aPublication);
 	}
-	
+
 	public String getPublicationCitation() {
 		return this.publicationCitation;
 	}
@@ -181,6 +183,10 @@ public class DataSet extends AbstractPropertyChangeObject {
 		states.put(character.getNexmlID(), state);
 		this.firePropertyChange(MATRIX_CELL, oldValue, new MatrixCellValue(taxon, character, state));
 	}    
+
+	public Map<Association, Set<AssociationSupport>> getAssociationSupport() {
+		return associationSupport;
+	}
 
 	@Override
 	public Class<?> getClass(String propertyKey) throws UndefinedKeyException {

@@ -38,6 +38,7 @@ public class NeXMLUtil {
     public static final QName FIGURE_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "inFigure", PHENOSCAPE_PREFIX);
     public static final QName DISCUSSION_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "discussion", PHENOSCAPE_PREFIX);
     public static final QName PHENOTYPE_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "describesPhenotype", PHENOSCAPE_PREFIX);
+    public static final QName ENTAILED_BY_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "entailedBy", PHENOSCAPE_PREFIX);
     
     public static final String PHENOXML_NAMESPACE = "http://www.bioontologies.org/obd/schema/pheno";
     public static final String PHENOXML_PREFIX = "phen";
@@ -49,7 +50,8 @@ public class NeXMLUtil {
     public static final QName PUBLICATION_LABEL_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "title", DUBLIN_CORE_PREFIX);
     public static final QName PUBLICATION_URI_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "identifier", DUBLIN_CORE_PREFIX);
     public static final QName PUBLICATION_CITATION_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "bibliographicCitation", DUBLIN_CORE_PREFIX);
-    public static final QName PUBLICATION_NOTES_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "description", DUBLIN_CORE_PREFIX);
+    public static final QName DC_DESCRIPTION_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "description", DUBLIN_CORE_PREFIX);
+    public static final QName DC_SOURCE_PREDICATE = new QName(DUBLIN_CORE_NAMESPACE, "source", DUBLIN_CORE_PREFIX);
 
     public static final String DARWIN_CORE_NAMESPACE = "http://rs.tdwg.org/dwc/terms/";
     public static final String DARWIN_CORE_PREFIX = "dwc";

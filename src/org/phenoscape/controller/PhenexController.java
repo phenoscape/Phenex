@@ -239,6 +239,8 @@ public class PhenexController extends DocumentController {
 		this.getDataSet().setPublicationCitation(reader.getDataSet().getPublicationCitation());
 		this.getDataSet().setPublicationNotes(reader.getDataSet().getPublicationNotes());
 		this.getDataSet().setMatrixData(reader.getDataSet().getMatrixData());
+		this.getDataSet().getAssociationSupport().clear();
+		this.getDataSet().getAssociationSupport().putAll(reader.getDataSet().getAssociationSupport());
 		this.fireDataChanged();
 	}
 

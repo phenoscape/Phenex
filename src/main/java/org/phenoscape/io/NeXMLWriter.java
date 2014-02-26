@@ -285,25 +285,32 @@ public class NeXMLWriter {
 				if (state != null) {
 					final AbstractObs xmlCell = this.findOrCreateCellForCharacter(existingCells, character.getNexmlID());
 					final XmlAnySimpleType xmlState = XmlAnySimpleType.Factory.newInstance();
+					final Set<State> statesForAssociations = new HashSet<State>();
 					if (state instanceof MultipleState) {
 						xmlState.setStringValue(this.findOrCreateMultiValueState(character, (MultipleState)state).getId());
+						for (State subState : ((MultipleState) state).getStates()) {
+							statesForAssociations.add(subState);
+						}
 					} else {
 						xmlState.setStringValue(state.getNexmlID());
+						statesForAssociations.add(state);
 					}
 					xmlCell.setState(xmlState);
-					final Association association = new Association(taxon.getNexmlID(), character.getNexmlID(), xmlState.getStringValue());
-					final Annotatable annotatableCell = new Annotatable(xmlCell);					
-					NeXMLUtil.unsetMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE);
-					final Set<AssociationSupport> supports = this.data.getAssociationSupport().get(association);
-					if (supports != null) {
-						for (AssociationSupport support : this.data.getAssociationSupport().get(association)) {
-							final Map<QName, Object> supportMeta = new HashMap<QName, Object>();
-							supportMeta.put(NeXMLUtil.DC_DESCRIPTION_PREDICATE, support.getDescriptionText());
-							supportMeta.put(NeXMLUtil.DC_SOURCE_PREDICATE, support.getDescriptionSource());
-							NeXMLUtil.addMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE, supportMeta);
+					for (State stateForAssociations : statesForAssociations) {
+						final Association association = new Association(taxon.getNexmlID(), character.getNexmlID(), stateForAssociations.getNexmlID());
+						final Annotatable annotatableCell = new Annotatable(xmlCell);					
+						NeXMLUtil.unsetMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE);
+						final Set<AssociationSupport> supports = this.data.getAssociationSupport().get(association);
+						if (supports != null) {
+							for (AssociationSupport support : this.data.getAssociationSupport().get(association)) {
+								final Map<QName, Object> supportMeta = new HashMap<QName, Object>();
+								supportMeta.put(NeXMLUtil.DC_IDENTIFIER, stateForAssociations.getNexmlID());
+								supportMeta.put(NeXMLUtil.DC_DESCRIPTION_PREDICATE, support.getDescriptionText());
+								supportMeta.put(NeXMLUtil.DC_SOURCE_PREDICATE, support.getDescriptionSource());
+								NeXMLUtil.addMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE, supportMeta);
+							}
 						}
 					}
-
 					newCells.add(xmlCell);
 				}
 			}

@@ -4,4 +4,5 @@
 /phenex.jar
 /dist
 .DS_Store
-/target
+target
+

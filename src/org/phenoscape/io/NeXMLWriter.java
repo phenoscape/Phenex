@@ -294,12 +294,16 @@ public class NeXMLWriter {
 					final Association association = new Association(taxon.getNexmlID(), character.getNexmlID(), xmlState.getStringValue());
 					final Annotatable annotatableCell = new Annotatable(xmlCell);					
 					NeXMLUtil.unsetMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE);
-					for (AssociationSupport support : this.data.getAssociationSupport().get(association)) {//FIXME wrong things
-						final Map<QName, Object> supportMeta = new HashMap<QName, Object>();
-						supportMeta.put(NeXMLUtil.DC_DESCRIPTION_PREDICATE, support.getDescriptionText());
-						supportMeta.put(NeXMLUtil.DC_SOURCE_PREDICATE, support.getDescriptionSource());
-						NeXMLUtil.addMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE, supportMeta);
+					final Set<AssociationSupport> supports = this.data.getAssociationSupport().get(association);
+					if (supports != null) {
+						for (AssociationSupport support : this.data.getAssociationSupport().get(association)) {
+							final Map<QName, Object> supportMeta = new HashMap<QName, Object>();
+							supportMeta.put(NeXMLUtil.DC_DESCRIPTION_PREDICATE, support.getDescriptionText());
+							supportMeta.put(NeXMLUtil.DC_SOURCE_PREDICATE, support.getDescriptionSource());
+							NeXMLUtil.addMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE, supportMeta);
+						}
 					}
+
 					newCells.add(xmlCell);
 				}
 			}

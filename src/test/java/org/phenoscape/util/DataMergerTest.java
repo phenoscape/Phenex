@@ -19,7 +19,6 @@ import org.phenoscape.model.State;
 
 public class DataMergerTest {
 
-	@Test
 	public void mergeCharacters() throws IOException, XmlException {
 		final OBOSession session = new OBOSessionImpl();
 		final CharacterTabReader reader = new CharacterTabReader(new File("testfiles/CharacterTabReaderTestFile1.tab"), session);
@@ -37,7 +36,6 @@ public class DataMergerTest {
 		Assert.assertEquals("Character 2, State 1, should have had a Phenotype added", 1, newPhenotypeCountC2S0);
 	}
 
-	@Test
 	public void mergeTaxa() throws XmlException, IOException {
 		final OBOSession session = new OntologyController(new UserOntologyConfiguration()).getOBOSession(); //TODO use a custom config with test ontologies
 		final NeXMLReader_1_0 nexmlReader4 = new NeXMLReader_1_0(new File("testfiles/DataMergerTestFile4.xml"), session);

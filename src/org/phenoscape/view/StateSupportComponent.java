@@ -1,7 +1,6 @@
 package org.phenoscape.view;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
 import java.util.Collections;
 import java.util.Set;
 
@@ -9,7 +8,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 
-import org.apache.batik.ext.swing.GridBagConstants;
 import org.obo.app.swing.BugWorkaroundTable;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Association;

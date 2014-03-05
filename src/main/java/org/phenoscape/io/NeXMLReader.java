@@ -267,7 +267,7 @@ public class NeXMLReader {
 									final List<Object> identifierList = map.get(NeXMLUtil.DC_IDENTIFIER);
 									final List<Object> descriptionList = map.get(NeXMLUtil.DC_DESCRIPTION_PREDICATE);
 									final List<Object> sourceList = map.get(NeXMLUtil.DC_SOURCE_PREDICATE);
-									final AssociationSupport associationSupport = new AssociationSupport(stringOrNull(NeXMLUtil.first(descriptionList)), stringOrNull(NeXMLUtil.first(sourceList)));
+									final AssociationSupport associationSupport = AssociationSupport.create(stringOrNull(NeXMLUtil.first(descriptionList)), stringOrNull(NeXMLUtil.first(sourceList)));
 									final Association association = new Association(otuID, characterID, stringOrNull(NeXMLUtil.first(identifierList)));
 									final Set<AssociationSupport> supports;
 									if (this.data.getAssociationSupport().containsKey(association)) {

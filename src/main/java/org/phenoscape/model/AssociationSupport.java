@@ -1,13 +1,29 @@
 package org.phenoscape.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class AssociationSupport {
 
 	private final String descriptionText;
 	private final String descriptionSource;
+	private static final Map<String, AssociationSupport> pool = new HashMap<String, AssociationSupport>();
 
-	public AssociationSupport(String descriptionText, String descriptionSource) {
+	private AssociationSupport(String descriptionText, String descriptionSource) {
 		this.descriptionText = descriptionText;
 		this.descriptionSource = descriptionSource;
+	}
+
+	public static AssociationSupport create(String descriptionText, String descriptionSource) {
+		final String key = descriptionText + descriptionSource;
+		final AssociationSupport newSupport;
+		if (pool.containsKey(key)) {
+			newSupport = pool.get(key);
+		} else {
+			newSupport = new AssociationSupport(descriptionText, descriptionSource);
+			pool.put(key, newSupport);
+		}
+		return newSupport;
 	}
 
 	public String getDescriptionText() {
@@ -47,6 +63,11 @@ public class AssociationSupport {
 		} else if (!descriptionText.equals(other.descriptionText))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "AssociationSupport [descriptionText=" + descriptionText + ", descriptionSource=" + descriptionSource + "]";
 	}
 
 }

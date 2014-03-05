@@ -61,4 +61,9 @@ public class Association {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "Association [taxonID=" + taxonID + ", characterID=" + characterID + ", stateID=" + stateID + "]";
+	}
+
 }

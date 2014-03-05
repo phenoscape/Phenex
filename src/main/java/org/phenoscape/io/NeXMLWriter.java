@@ -296,10 +296,10 @@ public class NeXMLWriter {
 						statesForAssociations.add(state);
 					}
 					xmlCell.setState(xmlState);
+					final Annotatable annotatableCell = new Annotatable(xmlCell);					
+					NeXMLUtil.unsetMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE);
 					for (State stateForAssociations : statesForAssociations) {
 						final Association association = new Association(taxon.getNexmlID(), character.getNexmlID(), stateForAssociations.getNexmlID());
-						final Annotatable annotatableCell = new Annotatable(xmlCell);					
-						NeXMLUtil.unsetMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE);
 						final Set<AssociationSupport> supports = this.data.getAssociationSupport().get(association);
 						if (supports != null) {
 							for (AssociationSupport support : this.data.getAssociationSupport().get(association)) {

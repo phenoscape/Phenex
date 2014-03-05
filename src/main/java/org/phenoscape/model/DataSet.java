@@ -172,7 +172,7 @@ public class DataSet extends AbstractPropertyChangeObject {
 		if (ObjectUtils.equals(this.getStateForTaxon(taxon, character), state)) {
 			return;
 		}
-		final MatrixCellValue oldValue = new MatrixCellValue(taxon, character, this.getStateForTaxon(taxon, character));
+		final MatrixCellValue oldValue = new MatrixCellValue(new MatrixCell(taxon, character), this.getStateForTaxon(taxon, character));
 		final Map<String, State> states;
 		if (this.matrix.containsKey(taxon.getNexmlID())) {
 			states = this.matrix.get(taxon.getNexmlID());
@@ -181,7 +181,7 @@ public class DataSet extends AbstractPropertyChangeObject {
 		}
 		this.matrix.put(taxon.getNexmlID(), states);
 		states.put(character.getNexmlID(), state);
-		this.firePropertyChange(MATRIX_CELL, oldValue, new MatrixCellValue(taxon, character, state));
+		this.firePropertyChange(MATRIX_CELL, oldValue, new MatrixCellValue(new MatrixCell(taxon, character), state));
 	}    
 
 	public Map<Association, Set<AssociationSupport>> getAssociationSupport() {

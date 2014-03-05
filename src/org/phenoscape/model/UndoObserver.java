@@ -107,7 +107,7 @@ public class UndoObserver {
 						super.redo();
 						undoing = true;
 						final MatrixCellValue newValue = (MatrixCellValue)(change.getNewValue());
-						((DataSet)(change.getSource())).setStateForTaxon(newValue.getTaxon(), newValue.getCharacter(), newValue.getState());                        
+						((DataSet)(change.getSource())).setStateForTaxon(newValue.getCell().getTaxon(), newValue.getCell().getCharacter(), newValue.getState());                        
 					}
 
 					@Override
@@ -115,7 +115,7 @@ public class UndoObserver {
 						super.undo();
 						undoing = true;
 						final MatrixCellValue oldValue = (MatrixCellValue)(change.getOldValue());
-						((DataSet)(change.getSource())).setStateForTaxon(oldValue.getTaxon(), oldValue.getCharacter(), oldValue.getState());
+						((DataSet)(change.getSource())).setStateForTaxon(oldValue.getCell().getTaxon(), oldValue.getCell().getCharacter(), oldValue.getState());
 					}
 
 				});

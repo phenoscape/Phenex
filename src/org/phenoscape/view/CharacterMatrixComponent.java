@@ -184,7 +184,6 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 			selectedCharacter = null;
 		}
 		if (selectedTaxon != null && selectedCharacter != null) {
-			//		final Association assoc = new Association(selectedTaxon.getNexmlID(), selectedCharacter.getNexmlID(), selectedState.getNexmlID());
 			this.getController().setSelectedMatrixCell(new MatrixCell(selectedTaxon, selectedCharacter));
 		} else {
 			this.getController().setSelectedMatrixCell(null);

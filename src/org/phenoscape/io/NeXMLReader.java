@@ -44,6 +44,8 @@ import org.obo.datamodel.ObsoletableObject;
 import org.obo.datamodel.impl.DanglingClassImpl;
 import org.phenoscape.io.NeXMLUtil.LiteralContents;
 import org.phenoscape.io.NeXMLUtil.OBOURISyntaxException;
+import org.phenoscape.model.Association;
+import org.phenoscape.model.AssociationSupport;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.MultipleState;
@@ -256,6 +258,28 @@ public class NeXMLReader {
 					final State state = this.allStates.get(stateID);
 					if (characterID != null && state != null) {
 						currentTaxonMap.put(characterID, state);
+						final List<Object> suppportMetas = NeXMLUtil.getMetadataValues(cell, NeXMLUtil.ENTAILED_BY_PREDICATE);
+						for (Object supportMeta : suppportMetas) {
+							if (supportMeta instanceof Map<?,?>) {
+								@SuppressWarnings("unchecked")
+								final Map<QName, List<Object>> map = (Map<QName, List<Object>>)supportMeta;
+								if (map.containsKey(NeXMLUtil.DC_IDENTIFIER) && map.containsKey(NeXMLUtil.DC_DESCRIPTION_PREDICATE) && map.containsKey(NeXMLUtil.DC_SOURCE_PREDICATE)) {
+									final List<Object> identifierList = map.get(NeXMLUtil.DC_IDENTIFIER);
+									final List<Object> descriptionList = map.get(NeXMLUtil.DC_DESCRIPTION_PREDICATE);
+									final List<Object> sourceList = map.get(NeXMLUtil.DC_SOURCE_PREDICATE);
+									final AssociationSupport associationSupport = AssociationSupport.create(stringOrNull(NeXMLUtil.first(descriptionList)), stringOrNull(NeXMLUtil.first(sourceList)));
+									final Association association = new Association(otuID, characterID, stringOrNull(NeXMLUtil.first(identifierList)));
+									final Set<AssociationSupport> supports;
+									if (this.data.getAssociationSupport().containsKey(association)) {
+										supports = this.data.getAssociationSupport().get(association);
+									} else {
+										supports = new HashSet<AssociationSupport>();
+										this.data.getAssociationSupport().put(association, supports);
+									}
+									supports.add(associationSupport);
+								}
+							}
+						}
 					}
 				}
 			}
@@ -283,7 +307,7 @@ public class NeXMLReader {
 				this.data.setPublicationURI(stringOrNull(NeXMLUtil.first(uriList)));
 			}
 		}
-		final Object pubNotesObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.PUBLICATION_NOTES_PREDICATE);
+		final Object pubNotesObj = NeXMLUtil.getFirstMetadataValue(nexml, NeXMLUtil.DC_DESCRIPTION_PREDICATE);
 		this.data.setPublicationNotes(stringOrNull(pubNotesObj));
 	}
 

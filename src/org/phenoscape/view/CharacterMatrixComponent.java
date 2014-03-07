@@ -28,6 +28,8 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import org.apache.log4j.Logger;
@@ -37,8 +39,10 @@ import org.obo.app.swing.PlaceholderRenderer;
 import org.obo.app.swing.SortDisabler;
 import org.obo.app.util.EverythingEqualComparator;
 import org.phenoscape.controller.PhenexController;
+import org.phenoscape.model.Association;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
+import org.phenoscape.model.MatrixCell;
 import org.phenoscape.model.MultipleState;
 import org.phenoscape.model.MultipleState.MODE;
 import org.phenoscape.model.State;
@@ -152,6 +156,38 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 				matrixTableModel.fireTableDataChanged();
 			}
 		});
+		this.matrixTable.getColumnModel().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				updateSelectedCell();
+			}
+		});
+		this.matrixTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				updateSelectedCell();
+			}
+		});
+	}
+
+	private void updateSelectedCell() {
+		final Taxon selectedTaxon;
+		if (this.matrixTable.getSelectedRow() != -1) {
+			selectedTaxon = this.matrixTableModel.getElementAt(this.matrixTable.getSelectedRow());
+		} else {
+			selectedTaxon = null;
+		}
+		final Character selectedCharacter;
+		if (this.matrixTable.getSelectedColumn() != -1) {
+			selectedCharacter = this.getCharacter(this.matrixTable.getSelectedColumn());
+		} else {
+			selectedCharacter = null;
+		}
+		if (selectedTaxon != null && selectedCharacter != null) {
+			this.getController().setSelectedMatrixCell(new MatrixCell(selectedTaxon, selectedCharacter));
+		} else {
+			this.getController().setSelectedMatrixCell(null);
+		}
 	}
 
 	private JToolBar createToolBar() {
@@ -200,6 +236,10 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 		toolBar.add(editorTypeCheckBox);
 		toolBar.setFloatable(false);
 		return toolBar;
+	}
+
+	private Character getCharacter(int index) {
+		return getController().getDataSet().getCharacters().get(index);
 	}
 
 	private class HeaderTableFormat implements AdvancedTableFormat<Taxon> {
@@ -278,7 +318,7 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 		@Override
 		public String getColumnName(int column) {
 			if (characterOption.equals(CharacterDisplay.CHARACTER_DESCRIPTION)) {
-				return this.getCharacter(column).toString();
+				return getCharacter(column).toString();
 			} else if (characterOption.equals(CharacterDisplay.CHARACTER_NUMBER)) {
 				return "" + (column + 1);
 			}
@@ -287,7 +327,7 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 
 		@Override
 		public Object getColumnValue(Taxon taxon, int column) {
-			return getController().getDataSet().getStateForTaxon(taxon, this.getCharacter(column));
+			return getController().getDataSet().getStateForTaxon(taxon, getCharacter(column));
 		}
 
 		@Override
@@ -297,12 +337,8 @@ public class CharacterMatrixComponent extends PhenoscapeGUIComponent {
 
 		@Override
 		public Taxon setColumnValue(Taxon taxon, Object editedValue, int column) {
-			getController().getDataSet().setStateForTaxon(taxon, this.getCharacter(column), (State)editedValue);
+			getController().getDataSet().setStateForTaxon(taxon, getCharacter(column), (State)editedValue);
 			return taxon;
-		}
-
-		private Character getCharacter(int index) {
-			return getController().getDataSet().getCharacters().get(index);
 		}
 
 	}

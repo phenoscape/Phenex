@@ -53,6 +53,8 @@ import org.nexml.schema_2009.Trees;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.impl.OBOClassImpl;
 import org.phenoscape.io.NeXMLUtil.Annotatable;
+import org.phenoscape.model.Association;
+import org.phenoscape.model.AssociationSupport;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.MultipleState;
@@ -159,7 +161,7 @@ public class NeXMLWriter {
 					NeXMLUtil.PUBLICATION_SOURCE_PREDICATE, publicationData);
 		}
 		NeXMLUtil.setMetadata(annotatableNexml,
-				NeXMLUtil.PUBLICATION_NOTES_PREDICATE,
+				NeXMLUtil.DC_DESCRIPTION_PREDICATE,
 				this.data.getPublicationNotes());
 		final AbstractBlock charBlock = NeXMLUtil.findOrCreateCharactersBlock(
 				newDoc, this.charactersBlockID);
@@ -271,33 +273,44 @@ public class NeXMLWriter {
 	}
 
 	private void writeMatrix(AbstractObsMatrix matrix) {
-		final List<AbstractObsRow> existingRows = Arrays.asList(matrix
-				.getRowArray());
+		final List<AbstractObsRow> existingRows = Arrays.asList(matrix.getRowArray());
 		final List<AbstractObsRow> newRows = new ArrayList<AbstractObsRow>();
 		for (Taxon taxon : this.data.getTaxa()) {
-			final AbstractObsRow xmlRow = this.findOrCreateRowForTaxon(
-					existingRows, taxon.getNexmlID());
+			final AbstractObsRow xmlRow = this.findOrCreateRowForTaxon(existingRows, taxon.getNexmlID());
 			newRows.add(xmlRow);
-			final List<AbstractObs> existingCells = Arrays.asList(xmlRow
-					.getCellArray());
+			final List<AbstractObs> existingCells = Arrays.asList(xmlRow.getCellArray());
 			final List<AbstractObs> newCells = new ArrayList<AbstractObs>();
 			for (Character character : this.data.getCharacters()) {
-				final State state = this.data
-						.getStateForTaxon(taxon, character);
+				final State state = this.data.getStateForTaxon(taxon, character);
 				if (state != null) {
-					final AbstractObs xmlCell = this
-							.findOrCreateCellForCharacter(existingCells,
-									character.getNexmlID());
-					final XmlAnySimpleType xmlState = XmlAnySimpleType.Factory
-							.newInstance();
+					final AbstractObs xmlCell = this.findOrCreateCellForCharacter(existingCells, character.getNexmlID());
+					final XmlAnySimpleType xmlState = XmlAnySimpleType.Factory.newInstance();
+					final Set<State> statesForAssociations = new HashSet<State>();
 					if (state instanceof MultipleState) {
-						xmlState.setStringValue(this
-								.findOrCreateMultiValueState(character,
-										(MultipleState) state).getId());
+						xmlState.setStringValue(this.findOrCreateMultiValueState(character, (MultipleState)state).getId());
+						for (State subState : ((MultipleState) state).getStates()) {
+							statesForAssociations.add(subState);
+						}
 					} else {
 						xmlState.setStringValue(state.getNexmlID());
+						statesForAssociations.add(state);
 					}
 					xmlCell.setState(xmlState);
+					final Annotatable annotatableCell = new Annotatable(xmlCell);					
+					NeXMLUtil.unsetMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE);
+					for (State stateForAssociations : statesForAssociations) {
+						final Association association = new Association(taxon.getNexmlID(), character.getNexmlID(), stateForAssociations.getNexmlID());
+						final Set<AssociationSupport> supports = this.data.getAssociationSupport().get(association);
+						if (supports != null) {
+							for (AssociationSupport support : this.data.getAssociationSupport().get(association)) {
+								final Map<QName, Object> supportMeta = new HashMap<QName, Object>();
+								supportMeta.put(NeXMLUtil.DC_IDENTIFIER, stateForAssociations.getNexmlID());
+								supportMeta.put(NeXMLUtil.DC_DESCRIPTION_PREDICATE, support.getDescriptionText());
+								supportMeta.put(NeXMLUtil.DC_SOURCE_PREDICATE, support.getDescriptionSource());
+								NeXMLUtil.addMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE, supportMeta);
+							}
+						}
+					}
 					newCells.add(xmlCell);
 				}
 			}

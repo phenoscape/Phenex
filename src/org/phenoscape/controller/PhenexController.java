@@ -58,6 +58,8 @@ import org.phenoscape.io.TaxonTabReader;
 import org.phenoscape.io.nexml_1_0.NeXMLReader_1_0;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
+import org.phenoscape.model.MatrixCell;
+import org.phenoscape.model.MatrixCellSelectionListener;
 import org.phenoscape.model.NewDataListener;
 import org.phenoscape.model.Phenotype;
 import org.phenoscape.model.Specimen;
@@ -92,9 +94,11 @@ public class PhenexController extends DocumentController {
 	private NexmlDocument xmlDoc = NexmlDocument.Factory.newInstance();
 	private String appName;
 	private final List<NewDataListener> newDataListeners = new ArrayList<NewDataListener>();
+	private final List<MatrixCellSelectionListener> matrixCellSelectionListeners = new ArrayList<MatrixCellSelectionListener>();
 	private final UndoObserver undoObserver;
 	private final SelectionManager phenoteSelectionManager;
 	private SwingWorker<WatchEvent<?>, Void> fileMonitor;
+	private MatrixCell selectedCell;
 
 	public PhenexController(OntologyController ontologyController) {
 		super();
@@ -239,6 +243,8 @@ public class PhenexController extends DocumentController {
 		this.getDataSet().setPublicationCitation(reader.getDataSet().getPublicationCitation());
 		this.getDataSet().setPublicationNotes(reader.getDataSet().getPublicationNotes());
 		this.getDataSet().setMatrixData(reader.getDataSet().getMatrixData());
+		this.getDataSet().getAssociationSupport().clear();
+		this.getDataSet().getAssociationSupport().putAll(reader.getDataSet().getAssociationSupport());
 		this.fireDataChanged();
 	}
 
@@ -381,7 +387,7 @@ public class PhenexController extends DocumentController {
 			this.writeForBioCreative(file);
 		}
 	}
-	
+
 	public void exportForCharaparserEvaluation() {
 		final JFileChooser fileChooser = this.createFileChooser();
 		final int result = fileChooser.showSaveDialog(GUIManager.getManager().getFrame());
@@ -448,6 +454,14 @@ public class PhenexController extends DocumentController {
 		this.newDataListeners.remove(listener);
 	}
 
+	public void addMatrixCellSelectionListener(MatrixCellSelectionListener listener) {
+		this.matrixCellSelectionListeners.add(listener);
+	}
+
+	public void removeMatrixCellSelectionListener(MatrixCellSelectionListener listener) {
+		this.matrixCellSelectionListeners.remove(listener);
+	}
+
 	public void runORBTermRequest() {
 		this.orbController.runORBTermRequest();
 		//       final NewTermRequestPanel panel = new NewTermRequestPanel(this.getOntologyCoordinator());
@@ -462,6 +476,17 @@ public class PhenexController extends DocumentController {
 		final Tree tree = new Tree();
 		tree.setTopology(topology);
 		this.dataSet.addTree(tree);
+	}
+
+	public void setSelectedMatrixCell(MatrixCell cell) {
+		this.selectedCell = cell;
+		for (MatrixCellSelectionListener listener : this.matrixCellSelectionListeners) {
+			listener.matrixCellWasSelected(this.selectedCell, this);
+		}
+	}
+
+	public MatrixCell getSelectedMatrixCell() {
+		return this.selectedCell;
 	}
 
 	private void fireDataChanged() {
@@ -519,7 +544,7 @@ public class PhenexController extends DocumentController {
 			log().error("Error writing to tab-delimited file", e);
 		}
 	}
-	
+
 	private void writeForCharaparserEvaluation(File aFile) {
 		final CharaparserEvaluationTabFormat writer = new CharaparserEvaluationTabFormat(this.getDataSet());
 		try {

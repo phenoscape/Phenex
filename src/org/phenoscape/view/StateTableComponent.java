@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import org.obo.app.swing.PlaceholderRenderer;
 import org.obo.app.swing.SortDisabler;
 import org.obo.app.swing.TableColumnPrefsSaver;
 import org.phenoscape.controller.PhenexController;
+import org.phenoscape.model.Association;
 import org.phenoscape.model.Character;
 import org.phenoscape.model.DataSet;
 import org.phenoscape.model.MultipleState;

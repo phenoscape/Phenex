@@ -12,6 +12,7 @@ import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import org.apache.log4j.Logger;
@@ -21,6 +22,7 @@ import org.obo.app.controller.DocumentController.AutosaveChangeListener;
 import org.obo.app.swing.ResponderChainAction;
 import org.obo.app.util.CrossPlatform;
 import org.phenoscape.controller.PhenexController;
+import org.phenoscape.main.Phenex;
 
 import edu.stanford.ejalbert.BrowserLauncher;
 import edu.stanford.ejalbert.exception.BrowserLaunchingInitializingException;
@@ -163,34 +165,41 @@ public class MenuFactory {
 
 	private JMenuItem createHelpMenu() {
 		final JMenu menu = new JMenu("Help");
-		final Action homepageAction = new AbstractAction("Phenex Homepage") {
+		final Action versionAction = new AbstractAction("Display Version") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					(new BrowserLauncher(null)).openURLinBrowser("http://www.phenoscape.org/wiki/Phenex");
-				} catch (BrowserLaunchingInitializingException e1) {
-					log().error("Unable to open URL in browser", e1);
-					e1.printStackTrace();
-				} catch (UnsupportedOperatingSystemException e1) {
-					log().error("Unable to open URL in browser", e1);
-				}
+				JOptionPane.showMessageDialog(menu, "Phenex " + Phenex.version());
 			}
 		};
-		final Action trackerAction = new AbstractAction("Submit Bug Report or Feature Request...") {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					(new BrowserLauncher(null)).openURLinBrowser("https://sourceforge.net/tracker/?func=add&group_id=76834&atid=1116214");
-				} catch (BrowserLaunchingInitializingException e1) {
-					log().error("Unable to open URL in browser", e1);
-					e1.printStackTrace();
-				} catch (UnsupportedOperatingSystemException e1) {
-					log().error("Unable to open URL in browser", e1);
-				}
-			}
-		};
-		menu.add(homepageAction);
-		menu.add(trackerAction);
+//		final Action homepageAction = new AbstractAction("Phenex Homepage") {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					new BrowserLauncher().openURLinBrowser("http://www.phenoscape.org/wiki/Phenex");
+//				} catch (BrowserLaunchingInitializingException e1) {
+//					log().error("Unable to open URL in browser", e1);
+//					e1.printStackTrace();
+//				} catch (UnsupportedOperatingSystemException e1) {
+//					log().error("Unable to open URL in browser", e1);
+//				}
+//			}
+//		};
+//		final Action trackerAction = new AbstractAction("Submit Bug Report or Feature Request...") {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				try {
+//					new BrowserLauncher().openURLinBrowser("https://sourceforge.net/tracker/?func=add&group_id=76834&atid=1116214");
+//				} catch (BrowserLaunchingInitializingException e1) {
+//					log().error("Unable to open URL in browser", e1);
+//					e1.printStackTrace();
+//				} catch (UnsupportedOperatingSystemException e1) {
+//					log().error("Unable to open URL in browser", e1);
+//				}
+//			}
+//		};
+		menu.add(versionAction);
+//		menu.add(homepageAction);
+//		menu.add(trackerAction);
 		return menu;
 	}
 

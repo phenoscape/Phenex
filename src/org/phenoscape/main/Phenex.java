@@ -21,4 +21,9 @@ public class Phenex {
 		}
 	}
 
+	public static String version() {
+		final Package p = Phenex.class.getPackage();
+		return p.getImplementationVersion();
+	}
+
 }

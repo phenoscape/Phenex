@@ -39,6 +39,7 @@ public class NeXMLUtil {
     public static final QName DISCUSSION_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "discussion", PHENOSCAPE_PREFIX);
     public static final QName PHENOTYPE_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "describesPhenotype", PHENOSCAPE_PREFIX);
     public static final QName ENTAILED_BY_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "entailedBy", PHENOSCAPE_PREFIX);
+    public static final QName IS_DIRECT_PREDICATE = new QName(PHENOSCAPE_NAMESPACE, "isDirect", PHENOSCAPE_PREFIX);
     
     public static final String PHENOXML_NAMESPACE = "http://www.bioontologies.org/obd/schema/pheno";
     public static final String PHENOXML_PREFIX = "phen";

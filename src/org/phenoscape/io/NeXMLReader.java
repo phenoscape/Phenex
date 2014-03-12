@@ -264,11 +264,12 @@ public class NeXMLReader {
 								@SuppressWarnings("unchecked")
 								final Map<QName, List<Object>> map = (Map<QName, List<Object>>)supportMeta;
 								if (map.containsKey(NeXMLUtil.DC_IDENTIFIER) && map.containsKey(NeXMLUtil.DC_DESCRIPTION_PREDICATE) && map.containsKey(NeXMLUtil.DC_SOURCE_PREDICATE)) {
-									final List<Object> identifierList = map.get(NeXMLUtil.DC_IDENTIFIER);
-									final List<Object> descriptionList = map.get(NeXMLUtil.DC_DESCRIPTION_PREDICATE);
-									final List<Object> sourceList = map.get(NeXMLUtil.DC_SOURCE_PREDICATE);
-									final AssociationSupport associationSupport = AssociationSupport.create(stringOrNull(NeXMLUtil.first(descriptionList)), stringOrNull(NeXMLUtil.first(sourceList)));
-									final Association association = new Association(otuID, characterID, stringOrNull(NeXMLUtil.first(identifierList)));
+									final String identifier = stringOrNull(NeXMLUtil.first(map.get(NeXMLUtil.DC_IDENTIFIER)));
+									final String description = stringOrNull(NeXMLUtil.first(map.get(NeXMLUtil.DC_DESCRIPTION_PREDICATE)));
+									final String source = stringOrNull(NeXMLUtil.first(map.get(NeXMLUtil.DC_SOURCE_PREDICATE)));
+									final boolean direct = Boolean.parseBoolean(stringOrNull(NeXMLUtil.first(map.get(NeXMLUtil.IS_DIRECT_PREDICATE))));
+									final AssociationSupport associationSupport = AssociationSupport.create(description, source, direct);
+									final Association association = new Association(otuID, characterID, identifier);
 									final Set<AssociationSupport> supports;
 									if (this.data.getAssociationSupport().containsKey(association)) {
 										supports = this.data.getAssociationSupport().get(association);

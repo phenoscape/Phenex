@@ -307,6 +307,7 @@ public class NeXMLWriter {
 								supportMeta.put(NeXMLUtil.DC_IDENTIFIER, stateForAssociations.getNexmlID());
 								supportMeta.put(NeXMLUtil.DC_DESCRIPTION_PREDICATE, support.getDescriptionText());
 								supportMeta.put(NeXMLUtil.DC_SOURCE_PREDICATE, support.getDescriptionSource());
+								supportMeta.put(NeXMLUtil.IS_DIRECT_PREDICATE, support.isDirect());
 								NeXMLUtil.addMetadata(annotatableCell, NeXMLUtil.ENTAILED_BY_PREDICATE, supportMeta);
 							}
 						}

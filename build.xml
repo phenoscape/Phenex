@@ -15,7 +15,7 @@
 	<tstamp>
 		<format property="NOW" pattern="yyyy-MM-dd_HH:mm:ss" />
 	</tstamp>
-	<property name="phenex.version" value="1.14.1" />
+	<property name="phenex.version" value="1.15" />
 	<property name="phenex.build" value="${NOW}" />
 	<property name="java-minimum" value="1.7" />
 
@@ -148,55 +148,6 @@
 				<![CDATA[<h1>Phenote</h1>]]></doctitle>
 	</javadoc>
 </target>
-<property name="dist" value="0.6" />
-<target name="tar">
-	<mkdir dir="tars/${dist}" />
-	<tar destfile="tars/${dist}/phenote-${dist}.tar">
-		<tarfileset dir=".">
-			<exclude name="${dist}/**" />
-			<exclude name="svn-phenote/**" />
-			<exclude name="tars/**" />
-			<exclude name="src/obo-files/**" />
-			<exclude name="*.tar" />
-			<exclude name="*.jar" />
-			<exclude name="garbage/**" />
-			<exclude name="oldjars/**" />
-			<exclude name="src/java/**" />
-			<exclude name="web-classfiles/**" />
-			<exclude name="web-interface/**" />
-			<exclude name="web-deployment/**" />
-		</tarfileset>
-	</tar>
-	<gzip zipfile="tars/${dist}/phenote-${dist}.tar.gz" src="tars/${dist}/phenote-${dist}.tar" />
-</target>
-<target name="tar-source">
-	<mkdir dir="tars/${dist}" />
-	<tar destfile="tars/${dist}/phenote-${dist}-src.tar">
-		<tarfileset dir=".">
-			<exclude name="${dist}/**" />
-			<exclude name="svn-phenote/**" />
-			<exclude name="tars/**" />
-			<exclude name="src/obo-files/**" />
-			<!-- for now take out go as its 8.5M & not being used yet -->
-			<exclude name="obo-files/gene_ontology.obo" />
-			<exclude name="*.tar" />
-			<exclude name="*.jar" />
-			<exclude name="garbage/**" />
-			<exclude name="oldjars/**" />
-			<!-- exclude name="jars/phenote.jar"/ -->
-			<exclude name="doc/**" />
-			<exclude name="classfiles/**" />
-			<exclude name="web-classfiles/**" />
-			<exclude name="web-interface/**" />
-			<exclude name="web-deployment/**" />
-		</tarfileset>
-	</tar>
-	<gzip zipfile="tars/${dist}/phenote-${dist}-src.tar.gz" src="tars/${dist}/phenote-${dist}-src.tar" />
-</target>
-
-<target name="gzip-tar">
-	<gzip zipfile="tars/${dist}/phenote-${dist}.tar.gz" src="tars/${dist}/phenote-${dist}.tar" />
-</target>
 
 <taskdef name="xmlbean" classname="org.apache.xmlbeans.impl.tool.XMLBean" classpath="${lib}/xbean.jar" />
 <!-- classgendir="${build.dir}" - if not doing jar but classes, schema is directory where xsd files are (conf) -->
@@ -214,6 +165,8 @@
 		<fileset file="log4j.xml" />
 		<manifest>
 			<attribute name="Main-Class" value="${main-class}" />
+			<attribute name="Specification-Version" value="${phenex.version}" />
+			<attribute name="Implementation-Version" value="${phenex.version}" />
 			<!--	<attribute name="SplashScreen-Image" value="org/phenoscape/view/images/Seal-of-Phenex-medium.png"/> -->
 		</manifest>
 	</jar>

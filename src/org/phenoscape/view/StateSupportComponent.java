@@ -56,11 +56,6 @@ public class StateSupportComponent extends PhenoscapeGUIComponent {
 	}
 
 	private void displaySupportForCell(MatrixCell cell) {
-
-		//		final GridBagConstraints constraints = new GridBagConstraints();
-		//		constraints.fill = GridBagConstants.HORIZONTAL;
-		//		constraints.gridx = 0;
-		//		constraints.gridy = 0;
 		for (State state : this.stateValuesForCell(cell)) {
 			this.panel.addTab(state.getSymbol(), new JScrollPane(this.createSupportTable(cell, state)));
 		}
@@ -106,6 +101,8 @@ public class StateSupportComponent extends PhenoscapeGUIComponent {
 	}
 
 	private static class SupportTableFormat implements TableFormat<AssociationSupport> {
+		
+		private static final String BOLD = "<HTML><B>%s</B></HTML>";
 
 		@Override
 		public int getColumnCount() {
@@ -125,10 +122,14 @@ public class StateSupportComponent extends PhenoscapeGUIComponent {
 		@Override
 		public Object getColumnValue(AssociationSupport support, int column) {
 			switch(column) {
-			case 0: return support.getDescriptionText(); 
-			case 1: return support.getDescriptionSource();
+			case 0: return boldIfNeeded(support.getDescriptionText(), support); 
+			case 1: return boldIfNeeded(support.getDescriptionSource(), support);
 			default: return null;
 			}
+		}
+		
+		private String boldIfNeeded(String text, AssociationSupport support) {
+			return support.isDirect() ? String.format(BOLD, text) : text;
 		}
 
 	}

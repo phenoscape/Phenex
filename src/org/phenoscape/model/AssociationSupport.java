@@ -44,8 +44,13 @@ public class AssociationSupport {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((descriptionSource == null) ? 0 : descriptionSource.hashCode());
-		result = prime * result + ((descriptionText == null) ? 0 : descriptionText.hashCode());
+		result = prime
+				* result
+				+ ((descriptionSource == null) ? 0 : descriptionSource
+						.hashCode());
+		result = prime * result
+				+ ((descriptionText == null) ? 0 : descriptionText.hashCode());
+		result = prime * result + (direct ? 1231 : 1237);
 		return result;
 	}
 
@@ -67,6 +72,8 @@ public class AssociationSupport {
 			if (other.descriptionText != null)
 				return false;
 		} else if (!descriptionText.equals(other.descriptionText))
+			return false;
+		if (direct != other.direct)
 			return false;
 		return true;
 	}

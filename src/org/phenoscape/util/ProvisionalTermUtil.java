@@ -77,13 +77,18 @@ public class ProvisionalTermUtil {
 			final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 			final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 			final Document xmlDoc = new DOMBuilder().build(docBuilder.parse(response.getEntity().getContent()));
-			@SuppressWarnings("unchecked")
-			final List<Element> termElements = xmlDoc.getRootElement().getChild("data").getChild("page").getChild("contents").getChild("classBeanResultList").getChildren("classBean");
-			final List<OBOClass> terms = new ArrayList<OBOClass>();
-			for (Element element : termElements) {
-				terms.add(createClassForProvisionalTerm(element, session));
+			if (xmlDoc.getRootElement().getChild("data") != null) {
+				@SuppressWarnings("unchecked")
+				final List<Element> termElements = xmlDoc.getRootElement().getChild("data").getChild("page").getChild("contents").getChild("classBeanResultList").getChildren("classBean");
+				final List<OBOClass> terms = new ArrayList<OBOClass>();
+				for (Element element : termElements) {
+					terms.add(createClassForProvisionalTerm(element, session));
+				}
+				return terms;
+			} else {
+				return Collections.emptyList();
 			}
-			return terms;
+
 		}
 	}
 

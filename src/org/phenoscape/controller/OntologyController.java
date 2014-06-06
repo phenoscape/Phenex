@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JOptionPane;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -30,7 +29,6 @@ import org.obo.datamodel.impl.OBOSessionImpl;
 import org.obo.filters.Filter;
 import org.oboedit.controller.SessionManager;
 import org.phenoscape.util.ProvisionalTermUtil;
-import org.xml.sax.SAXException;
 
 /**
  * @author Jim Balhoff
@@ -255,13 +253,7 @@ public class OntologyController {
 		} catch (IllegalStateException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

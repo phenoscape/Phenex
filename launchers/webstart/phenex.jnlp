@@ -37,6 +37,7 @@
 		<jar href="lib/beansbinding-1.2.1.jar" />
 		<jar href="lib/commons-codec-1.4.jar" />
 		<jar href="lib/commons-csv-20070730.jar" />
+		<jar href="lib/commons-io-2.4.jar" />
 		<jar href="lib/commons-lang-2.4.jar" />
 		<jar href="lib/commons-logging-1.1.1.jar" />
 		<jar href="lib/debug.jar" />

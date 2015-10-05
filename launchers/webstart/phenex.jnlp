@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="6.0+" version="@@phenex.version@@" codebase="http://phenoscape.github.io/Phenex/webstart/"
-	href="phenex.jnlp">
+<jnlp spec="6.0+" version="@@phenex.version@@"
+	codebase="http://phenoscape.github.io/Phenex/webstart/" href="phenex.jnlp">
 	<information>
 		<title>Phenex</title>
 		<vendor>Phenoscape Team</vendor>
@@ -37,6 +37,7 @@
 		<jar href="lib/beansbinding-1.2.1.jar" />
 		<jar href="lib/commons-codec-1.4.jar" />
 		<jar href="lib/commons-csv-20070730.jar" />
+		<jar href="lib/commons-io-2.4.jar" />
 		<jar href="lib/commons-lang-2.4.jar" />
 		<jar href="lib/commons-logging-1.1.1.jar" />
 		<jar href="lib/debug.jar" />
@@ -55,6 +56,7 @@
 		<jar href="lib/jlibeps.jar" />
 		<jar href="lib/jpathwatch-0-94.jar" />
 		<jar href="lib/jpl.jar" />
+		<jar href="lib/json-20140107.jar" />
 		<jar href="lib/jsr173-1.0.jar" />
 		<jar href="lib/junit-4.5.jar" />
 		<jar href="lib/jwf-1.0.1.jar" />

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -194,7 +195,8 @@ public class TabDelimitedWriter {
 	}
 
 	private OBOClass getCharacterAttributeForValue(OBOClass valueTerm) {
-		final Set<TermSubset> categories = valueTerm.getSubsets();
+		@SuppressWarnings("unchecked")
+		final Set<TermSubset> categories = valueTerm.getSubsets() != null ? valueTerm.getSubsets() : Collections.EMPTY_SET;
 		final Set<String> categoryNames = new HashSet<String>();
 		for (TermSubset category : categories) {
 			categoryNames.add(category.getName());

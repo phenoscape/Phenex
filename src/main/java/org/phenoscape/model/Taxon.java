@@ -25,7 +25,7 @@ public class Taxon extends AbstractPropertyChangeObject {
     public static final String FIGURE = "figure";
 
     public Taxon() {
-        this(UUID.randomUUID().toString());
+        this("t" + UUID.randomUUID().toString());
     }
 
     public Taxon(String nexmlID) {

@@ -76,7 +76,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
 		factories.add(new OntologyPreferencesComponentFactory(this.ontologyConfiguration));
 		factories.add(new ORBPreferencesComponentFactory());
 		factories.add(new TermInfoComponentFactory(this.controller.getOntologyCoordinator()));
-		factories.add(new PhenoteOntologyTreeEditorFactory());
+		//factories.add(new PhenoteOntologyTreeEditorFactory());
 		factories.add(new SearchComponentFactory() {
 			@Override
 			public FactoryCategory getCategory() {

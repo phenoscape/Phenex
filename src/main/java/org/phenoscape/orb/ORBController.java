@@ -2,28 +2,23 @@ package org.phenoscape.orb;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 import javax.swing.JOptionPane;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.DOMBuilder;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOSession;
 import org.phenoscape.controller.PhenexController;
@@ -32,7 +27,6 @@ import org.xml.sax.SAXException;
 
 public class ORBController {
 
-	private static final String SERVICE = "http://rest.bioontology.org/bioportal/provisional";
 	private final PhenexController controller;
 
 
@@ -75,17 +69,15 @@ public class ORBController {
 
 	private OBOClass requestTerm(ORBTerm term) throws ClientProtocolException, IOException, ParserConfigurationException, IllegalStateException, SAXException {
 		final OBOSession session = this.controller.getOntologyController().getOBOSession();
-		final HttpPost post = new HttpPost(SERVICE);
-		post.setHeader(new BasicHeader("Content-Type", "application/x-www-form-urlencoded"));
+		final HttpPost post = new HttpPost(ProvisionalTermUtil.SERVICE);
+		post.setHeader(new BasicHeader("Content-Type", "application/json"));
+		post.setHeader(new BasicHeader("Authorization", "apikey token=" + ProvisionalTermUtil.getAPIKey()));
 		post.setEntity(this.createPostEntity(term));
 		final DefaultHttpClient client = new DefaultHttpClient();
 		final HttpResponse response = new DefaultHttpClient().execute(post);
 		client.getConnectionManager().shutdown();
-		final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-		final DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-		final Document xmlDoc = new DOMBuilder().build(docBuilder.parse(response.getEntity().getContent()));
-		final Element newTermElement = xmlDoc.getRootElement().getChild("data").getChild("classBean");
-		final OBOClass newTerm = ProvisionalTermUtil.createClassForProvisionalTerm(newTermElement, session);
+		final JSONObject json = new JSONObject(IOUtils.toString(response.getEntity().getContent(), "utf-8"));
+		final OBOClass newTerm = ProvisionalTermUtil.createClassForProvisionalTerm(json, session);
 		session.addObject(newTerm);
 		this.controller.getOntologyController().invalidateAllTermSets();
 		this.controller.getOntologyCoordinator().getSelectionManager().selectTerm(this, newTerm, false);
@@ -93,19 +85,19 @@ public class ORBController {
 	}
 
 	private HttpEntity createPostEntity(ORBTerm term) throws UnsupportedEncodingException {
-		final List<NameValuePair> values = new ArrayList<NameValuePair>();
-		values.add(new BasicNameValuePair("apikey", ProvisionalTermUtil.getAPIKey()));
-		values.add(new BasicNameValuePair("preferredname", term.getLabel()));
-		values.add(new BasicNameValuePair("definition", term.getDefinition()));
+		final JSONObject json = new JSONObject();
+		json.put("label", term.getLabel());
+		json.put("definition", new JSONArray(Collections.singleton(term.getDefinition())));
 		if (term.getParent() != null) {
 			final String parentURI = ProvisionalTermUtil.toURI(term.getParent().getID());
-			values.add(new BasicNameValuePair("superclass", parentURI));
+			json.put("subclassOf", parentURI);
 		}
 		if (!term.getSynonyms().isEmpty()) {
+			//FIXME this is not doing anything
 			StringUtils.join(term.getSynonyms(), ",");
 		}
-		values.add(new BasicNameValuePair("submittedby", ProvisionalTermUtil.getUserID()));
-		return new UrlEncodedFormEntity(values);
+		json.put("creator", ProvisionalTermUtil.getUserID());
+		return new StringEntity(json.toString(), "utf-8");
 	}
 
 	@SuppressWarnings("unused")

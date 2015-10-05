@@ -89,7 +89,9 @@ public class OBOUtil {
 	public static String generateManchesterLabelExpression(OBOClass term) {
 		if (!isPostCompTerm(term)) {
 			final String name = term.getName();
-			if (name.contains(" ")) {
+			if (name == null) {
+				return term.getID();
+			} else if (name.contains(" ")) {
 				return "'" + name + "'";
 			} else {
 				return name;

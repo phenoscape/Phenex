@@ -1,8 +1,11 @@
 package org.phenoscape.io;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -14,6 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -24,6 +28,13 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlOptions;
 import org.bioontologies.obd.schema.pheno.PhenotypeCharacterDocument.PhenotypeCharacter;
 import org.bioontologies.obd.schema.pheno.PhenotypeManifestationDocument.PhenotypeManifestation;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.XMLOutputter;
 import org.nexml.schema_2009.AbstractBlock;
 import org.nexml.schema_2009.AbstractChar;
 import org.nexml.schema_2009.AbstractMapping;
@@ -114,15 +125,77 @@ public class NeXMLWriter {
 	}
 
 	public void write(File aFile) throws IOException {
-		this.constructXMLDoc().save(aFile, this.options);
+		final OutputStream stream = new FileOutputStream(aFile);
+		this.write(stream);
+		stream.close();
 	}
 
 	public void write(OutputStream aStream) throws IOException {
-		this.constructXMLDoc().save(aStream, this.options);
+		final Document document = this.saveToJDOMDoc();
+		new XMLOutputter().output(document, aStream);
 	}
 
 	public void write(Writer aWriter) throws IOException {
-		this.constructXMLDoc().save(aWriter, this.options);
+		final Document document = this.saveToJDOMDoc();
+		new XMLOutputter().output(document, aWriter);
+	}
+
+	private Document saveToJDOMDoc() throws IOException {
+		try {
+			final StringWriter writer = new StringWriter();
+			this.constructXMLDoc().save(writer, this.options);
+			writer.close();
+			final String doc = writer.toString();
+			final SAXBuilder jdomBuilder = new SAXBuilder();
+			final Document document = jdomBuilder.build(new StringReader(doc));
+			final Element nexmlRoot = document.getRootElement();
+			nexmlRoot.addNamespaceDeclaration(Namespace.getNamespace(NeXMLUtil.DARWIN_CORE_PREFIX, NeXMLUtil.DARWIN_CORE_NAMESPACE));
+			nexmlRoot.addNamespaceDeclaration(Namespace.getNamespace(NeXMLUtil.DUBLIN_CORE_PREFIX, NeXMLUtil.DUBLIN_CORE_NAMESPACE));
+			nexmlRoot.addNamespaceDeclaration(Namespace.getNamespace(NeXMLUtil.PHENOSCAPE_PREFIX, NeXMLUtil.PHENOSCAPE_NAMESPACE));
+			nexmlRoot.addNamespaceDeclaration(Namespace.getNamespace(NeXMLUtil.RDFS_PREFIX, NeXMLUtil.RDFS_NAMESPACE));
+			final Map<String, String> declaredNamespaceURIs = new HashMap<String, String>();
+			for (Namespace namespace : nexmlRoot.getNamespacesIntroduced()) {
+				declaredNamespaceURIs.put(namespace.getURI(), namespace.getPrefix());
+			}
+
+			for (Element child : nexmlRoot.getChildren()) {
+				recursivelyRemoveRedundantNamespaces(child, declaredNamespaceURIs);
+			}
+			return document;
+		} catch (JDOMException e) {
+			throw new IOException(e);
+		}
+	}
+
+	private void recursivelyRemoveRedundantNamespaces(Element element, Map<String, String> declaredNamespaces) {
+		for (Element child : element.getChildren()) {
+			recursivelyRemoveRedundantNamespaces(child, declaredNamespaces);
+		}
+
+		for (Attribute attribute : element.getAttributes()) {
+			final String value = attribute.getValue();
+			for (Namespace namespace : element.getNamespacesInScope()) {
+				final String possiblePrefix = namespace.getPrefix() + ":";
+				if (value.startsWith(possiblePrefix)) {
+					final Namespace valueNamespace = namespace;
+					if (declaredNamespaces.keySet().contains(valueNamespace.getURI())) {
+						final String newPrefix = declaredNamespaces.get(valueNamespace.getURI()) == "" ? "" : declaredNamespaces.get(valueNamespace.getURI()) + ":";
+						final String newValue = value.replaceFirst(Pattern.quote(possiblePrefix), newPrefix);
+						attribute.setValue(newValue);
+						break;
+					}
+				}
+			}
+		}
+		final Set<Namespace> namespacesToRemove = new HashSet<Namespace>();
+		for (Namespace namespace : element.getNamespacesIntroduced()) {
+			if (declaredNamespaces.keySet().contains(namespace.getURI())) {
+				namespacesToRemove.add(namespace);
+			}
+		}
+		for (Namespace namespace : namespacesToRemove) {
+			element.removeNamespaceDeclaration(namespace);	
+		}
 	}
 
 	private NexmlDocument constructXMLDoc() {
@@ -235,7 +308,7 @@ public class NeXMLWriter {
 			final AbstractStates usableStatesBlock;
 			if (usedStatesIDs.contains(statesBlock.getId())) {
 				usableStatesBlock = (AbstractStates) (statesBlock.copy());
-				usableStatesBlock.setId(UUID.randomUUID().toString());
+				usableStatesBlock.setId("sb" + UUID.randomUUID().toString());
 			} else {
 				usableStatesBlock = statesBlock;
 			}
@@ -433,7 +506,7 @@ public class NeXMLWriter {
 		}
 		final AbstractObsRow newRow = StandardMatrixObsRow.Factory
 				.newInstance();
-		newRow.setId(UUID.randomUUID().toString());
+		newRow.setId("r" + UUID.randomUUID().toString());
 		newRow.setOtu(id);
 		return newRow;
 	}
@@ -502,65 +575,54 @@ public class NeXMLWriter {
 		return newState;
 	}
 
-	private AbstractState findOrCreateMultiValueState(Character character,
-			MultipleState state) {
-		final AbstractStates block = this.statesBlocksByCharacter
-				.get(character);
-		final AbstractUncertainStateSet[] sets = (state.getMode() == MODE.POLYMORPHIC) ? block
-				.getPolymorphicStateSetArray() : block
-				.getUncertainStateSetArray();
-				for (AbstractUncertainStateSet set : sets) {
-					if (this.multipleStateSetMatches(state, set)) {
-						this.usedUncertainStateSets.add(set.getId());
-						return set;
-					}
-				}
-				final AbstractUncertainStateSet set;
-				if (state.getMode() == MODE.POLYMORPHIC) {
-					final StandardPolymorphicStateSet polymorphicSet = StandardPolymorphicStateSet.Factory
-							.newInstance();
-					set = polymorphicSet;
-					polymorphicSet.setId(UUID.randomUUID().toString());
-					final AbstractPolymorphicStateSet[] oldStates = block
-							.getPolymorphicStateSetArray();
-					final List<AbstractPolymorphicStateSet> newStates = new ArrayList<AbstractPolymorphicStateSet>();
-					newStates.addAll(Arrays.asList(oldStates));
-
-					final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
-					for (State substate : state.getStates()) {
-						final StandardMapping mapping = StandardMapping.Factory
-								.newInstance();
-						mapping.setState(substate.getNexmlID());
-						mappings.add(mapping);
-					}
-					set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
-					newStates.add(polymorphicSet);
-					block.setPolymorphicStateSetArray(newStates
-							.toArray(new AbstractPolymorphicStateSet[] {}));
-				} else {
-					final StandardUncertainStateSet uncertainSet = StandardUncertainStateSet.Factory
-							.newInstance();
-					set = uncertainSet;
-					uncertainSet.setId(UUID.randomUUID().toString());
-					final AbstractUncertainStateSet[] oldStates = block
-							.getUncertainStateSetArray();
-					final List<AbstractUncertainStateSet> newStates = new ArrayList<AbstractUncertainStateSet>();
-					newStates.addAll(Arrays.asList(oldStates));
-
-					final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
-					for (State substate : state.getStates()) {
-						final StandardMapping mapping = StandardMapping.Factory
-								.newInstance();
-						mapping.setState(substate.getNexmlID());
-						mappings.add(mapping);
-					}
-					set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
-					newStates.add(uncertainSet);
-					block.setUncertainStateSetArray(newStates
-							.toArray(new AbstractUncertainStateSet[] {}));
-				}
+	private AbstractState findOrCreateMultiValueState(Character character, MultipleState state) {
+		final AbstractStates block = this.statesBlocksByCharacter.get(character);
+		final AbstractUncertainStateSet[] sets = (state.getMode() == MODE.POLYMORPHIC) ? block.getPolymorphicStateSetArray() : block.getUncertainStateSetArray();
+		for (AbstractUncertainStateSet set : sets) {
+			if (this.multipleStateSetMatches(state, set)) {
 				this.usedUncertainStateSets.add(set.getId());
 				return set;
+			}
+		}
+		final AbstractUncertainStateSet set;
+		if (state.getMode() == MODE.POLYMORPHIC) {
+			final StandardPolymorphicStateSet polymorphicSet = StandardPolymorphicStateSet.Factory.newInstance();
+			set = polymorphicSet;
+			polymorphicSet.setId("s" + UUID.randomUUID().toString());
+			writeSymbol(polymorphicSet, state.getSymbol());
+			final AbstractPolymorphicStateSet[] oldStates = block.getPolymorphicStateSetArray();
+			final List<AbstractPolymorphicStateSet> newStates = new ArrayList<AbstractPolymorphicStateSet>();
+			newStates.addAll(Arrays.asList(oldStates));
+			final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
+			for (State substate : state.getStates()) {
+				final StandardMapping mapping = StandardMapping.Factory
+						.newInstance();
+				mapping.setState(substate.getNexmlID());
+				mappings.add(mapping);
+			}
+			set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
+			newStates.add(polymorphicSet);
+			block.setPolymorphicStateSetArray(newStates.toArray(new AbstractPolymorphicStateSet[] {}));
+		} else {
+			final StandardUncertainStateSet uncertainSet = StandardUncertainStateSet.Factory.newInstance();
+			set = uncertainSet;
+			uncertainSet.setId("s" + UUID.randomUUID().toString());
+			writeSymbol(uncertainSet, state.getSymbol());
+			final AbstractUncertainStateSet[] oldStates = block.getUncertainStateSetArray();
+			final List<AbstractUncertainStateSet> newStates = new ArrayList<AbstractUncertainStateSet>();
+			newStates.addAll(Arrays.asList(oldStates));
+			final List<AbstractMapping> mappings = new ArrayList<AbstractMapping>();
+			for (State substate : state.getStates()) {
+				final StandardMapping mapping = StandardMapping.Factory.newInstance();
+				mapping.setState(substate.getNexmlID());
+				mappings.add(mapping);
+			}
+			set.setMemberArray(mappings.toArray(new AbstractMapping[] {}));
+			newStates.add(uncertainSet);
+			block.setUncertainStateSetArray(newStates.toArray(new AbstractUncertainStateSet[] {}));
+		}
+		this.usedUncertainStateSets.add(set.getId());
+		return set;
 	}
 
 	private boolean multipleStateSetMatches(MultipleState state,
@@ -689,10 +751,9 @@ public class NeXMLWriter {
 	 * incorrect. This method should allow us to write any kind of symbol.
 	 */
 	private void writeSymbol(AbstractState state, String symbolValue) {
-		final XmlAnySimpleType symbol = state.getSymbol() != null ? state
-				.getSymbol() : state.addNewSymbol();
-				final Attr attribute = (Attr) (symbol.getDomNode());
-				attribute.setValue(symbolValue);
+		final XmlAnySimpleType symbol = state.getSymbol() != null ? state.getSymbol() : state.addNewSymbol();
+		final Attr attribute = (Attr) (symbol.getDomNode());
+		attribute.setValue(symbolValue);
 	}
 
 	private Logger log() {

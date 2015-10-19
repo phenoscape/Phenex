@@ -163,6 +163,7 @@ public class NeXMLReader {
 			newCharacter.setComment(this.getComment(standardChar));
 			newCharacter.setFigure(this.getFigure(standardChar));
 			newCharacter.setDiscussion(this.getDiscussion(standardChar));
+			newCharacter.setDenotes(this.getDenotes(standardChar));
 			final AbstractStates states = NeXMLUtil.findOrCreateStates(format, newCharacter.getStatesNexmlID());
 			if (states instanceof StandardStates) {
 				for (AbstractState abstractState : states.getStateArray()) {
@@ -372,6 +373,15 @@ public class NeXMLReader {
 	private String getDiscussion(Annotated node) {
 		final Object comment = NeXMLUtil.getFirstMetadataValue(node, NeXMLUtil.DISCUSSION_PREDICATE);
 		return stringOrNull(comment);
+	}
+	
+	private URI getDenotes(Annotated node) {
+		final String term = stringOrNull(NeXMLUtil.getFirstMetadataValue(node, NeXMLUtil.DENOTES_PREDICATE));
+		if (term != null) {
+			return URI.create(term);
+		} else {
+			return null;
+		}
 	}
 
 	private String getFigure(Annotated node) {

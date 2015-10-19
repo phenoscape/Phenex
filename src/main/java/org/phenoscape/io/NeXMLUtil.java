@@ -67,6 +67,8 @@ public class NeXMLUtil {
     public static final QName COMMENT_PREDICATE = new QName(RDFS_NAMESPACE, "comment", RDFS_PREFIX);
     
     public static final String OBO_NAMESPACE = "http://purl.obolibrary.org/obo/";
+    public static final String OBO_PREFIX = "obo";
+    public static final QName DENOTES_PREDICATE = new QName(OBO_NAMESPACE, "IAO_0000219", OBO_PREFIX);
 
     public static Taxa findOrCreateTaxa(NexmlDocument doc, String id) {
         for (Taxa taxaBlock : doc.getNexml().getOtusArray()) {

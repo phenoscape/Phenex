@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -299,6 +300,7 @@ public class NeXMLWriter {
 					existingChars, character.getNexmlID());
 			newCharacters.add(xmlChar);
 			xmlChar.setLabel(character.getLabel());
+			this.writeDenotes(xmlChar, character.getDenotes());
 			this.writeComment(xmlChar, character.getComment());
 			this.writeFigure(xmlChar, character.getFigure());
 			this.writeDiscussion(xmlChar, character.getDiscussion());
@@ -669,6 +671,15 @@ public class NeXMLWriter {
 			}
 			NeXMLUtil.addMetadata(annotatableOTU, NeXMLUtil.SPECIMEN_PREDICATE,
 					specimenData);
+		}
+	}
+
+	private void writeDenotes(Annotated node, URI term) {
+		final Annotatable annotatableNode = new Annotatable(node);
+		if (term == null) {
+			NeXMLUtil.unsetMetadata(annotatableNode, NeXMLUtil.DENOTES_PREDICATE);
+		} else {
+			NeXMLUtil.setMetadata(annotatableNode, NeXMLUtil.DENOTES_PREDICATE, term);
 		}
 	}
 

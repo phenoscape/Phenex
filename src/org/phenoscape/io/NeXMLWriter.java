@@ -99,13 +99,11 @@ public class NeXMLWriter {
 		this.options.setSavePrettyPrint();
 		final Map<String, String> suggestedPrefixes = new HashMap<String, String>();
 		suggestedPrefixes.put("http://www.nexml.org/2009", "");
-		suggestedPrefixes.put(NeXMLUtil.DARWIN_CORE_NAMESPACE,
-				NeXMLUtil.DARWIN_CORE_PREFIX);
-		suggestedPrefixes.put(NeXMLUtil.DUBLIN_CORE_NAMESPACE,
-				NeXMLUtil.DUBLIN_CORE_PREFIX);
-		suggestedPrefixes.put(NeXMLUtil.PHENOSCAPE_NAMESPACE,
-				NeXMLUtil.PHENOSCAPE_PREFIX);
+		suggestedPrefixes.put(NeXMLUtil.DARWIN_CORE_NAMESPACE, NeXMLUtil.DARWIN_CORE_PREFIX);
+		suggestedPrefixes.put(NeXMLUtil.DUBLIN_CORE_NAMESPACE, NeXMLUtil.DUBLIN_CORE_PREFIX);
+		suggestedPrefixes.put(NeXMLUtil.PHENOSCAPE_NAMESPACE, NeXMLUtil.PHENOSCAPE_PREFIX);
 		suggestedPrefixes.put(NeXMLUtil.RDFS_NAMESPACE, NeXMLUtil.RDFS_PREFIX);
+		suggestedPrefixes.put(NeXMLUtil.OBO_NAMESPACE, NeXMLUtil.OBO_PREFIX);
 		this.options.setSaveAggressiveNamespaces();
 		this.options.setSaveSuggestedPrefixes(suggestedPrefixes);
 		this.options.setSaveNamespacesFirst();
@@ -154,6 +152,7 @@ public class NeXMLWriter {
 			nexmlRoot.addNamespaceDeclaration(Namespace.getNamespace(NeXMLUtil.DUBLIN_CORE_PREFIX, NeXMLUtil.DUBLIN_CORE_NAMESPACE));
 			nexmlRoot.addNamespaceDeclaration(Namespace.getNamespace(NeXMLUtil.PHENOSCAPE_PREFIX, NeXMLUtil.PHENOSCAPE_NAMESPACE));
 			nexmlRoot.addNamespaceDeclaration(Namespace.getNamespace(NeXMLUtil.RDFS_PREFIX, NeXMLUtil.RDFS_NAMESPACE));
+			nexmlRoot.addNamespaceDeclaration(Namespace.getNamespace(NeXMLUtil.OBO_PREFIX, NeXMLUtil.OBO_NAMESPACE));
 			final Map<String, String> declaredNamespaceURIs = new HashMap<String, String>();
 			for (Namespace namespace : nexmlRoot.getNamespacesIntroduced()) {
 				declaredNamespaceURIs.put(namespace.getURI(), namespace.getPrefix());

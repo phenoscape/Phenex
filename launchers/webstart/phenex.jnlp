@@ -14,7 +14,7 @@
 	<offline-allowed />
 	<resources>
 		<!-- Application Resources -->
-		<java version="1.7+" max-heap-size="1g" />
+		<java version="1.8+" max-heap-size="8g" />
 		<jar href="phenex.jar" main="true" />
 		<jar href="lib/BrowserLauncher2-1.3.jar" />
 		<jar href="lib/antlr-runtime-3.0.jar" />

@@ -24,7 +24,6 @@ import org.jdesktop.swingworker.SwingWorker;
 import org.obo.annotation.base.UserOntologyConfiguration;
 import org.obo.annotation.view.LogViewComponentFactory;
 import org.obo.annotation.view.NativeDockingTheme;
-import org.obo.annotation.view.PhenoteOntologyTreeEditorFactory;
 import org.obo.annotation.view.SelectionBridge;
 import org.obo.annotation.view.TermInfoComponentFactory;
 import org.obo.app.swing.BlockingProgressDialog;
@@ -47,6 +46,7 @@ import org.phenoscape.view.PhenotypeProposalComponentFactory;
 import org.phenoscape.view.PhenotypeTableComponentFactory;
 import org.phenoscape.view.SpecimenTableComponentFactory;
 import org.phenoscape.view.StateSupportComponentFactory;
+import org.phenoscape.view.StateSupportInKBComponentFactory;
 import org.phenoscape.view.StateTableComponentFactory;
 import org.phenoscape.view.TaxonTableComponentFactory;
 
@@ -69,6 +69,7 @@ public class PhenexStartupTask extends DefaultGUIStartupTask {
 		factories.add(new AnnotationCheckerComponentFactory(this.controller));
 		factories.add(new ConsistencyReviewComponentFactory(this.controller));
 		factories.add(new StateSupportComponentFactory(this.controller));
+		factories.add(new StateSupportInKBComponentFactory(this.controller));
 		factories.add(new PhenotypeProposalComponentFactory(this.controller));
 		factories.add(new TaxonTableComponentFactory(this.controller));
 		factories.add(new SpecimenTableComponentFactory(this.controller));

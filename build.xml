@@ -15,9 +15,9 @@
 	<tstamp>
 		<format property="NOW" pattern="yyyy-MM-dd_HH:mm:ss" />
 	</tstamp>
-	<property name="phenex.version" value="1.16.4" />
+	<property name="phenex.version" value="1.17" />
 	<property name="phenex.build" value="${NOW}" />
-	<property name="java-minimum" value="1.7" />
+	<property name="java-minimum" value="1.8" />
 
 	<!-- The init target makes sure that the prerequisite directories exist. -->
 	<target name="init">

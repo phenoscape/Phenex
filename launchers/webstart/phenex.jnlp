@@ -49,7 +49,7 @@
 		<jar href="lib/httpmime-4.1.3.jar" />
 		<jar href="lib/idw-gpl.jar" />
 		<jar href="lib/jazzy-core.jar" />
-		<jar href="lib/jdom.jar" />
+		<jar href="lib/jdom-2.0.6.jar" />
 		<jar href="lib/jena.jar" />
 		<jar href="lib/jgrapht-jdk1.5.jar" />
 		<jar href="lib/jh.jar" />

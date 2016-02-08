@@ -33,11 +33,11 @@ public class TermRenderer extends PlaceholderRenderer {
 			final OBOObject term = (OBOObject)value;
 			this.setToolTipText(term.getID());
 			final Component component = super.getTableCellRendererComponent(table, (term.getName() != null ? term.getName() : term.getID()), isSelected, hasFocus, row, column);
-			if (this.isDangling(term)) {
+			if (isDangling(term)) {
 				component.setForeground(Color.BLUE);
 				this.setToolTipText("Dangling Term: " + term.getID());
 			}
-			if (this.isProvisional(term)) {
+			if (isProvisional(term)) {
 				component.setForeground(THE_COLOR_PURPLE);
 				this.setToolTipText("Provisional Term: " + term.getID());
 			}
@@ -52,16 +52,16 @@ public class TermRenderer extends PlaceholderRenderer {
 		}  
 	}
 
-	private boolean isDangling(OBOObject term) {
+	public static boolean isDangling(OBOObject term) {
 		if (OBOUtil.isPostCompTerm(term)) {
-			if (this.isDangling(OBOUtil.getGenusTerm((OBOClass)term))) {
+			if (isDangling(OBOUtil.getGenusTerm((OBOClass)term))) {
 				return true;
 			} else {
 				for (Link link : OBOUtil.getAllDifferentia((OBOClass)term)) {
 					final LinkedObject parent = link.getParent();
 					if (!(parent instanceof OBOClass)) continue;
 					final OBOClass differentium = (OBOClass)parent;
-					if (this.isDangling(differentium)) {
+					if (isDangling(differentium)) {
 						return true;
 					}
 				}
@@ -72,7 +72,7 @@ public class TermRenderer extends PlaceholderRenderer {
 		return false;
 	}
 
-	private boolean isProvisional(OBOObject term) {
+	public static boolean isProvisional(OBOObject term) {
 		if (term.getNamespace() != null) {
 			return term.getNamespace().equals(new Namespace("bioportal_provisional"));	
 		} else {

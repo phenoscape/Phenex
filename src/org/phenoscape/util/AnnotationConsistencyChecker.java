@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.obo.annotation.base.OBOUtil;
+import org.obo.annotation.view.TermRenderer;
 import org.obo.datamodel.Link;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
+import org.obo.datamodel.OBOObject;
 import org.obo.datamodel.OBOProperty;
 import org.obo.datamodel.OBOSession;
 import org.obo.datamodel.TermSubset;
@@ -79,18 +81,35 @@ public class AnnotationConsistencyChecker {
 			if (isPostCompositionWithMultipleDifferentiae(phenotype.getEntity())) {
 				issues.add(new ConsistencyIssue(character, state, "Entity post-composition used with more than one differentia (may be okay)."));
 			}
+			if (usesProvisionalTerm(phenotype.getEntity())) {
+				issues.add(new ConsistencyIssue(character, state, "References provisional term."));
+			}
+			if (TermRenderer.isDangling(phenotype.getEntity())) {
+				issues.add(new ConsistencyIssue(character, state, "References dangling term."));
+			}
 		}
 		if (phenotype.getQuality() == null) {
 			issues.add(new ConsistencyIssue(character, state, "No quality has been entered."));
-
 		} else {
 			if (isPostCompositionWithMultipleDifferentiae(phenotype.getQuality())) {
 				issues.add(new ConsistencyIssue(character, state, "Quality post-composition used with more than one differentia (may be okay)."));
+			}
+			if (usesProvisionalTerm(phenotype.getQuality())) {
+				issues.add(new ConsistencyIssue(character, state, "References provisional term."));
+			}
+			if (TermRenderer.isDangling(phenotype.getQuality())) {
+				issues.add(new ConsistencyIssue(character, state, "References dangling term."));
 			}
 		}
 		if (phenotype.getRelatedEntity() != null) {
 			if (isPostCompositionWithMultipleDifferentiae(phenotype.getRelatedEntity())) {
 				issues.add(new ConsistencyIssue(character, state, "Related entity post-composition used with more than one differentia (may be okay)."));
+			}
+			if (usesProvisionalTerm(phenotype.getRelatedEntity())) {
+				issues.add(new ConsistencyIssue(character, state, "References provisional term."));
+			}
+			if (TermRenderer.isDangling(phenotype.getRelatedEntity())) {
+				issues.add(new ConsistencyIssue(character, state, "References dangling term."));
 			}
 		}
 		if (relation_slim != null) {
@@ -145,6 +164,26 @@ public class AnnotationConsistencyChecker {
 			}
 		} else {
 			return false;
+		}
+	}
+	
+	
+	
+	
+	private boolean usesProvisionalTerm(OBOClass term) {
+		if (OBOUtil.isPostCompTerm(term)) {
+			if (TermRenderer.isProvisional(OBOUtil.getGenusTerm(term))) {
+				return true;
+			}
+			final List<Link> differentiae = OBOUtil.getAllDifferentia(term);
+			for (Link differentia : differentiae) {
+				if (differentia.getParent() instanceof OBOObject) {
+					return TermRenderer.isProvisional((OBOObject)(differentia.getParent()));
+				}
+			}
+			return false;
+		} else {
+			return TermRenderer.isProvisional(term);
 		}
 	}
 

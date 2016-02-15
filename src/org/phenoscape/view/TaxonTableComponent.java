@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.Comparator;
 
 import javax.swing.AbstractAction;
@@ -23,8 +24,11 @@ import org.obo.app.swing.BugWorkaroundTable;
 import org.obo.app.swing.PlaceholderRenderer;
 import org.obo.app.swing.SortDisabler;
 import org.obo.app.swing.TableColumnPrefsSaver;
+import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOObject;
+import org.obo.datamodel.PropertyValue;
+import org.obo.util.TermUtil;
 import org.phenoscape.controller.PhenexController;
 import org.phenoscape.model.Taxon;
 
@@ -149,11 +153,24 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
 		return toolBar;
 	}
 
+	private OBOObject getFamilyForTaxon(OBOClass taxon) {
+		final Collection<LinkedObject> ancestors = TermUtil.getisaAncestors(taxon, true);
+		for (LinkedObject ancestor : ancestors) {
+			for (PropertyValue value : ancestor.getPropertyValues()) {
+				if (value.getValue().equals("has_rank TAXRANK:0000004") && value.getProperty().equals("property_value")) {
+					return (OBOObject)ancestor;
+				}
+			}
+		}
+		return null;
+
+	}
+
 	private class TaxaTableFormat implements WritableTableFormat<Taxon>, AdvancedTableFormat<Taxon> {
 
 		@Override
 		public boolean isEditable(Taxon taxon, int column) {
-			return column != 0;
+			return column != 0 || column != 6;
 		}
 
 		@Override
@@ -165,13 +182,14 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
 			case 3: taxon.setComment(editedValue.toString()); break;
 			case 4: taxon.setMatrixTaxonName(editedValue.toString()); break;
 			case 5: taxon.setFigure(editedValue.toString()); break;
+			case 6: break;
 			}
 			return taxon;
 		}
 
 		@Override
 		public int getColumnCount() {
-			return 6;
+			return 7;
 		}
 
 		@Override
@@ -183,6 +201,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
 			case 3: return "Comment";
 			case 4: return "Matrix Taxon";
 			case 5: return "Figure";
+			case 6: return "Family";
 			default: return null;
 			}
 		}
@@ -196,6 +215,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
 			case 3: return taxon.getComment();
 			case 4: return taxon.getMatrixTaxonName();
 			case 5: return taxon.getFigure();
+			case 6: return taxon.getValidName() != null ? getFamilyForTaxon(taxon.getValidName()) : null;
 			default: return null;
 			}
 		}
@@ -209,6 +229,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
 			case 3: return String.class;
 			case 4: return String.class;
 			case 5: return String.class;
+			case 6: return OBOObject.class;
 			default: return null;
 			}
 		}
@@ -222,6 +243,7 @@ public class TaxonTableComponent extends PhenoscapeGUIComponent {
 			case 3: return Strings.getNaturalComparator();
 			case 4: return Strings.getNaturalComparator();
 			case 5: return Strings.getNaturalComparator();
+			case 6: return GlazedLists.comparableComparator();
 			default: return null;
 			}
 		}

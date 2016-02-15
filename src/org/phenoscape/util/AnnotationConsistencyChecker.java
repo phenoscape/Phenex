@@ -167,9 +167,6 @@ public class AnnotationConsistencyChecker {
 		}
 	}
 	
-	
-	
-	
 	private boolean usesProvisionalTerm(OBOClass term) {
 		if (OBOUtil.isPostCompTerm(term)) {
 			if (TermRenderer.isProvisional(OBOUtil.getGenusTerm(term))) {

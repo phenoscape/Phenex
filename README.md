@@ -18,6 +18,8 @@ Phenex source code can be used, modified, and distributed under the terms of the
 How to cite
 ===========
 
-If you use Phenex in your research, please cite the following publication: 
+If you use Phenex in your research, please cite the following publications: 
 
-Balhoff, James P., Wasila M. Dahdul, Cartik R. Kothari, Hilmar Lapp, John G. Lundberg, Paula Mabee, Peter E. Midford, Monte Westerfield, and Todd J. Vision. 2010. Phenex: Ontological Annotation of Phenotypic Diversity. PLoS ONE 5:e10500. http://dx.doi.org/10.1371/journal.pone.0010500.
+* Balhoff, James P., Wasila M. Dahdul, Cartik R. Kothari, Hilmar Lapp, John G. Lundberg, Paula Mabee, Peter E. Midford, Monte Westerfield, and Todd J. Vision. 2010. Phenex: Ontological Annotation of Phenotypic Diversity. PLoS ONE 5:e10500. http://dx.doi.org/10.1371/journal.pone.0010500.
+
+* Balhoff, James, Wasila Dahdul, T. Alexander Dececchi, Hilmar Lapp, Paula Mabee, and Todd Vision. 2014. “Annotation of Phenotypic Diversity: Decoupling Data Curation and Ontology Curation Using Phenex.” Journal of Biomedical Semantics 5 (1): 45. http://dx.doi.org/10.1186/2041-1480-5-45

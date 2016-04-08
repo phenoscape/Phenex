@@ -34,10 +34,16 @@ import name.pachler.nio.file.WatchEvent;
 import name.pachler.nio.file.WatchKey;
 import name.pachler.nio.file.WatchService;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.bbop.framework.GUIManager;
 import org.jdesktop.swingworker.SwingWorker;
+import org.json.JSONObject;
 import org.nexml.schema_2009.NexmlDocument;
 import org.obo.annotation.view.DefaultOntologyCoordinator;
 import org.obo.annotation.view.OntologyCoordinator;
@@ -47,6 +53,7 @@ import org.obo.app.controller.UserCancelledReadException;
 import org.obo.app.swing.ListSelectionMaintainer;
 import org.obo.app.util.EverythingEqualComparator;
 import org.obo.datamodel.LinkedObject;
+import org.obo.datamodel.OBOClass;
 import org.phenoscape.io.BioCreativeTabFormat;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.CharaparserEvaluationTabFormat;
@@ -68,7 +75,9 @@ import org.phenoscape.model.Taxon;
 import org.phenoscape.model.Tree;
 import org.phenoscape.model.UndoObserver;
 import org.phenoscape.orb.ORBController;
+import org.phenoscape.orb.ProvisionalTermRequestPanel;
 import org.phenoscape.util.DataMerger;
+import org.phenoscape.util.ProvisionalTermUtil;
 import org.phenoscape.util.TreeBuilder;
 
 import ca.odell.glazedlists.CollectionList;
@@ -283,11 +292,32 @@ public class PhenexController extends DocumentController {
 
 	@Override
 	public void writeData(File aFile) throws IOException {
+		System.out.println("start ~~~~~~~~~~");
+		System.out.println("writeData(" + aFile + ")");
 		final NeXMLWriter writer = new NeXMLWriter(this.charactersBlockID, this.xmlDoc);
 		writer.setDataSet(this.dataSet);
+		System.out.println("toString");
+		System.out.println(this.dataSet.toString());
+		System.out.println("characters");
+		System.out.println(this.dataSet.getCharacters());
+//		System.out.println(this.dataSet.getStateForTaxon(taxon, character));
+		System.out.println(this.dataSet.getTaxa());
+//		this.dataSet.addCharacter(new Character("test"));
+		System.out.println();
+		System.out.println("matrix data");
+		System.out.println(this.dataSet.getMatrixData());
+		for(String test: this.dataSet.getMatrixData().keySet()){
+			System.out.println("-");
+			System.out.println(test);
+			System.out.println(this.dataSet.getValue(test)); //Map<String, State>
+			
+		}
+		System.out.println("end ~~~~~~~~~~");
+		
 		writer.setGenerator(this.getAppName() + " " + this.getAppVersion());
 		this.monitorFileForChanges(null);
 		writer.write(aFile);
+		System.out.println(this.charactersBlockID);
 		this.monitorFileForChanges(this.getCurrentFile());
 	}
 
@@ -476,6 +506,30 @@ public class PhenexController extends DocumentController {
 		final Tree tree = new Tree();
 		tree.setTopology(topology);
 		this.dataSet.addTree(tree);
+	}
+	
+	public void fillEntities() {
+		System.out.println("fill entities");
+		System.out.println(this.dataSet.getCharacters());
+		System.out.println(this.dataSet.getCharacters().getPublisher());
+		System.out.println(this.dataSet.getTaxa());
+		
+//		final ProvisionalTermRequestPanel panel = new ProvisionalTermRequestPanel(this);
+//		panel.init();
+//		panel.setSize(400, 100);
+//		final int result = JOptionPane.showConfirmDialog(null, panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		final HttpPost post = new HttpPost(ProvisionalTermUtil.SERVICE);
+		post.setHeader(new BasicHeader("Content-Type", "application/json"));
+		post.setHeader(new BasicHeader("Authorization", "apikey token=" + ProvisionalTermUtil.getAPIKey()));
+//		post.setEntity(this.createPostEntity(term));
+//		final DefaultHttpClient client = new DefaultHttpClient();
+//		final HttpResponse response = new DefaultHttpClient().execute(post);
+//		client.getConnectionManager().shutdown();
+//		final JSONObject json = new JSONObject(IOUtils.toString(response.getEntity().getContent(), "utf-8"));
+//		final OBOClass newTerm = ProvisionalTermUtil.createClassForProvisionalTerm(json, session);
+//		session.addObject(newTerm);
+	
+//		this.orbController.runORBTermRequest();
 	}
 
 	public void setSelectedMatrixCell(MatrixCell cell) {

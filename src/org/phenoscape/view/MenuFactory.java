@@ -76,7 +76,7 @@ public class MenuFactory {
 		menu.add(new JMenuItem(saveAction));
 		final Action saveAsAction = new AbstractAction("Save As...") {
 			@Override
-			public void actionPerformed(ActionEvent e) { controller.saveAs(); }
+			public void actionPerformed(ActionEvent e) { System.out.println(controller); controller.saveAs(); }
 		};
 		saveAsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK));
 		menu.add(new JMenuItem(saveAsAction));
@@ -149,7 +149,12 @@ public class MenuFactory {
 			@Override
 			public void actionPerformed(ActionEvent e) { controller.generateTree(); }
 		};
+		final Action fillEntities = new AbstractAction("Auto-fill Entities") {
+			@Override
+			public void actionPerformed(ActionEvent e) { controller.fillEntities(); }
+		};
 		menu.add(new JMenuItem(generateTreeAction));
+		menu.add(new JMenuItem(fillEntities));
 		return menu;
 	}
 

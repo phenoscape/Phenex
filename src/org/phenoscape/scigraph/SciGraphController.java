@@ -1,4 +1,4 @@
-package org.phenoscape.orb;
+package org.phenoscape.scigraph;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -25,11 +25,11 @@ import org.phenoscape.controller.PhenexController;
 import org.phenoscape.util.ProvisionalTermUtil;
 import org.xml.sax.SAXException;
 
-public class ORBController {
+public class SciGraphController {
 
 	private final PhenexController controller;
 
-	public ORBController(PhenexController controller) {
+	public SciGraphController(PhenexController controller) {
 		this.controller = controller;
 	}
 

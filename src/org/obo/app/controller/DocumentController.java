@@ -114,6 +114,7 @@ public abstract class DocumentController {
 	}
 
 	public void saveAs() {
+		System.out.println("START SAVE =================");
 		final JFileChooser fileChooser = this.createFileChooser();
 		final int result = fileChooser.showSaveDialog(this.getWindow());
 		if (result == JFileChooser.APPROVE_OPTION) {
@@ -141,6 +142,8 @@ public abstract class DocumentController {
 				this.runFileWriteErrorMessage(file, e.getLocalizedMessage());
 			}
 		}
+		System.out.println("END SAVE =======================");
+
 	}
 
 	public File getCurrentFile() {

@@ -24,6 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+import javax.xml.parsers.ParserConfigurationException;
 
 import name.pachler.nio.file.ClosedWatchServiceException;
 import name.pachler.nio.file.FileSystems;
@@ -36,6 +37,7 @@ import name.pachler.nio.file.WatchService;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
@@ -54,6 +56,8 @@ import org.obo.app.swing.ListSelectionMaintainer;
 import org.obo.app.util.EverythingEqualComparator;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
+import org.obo.datamodel.OBOSession;
+import org.obo.datamodel.impl.OBOClassImpl;
 import org.phenoscape.io.BioCreativeTabFormat;
 import org.phenoscape.io.CharacterTabReader;
 import org.phenoscape.io.CharaparserEvaluationTabFormat;
@@ -79,6 +83,7 @@ import org.phenoscape.orb.ProvisionalTermRequestPanel;
 import org.phenoscape.util.DataMerger;
 import org.phenoscape.util.ProvisionalTermUtil;
 import org.phenoscape.util.TreeBuilder;
+import org.xml.sax.SAXException;
 
 import ca.odell.glazedlists.CollectionList;
 import ca.odell.glazedlists.SortedList;
@@ -218,6 +223,7 @@ public class PhenexController extends DocumentController {
 	}
 
 	private void readNeXML(File aFile) throws XmlException, IOException {
+		System.out.println("PhenexController.readneXML()" + aFile);
 		final NeXMLReader reader = new NeXMLReader(aFile, this.getOntologyController().getOBOSession());
 		if (reader.didCreateDanglers()) {
 			final boolean result = this.runDanglerAlert(aFile, reader.getDanglersList());
@@ -241,6 +247,22 @@ public class PhenexController extends DocumentController {
 		this.charactersBlockID = reader.getCharactersBlockID();
 		this.dataSet.getCharacters().clear(); //TODO this is not well encapsulated
 		this.dataSet.getCharacters().addAll(reader.getDataSet().getCharacters());
+//		System.out.println("characters");
+//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates());
+//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getLabel()); //15-18
+//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getSymbol());
+////		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getEntity());
+////		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getQuality());
+////		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getRelatedEntity());
+////		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getComment());
+////		System.out.println(reader.getDataSet().getCharacters().get(5).getStates().get(0).getPhenotypes());
+//		System.out.println("=========");
+//		OBOClass term = new OBOClassImpl("FAKE:42");
+////		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).setEntity(term);
+//		Phenotype phenotype = new Phenotype();
+//		phenotype.setEntity(term);
+//		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().add(phenotype);
+
 		this.getDataSet().getTaxa().clear(); //TODO this is not well encapsulated
 		this.getDataSet().getTaxa().addAll(reader.getDataSet().getTaxa());
 		this.getDataSet().getTrees().clear(); //TODO this is not well encapsulated
@@ -254,10 +276,17 @@ public class PhenexController extends DocumentController {
 		this.getDataSet().setMatrixData(reader.getDataSet().getMatrixData());
 		this.getDataSet().getAssociationSupport().clear();
 		this.getDataSet().getAssociationSupport().putAll(reader.getDataSet().getAssociationSupport());
+		
+//		System.out.println(reader.getDataSet().getTaxa());
+//		System.out.println(reader.getDataSet().getTaxa().get(0).getPublicationName());
+//		OBOClass term = new OBOClassImpl("test");
+//		reader.getDataSet().getTaxa().get(0).setValidName(term);
+		
 		this.fireDataChanged();
 	}
 
 	private void readNeXML_1_0(File aFile) throws IOException {
+		System.out.println("PhenexController.readneXML_1_0()" + aFile);
 		try {
 			final NeXMLReader_1_0 reader = new NeXMLReader_1_0(aFile, this.getOntologyController().getOBOSession());
 			if (reader.didCreateDanglers()) {
@@ -296,24 +325,26 @@ public class PhenexController extends DocumentController {
 		System.out.println("writeData(" + aFile + ")");
 		final NeXMLWriter writer = new NeXMLWriter(this.charactersBlockID, this.xmlDoc);
 		writer.setDataSet(this.dataSet);
-		System.out.println("toString");
-		System.out.println(this.dataSet.toString());
-		System.out.println("characters");
-		System.out.println(this.dataSet.getCharacters());
-//		System.out.println(this.dataSet.getStateForTaxon(taxon, character));
-		System.out.println(this.dataSet.getTaxa());
-//		this.dataSet.addCharacter(new Character("test"));
-		System.out.println();
-		System.out.println("matrix data");
-		System.out.println(this.dataSet.getMatrixData());
-		for(String test: this.dataSet.getMatrixData().keySet()){
-			System.out.println("-");
-			System.out.println(test);
-			System.out.println(this.dataSet.getValue(test)); //Map<String, State>
-			
-		}
-		System.out.println("end ~~~~~~~~~~");
-		
+//		System.out.println("toString");
+//		System.out.println(this.dataSet.toString());
+//		System.out.println("characters");
+//		System.out.println(this.dataSet.getCharacters());
+////		System.out.println(this.dataSet.getStateForTaxon(taxon, character));
+//		System.out.println(this.dataSet.getTaxa());
+//		
+//
+////		this.dataSet.addCharacter(new Character("test"));
+//		System.out.println();
+//		System.out.println("matrix data");
+//		System.out.println(this.dataSet.getMatrixData());
+//		for(String test: this.dataSet.getMatrixData().keySet()){
+//			System.out.println("-");
+//			System.out.println(test);
+//			System.out.println(this.dataSet.getValue(test)); //Map<String, State>
+//			
+//		}
+//		System.out.println("end ~~~~~~~~~~");
+//		
 		writer.setGenerator(this.getAppName() + " " + this.getAppVersion());
 		this.monitorFileForChanges(null);
 		writer.write(aFile);
@@ -500,6 +531,10 @@ public class PhenexController extends DocumentController {
 		//       final int result = JOptionPane.showConfirmDialog(this.getWindow(), panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
 	}
+	
+	public Map<String, String> runSciGraphRequest(){
+		return this.orbController.runSciGraphRequest();
+	}
 
 	public void generateTree() {
 		final Map<LinkedObject, LinkedObject> topology = TreeBuilder.buildTree(this.dataSet, this.getOntologyController().getOBOSession());
@@ -509,28 +544,79 @@ public class PhenexController extends DocumentController {
 	}
 	
 	public void fillEntities() {
-		System.out.println("fill entities");
-		System.out.println(this.dataSet.getCharacters());
-		System.out.println(this.dataSet.getCharacters().getPublisher());
-		System.out.println(this.dataSet.getTaxa());
+//		System.out.println("PhenexController.fillEntities()");
+//		System.out.println("getChar");
+//		System.out.println(this.dataSet.getCharacters());
+////		System.out.println("getPub");
+////		System.out.println(this.dataSet.getCharacters().getPublisher());
+//		System.out.println("getTaxa");
+//		System.out.println(this.dataSet.getTaxa());
+//		System.out.println(this.dataSet.getCurators());
+//		System.out.println(this.dataSet.getPublicationNotes());
+//		System.out.println(this.dataSet.getPublicationLabel());
+//		System.out.println(this.dataSet.toString());
+//		System.out.println(this.dataSet.getTaxa());
+//		System.out.println(this.dataSet.getPublicationURI());
+//		System.out.println(this.dataSet.getTrees());
+//		
+//		System.out.println("data Matrix");
+//		Map<String, Map<String, State>> dataMatrix = this.dataSet.getMatrixData();
+//		for(String key: dataMatrix.keySet()){
+//			Map<String, State> value = dataMatrix.get(key);
+//			for(String s: value.keySet()){
+//				System.out.println(s);
+//			}
+//		}
+		
+		System.out.println("characters");
+		System.out.println(this.dataSet.getCharacters().get(0).getStates());
+		System.out.println(this.dataSet.getCharacters().get(0).getStates().get(0).getLabel()); //15-18
+		System.out.println(this.dataSet.getCharacters().get(0).getStates().get(0).getSymbol());
+//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getEntity());
+//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getQuality());
+//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getRelatedEntity());
+//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getComment());
+//		System.out.println(reader.getDataSet().getCharacters().get(5).getStates().get(0).getPhenotypes());
+		System.out.println("=========");
+		OBOClass term = new OBOClassImpl("FAKE:42");
+//		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).setEntity(term);
+		Phenotype phenotype2 = new Phenotype();
+		phenotype2.setEntity(term);
+		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().add(phenotype2);
+		
+		System.out.println(this.dataSet.getTaxa().get(0));
 		
 //		final ProvisionalTermRequestPanel panel = new ProvisionalTermRequestPanel(this);
 //		panel.init();
 //		panel.setSize(400, 100);
 //		final int result = JOptionPane.showConfirmDialog(null, panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		final HttpPost post = new HttpPost(ProvisionalTermUtil.SERVICE);
-		post.setHeader(new BasicHeader("Content-Type", "application/json"));
-		post.setHeader(new BasicHeader("Authorization", "apikey token=" + ProvisionalTermUtil.getAPIKey()));
+		
 //		post.setEntity(this.createPostEntity(term));
-//		final DefaultHttpClient client = new DefaultHttpClient();
-//		final HttpResponse response = new DefaultHttpClient().execute(post);
+		
 //		client.getConnectionManager().shutdown();
 //		final JSONObject json = new JSONObject(IOUtils.toString(response.getEntity().getContent(), "utf-8"));
 //		final OBOClass newTerm = ProvisionalTermUtil.createClassForProvisionalTerm(json, session);
 //		session.addObject(newTerm);
 	
-//		this.orbController.runORBTermRequest();
+		Map<String, String> result = runSciGraphRequest();
+		for(String key: result.keySet()){
+			Phenotype phenotype = new Phenotype();
+			
+			OBOClass entity = new OBOClassImpl(key);
+			phenotype.setEntity(entity);
+			if(result.get(key) == null){
+				System.out.println("set quality");
+				OBOClass quality = new OBOClassImpl(result.get(key));
+				phenotype.setQuality(quality);
+			}
+			this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().add(phenotype);
+			
+			
+		}
+
 	}
+
+
 
 	public void setSelectedMatrixCell(MatrixCell cell) {
 		this.selectedCell = cell;

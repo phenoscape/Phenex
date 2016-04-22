@@ -105,10 +105,10 @@ public class ORBController {
 	
 	//TODO: move this to a new class SciGraph Controller
 
-	public Map<String, String> runSciGraphRequest(){
-		Map<String, String> returnedRequest = null;
+	public SciGraphResponse runSciGraphRequest(String req){
+		SciGraphResponse returnedRequest = null;
 		try {
-			returnedRequest = this.sciGraphRequest();
+			returnedRequest = this.sciGraphRequest(req);
 		} catch (IOException | URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -116,32 +116,24 @@ public class ORBController {
 		return returnedRequest;
 	}
 	
-	//TODO: pass in list of values and then populate
 	
-	private Map<String, String> sciGraphRequest() throws ClientProtocolException, IOException, URISyntaxException{
+	//TODO: pass in list of values and then populate	
+	private SciGraphResponse sciGraphRequest(String param) throws ClientProtocolException, IOException, URISyntaxException{
 		final String url = "http://kb.phenoscape.org/scigraph/annotations/entities"; //json return object instead of HTML
 		System.out.println("sciGraphRequest()");
 		
-		final OBOSession session = this.controller.getOntologyController().getOBOSession();
+//		final OBOSession session = this.controller.getOntologyController().getOBOSession();
 		List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-		params.add(new BasicNameValuePair( "content", "Lateral ethmoid" ) );
+		params.add(new BasicNameValuePair( "content", param ) );
 		URI uri = new URI(url + "?" + URLEncodedUtils.format( params, "utf-8" ));
 		System.out.println(uri);
 		final HttpGet request = new HttpGet(uri);//ProvisionalTermUtil.SERVICE);
-		
-//		String url = "http://example.com";
-//		URI uri = new URI( url + "?" + URLEncodedUtils.format( params, "utf-8" );
-//		
-//		request.setParams(new BasicNameValuePair("content", "Lateral+ethmoid"));
-//		System.out.println(request);
-//		System.out.println(request.getURI());
-//		System.out.println();
+
+		System.out.println("requestLine");
 		System.out.println(request.getRequestLine());
 		
 		final DefaultHttpClient client = new DefaultHttpClient();
 		final HttpResponse response = new DefaultHttpClient().execute(request);
-		
-		
 		
 //		System.out.println(response.getEntity().getContent());
 //		System.out.println(response.getParams());
@@ -149,77 +141,57 @@ public class ORBController {
 
 		System.out.println("testtest");
 		
-		Map<String, ArrayList<String>> categoryMap = new HashMap<String, ArrayList<String>>();
-		Map<String, ArrayList<String>> termMap = new HashMap<String, ArrayList<String>>();
+//		Map<String, ArrayList<String>> categoryMap = new HashMap<String, ArrayList<String>>();
+//		Map<String, ArrayList<String>> termMap = new HashMap<String, ArrayList<String>>();
 		
 		//1-1 mapping TODO: make into a map of term to category
 //		List<String> categoryList = new ArrayList<String>();
 //		List<String> termMap = new ArrayList<String>();
 		
-		Map<String, String> termToCategory = new HashMap<String, String>();
+//		Map<String, String> termToID = new HashMap<String, String>();
+//		Map<String, ArrayList<String>> IDToTerm = new HashMap<String, ArrayList<String>>();
+		
+		List<String> qualityList = new ArrayList<String>();
+		List<String> entityList = new ArrayList<String>();
 
 		JSONArray responseJSON = new JSONArray(json);
 		for(int i = 0; i < responseJSON.length(); i++){ 
 			JSONObject jsonObj = (JSONObject) responseJSON.get(i);
 			JSONObject tokenObj = jsonObj.getJSONObject("token");
 
-			JSONArray categories = tokenObj.getJSONArray("categories");
+			//TODO: this map length doesn't line up 
+			
+			String id = tokenObj.getString("id");
 			JSONArray terms = tokenObj.getJSONArray("terms");
 			
-			System.out.println(categories.length());
-			System.out.println(terms.length());
-
-			
-			for (int j = 0; j < terms.length(); j++){ //TODO; Categories and terms have a 1-1 mapping (although categories sometimes is blank?)
-				String cat = null;
-				if (categories.length() > 0)
-					 cat = (String) categories.get(j);
-				String term = (String) terms.get(j);
-
-//				System.out.println(cat);
-//				System.out.println(term);
-				termToCategory.put(term, cat);
-				//termToCategory.put
+			String prefix = id.substring(0,id.indexOf(":"));
+			if (prefix.equals("UBERON") || prefix.equals("http") || prefix.equals("VTO")){
+				for (int j = 0; j < terms.length(); j++){ //TODO; Categories and terms have a 1-1 mapping (although categories sometimes is blank?)
+					String term = (String) terms.get(j);
+					entityList.add(term);
+				}
 			}
-//			for (int j = 0; i < terms.length(); j++){
-//				System.out.println(term);
-//			}
+			else if(prefix.equals("PATO") || prefix.equals("BSPO") || prefix.equals("RO")){
+				for (int j = 0; j < terms.length(); j++){ //TODO; Categories and terms have a 1-1 mapping (although categories sometimes is blank?)
+					String term = (String) terms.get(j);
+					qualityList.add(term);
+				}
+			}
+			else{
+				System.out.println("LILA " + prefix);
+			}
 		}
-		System.out.println("testtest");
-		System.out.println(termToCategory);
 		
-//		Iterator itr = responseJSON.keys();
-//
-//		System.out.println("key");
-//		while (itr.hasNext()){
-//			System.out.println("==");
-//		    String key = (String) itr.next();
-//		    System.out.println(key);
-//		    System.out.println(responseJSON.get(key));
-//		}
-
-//		JSONArray rsp = new JSONArray(responseJSON);
-//		System.out.println(rsp);
-//		JSONArray jsonArray = responseJSON.getJSONArray("");
-//		for(int i = 0; i < jsonArray.length(); i++){
-//			jsonArray.get(i);
-//			
-//		}
-//		System.out.println("arrll");
-//		System.out.println(jsonArray);
-//		responseJSON.get
-//		responseJSON.
-
-//		System.out.println(responseJSON);
-//		System.out.println(json);
-
-		//http://kb.phenoscape.org/scigraph/annotations/entities
-		//?content=Lateral+ethmoid&minLength=4
+		System.out.println(entityList);
+		System.out.println(qualityList);
+		SciGraphResponse packagedResponse = new SciGraphResponse(entityList, qualityList);
 		
+		//Package lists
+		//TODO: perhaps make an object or a better data structure
+//		Map<List<String>, List<String>> packagedLists = new HashMap<List<String>, List<String>>();
+//		packagedLists.put(entityList,  qualityList);
 		
-		//TODO: lateral side in categories does not show up, probably because categories is empty
-
-		return termToCategory;
+		return packagedResponse;
 	}
 
 	private HttpEntity createPostEntity(ORBTerm term) throws UnsupportedEncodingException {

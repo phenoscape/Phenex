@@ -52,6 +52,7 @@ import org.obo.annotation.view.OntologyCoordinator;
 import org.obo.annotation.view.SelectionManager;
 import org.obo.app.controller.DocumentController;
 import org.obo.app.controller.UserCancelledReadException;
+import org.obo.app.model.ObservableEventList;
 import org.obo.app.swing.ListSelectionMaintainer;
 import org.obo.app.util.EverythingEqualComparator;
 import org.obo.datamodel.LinkedObject;
@@ -80,6 +81,7 @@ import org.phenoscape.model.Tree;
 import org.phenoscape.model.UndoObserver;
 import org.phenoscape.orb.ORBController;
 import org.phenoscape.orb.ProvisionalTermRequestPanel;
+import org.phenoscape.orb.SciGraphResponse;
 import org.phenoscape.util.DataMerger;
 import org.phenoscape.util.ProvisionalTermUtil;
 import org.phenoscape.util.TreeBuilder;
@@ -247,22 +249,6 @@ public class PhenexController extends DocumentController {
 		this.charactersBlockID = reader.getCharactersBlockID();
 		this.dataSet.getCharacters().clear(); //TODO this is not well encapsulated
 		this.dataSet.getCharacters().addAll(reader.getDataSet().getCharacters());
-//		System.out.println("characters");
-//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates());
-//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getLabel()); //15-18
-//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getSymbol());
-////		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getEntity());
-////		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getQuality());
-////		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getRelatedEntity());
-////		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getComment());
-////		System.out.println(reader.getDataSet().getCharacters().get(5).getStates().get(0).getPhenotypes());
-//		System.out.println("=========");
-//		OBOClass term = new OBOClassImpl("FAKE:42");
-////		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).setEntity(term);
-//		Phenotype phenotype = new Phenotype();
-//		phenotype.setEntity(term);
-//		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().add(phenotype);
-
 		this.getDataSet().getTaxa().clear(); //TODO this is not well encapsulated
 		this.getDataSet().getTaxa().addAll(reader.getDataSet().getTaxa());
 		this.getDataSet().getTrees().clear(); //TODO this is not well encapsulated
@@ -279,8 +265,7 @@ public class PhenexController extends DocumentController {
 		
 //		System.out.println(reader.getDataSet().getTaxa());
 //		System.out.println(reader.getDataSet().getTaxa().get(0).getPublicationName());
-//		OBOClass term = new OBOClassImpl("test");
-//		reader.getDataSet().getTaxa().get(0).setValidName(term);
+
 		
 		this.fireDataChanged();
 	}
@@ -532,9 +517,57 @@ public class PhenexController extends DocumentController {
 
 	}
 	
-	public Map<String, String> runSciGraphRequest(){
-		return this.orbController.runSciGraphRequest();
+	private void runSciGraphRequest(ObservableEventList<Character> characterList, ObservableEventList<Taxon> taxonList){		
+		System.out.println("lilalilalila");
+		
+		// auto-fill characters
+		for(int i = 0; i < characterList.size(); i++){
+			String character = characterList.get(i).toString();
+			ObservableEventList<State> states = characterList.get(i).getStates();
+			for(int j = 0; j < states.size(); j++){
+				String request = character + " " + states.get(j).getLabel();
+				SciGraphResponse response = this.orbController.runSciGraphRequest(request);
+				updateCharacterEntityWithResponse(response, i, j);
+			}
+		}
+		
+		//auto-fill taxons
+		for(int i = 0; i < taxonList.size(); i++){
+			System.out.println("autofilltaxon request" + i);
+			String request = taxonList.get(i).getPublicationName().toString();
+			System.out.println(request);
+			SciGraphResponse response = this.orbController.runSciGraphRequest(request);
+			List<String> list = response.getEntityList();
+			System.out.println("autofilltaxonlist");
+			System.out.println(list);
+			System.out.println(response.getQualityList());
+			for(int j = 0; j < list.size(); j++){
+				//TODO: currently only taking first result. 
+				OBOClass term = new OBOClassImpl(list.get(j));
+				if(j == 0){
+					taxonList.get(i).setValidName(term);
+					break; //TODO
+				}
+			}
+		}
 	}
+	
+	private void updateCharacterEntityWithResponse(SciGraphResponse response, int characterIndex, int stateIndex){
+		List<String> qList = response.getQualityList();
+		List<String> eList = response.getEntityList();
+		
+		for (String e: eList){
+			for (String q: qList){
+				Phenotype phenotype = new Phenotype();
+				OBOClass entity = new OBOClassImpl(e);
+				phenotype.setEntity(entity);
+				OBOClass quality = new OBOClassImpl(q);
+				phenotype.setQuality(quality);
+				this.dataSet.getCharacters().get(characterIndex).getStates().get(stateIndex).getPhenotypes().add(phenotype);
+			}
+		}
+	}
+	
 
 	public void generateTree() {
 		final Map<LinkedObject, LinkedObject> topology = TreeBuilder.buildTree(this.dataSet, this.getOntologyController().getOBOSession());
@@ -578,11 +611,11 @@ public class PhenexController extends DocumentController {
 //		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getComment());
 //		System.out.println(reader.getDataSet().getCharacters().get(5).getStates().get(0).getPhenotypes());
 		System.out.println("=========");
-		OBOClass term = new OBOClassImpl("FAKE:42");
+//		OBOClass term = new OBOClassImpl("FAKE:42");
 //		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).setEntity(term);
-		Phenotype phenotype2 = new Phenotype();
-		phenotype2.setEntity(term);
-		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().add(phenotype2);
+//		Phenotype phenotype2 = new Phenotype();
+//		phenotype2.setEntity(term);
+//		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().add(phenotype2);
 		
 		System.out.println(this.dataSet.getTaxa().get(0));
 		
@@ -598,21 +631,25 @@ public class PhenexController extends DocumentController {
 //		final OBOClass newTerm = ProvisionalTermUtil.createClassForProvisionalTerm(json, session);
 //		session.addObject(newTerm);
 	
-		Map<String, String> result = runSciGraphRequest();
-		for(String key: result.keySet()){
-			Phenotype phenotype = new Phenotype();
-			
-			OBOClass entity = new OBOClassImpl(key);
-			phenotype.setEntity(entity);
-			if(result.get(key) == null){
-				System.out.println("set quality");
-				OBOClass quality = new OBOClassImpl(result.get(key));
-				phenotype.setQuality(quality);
-			}
-			this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().add(phenotype);
-			
-			
-		}
+		runSciGraphRequest(this.dataSet.getCharacters(), this.dataSet.getTaxa());
+		
+		
+		
+		
+//		for(String key: result.keySet()){
+//			Phenotype phenotype = new Phenotype();
+//			
+//			OBOClass entity = new OBOClassImpl(key);
+//			phenotype.setEntity(entity);
+//			if(result.get(key) == null){
+//				System.out.println("set quality");
+//				OBOClass quality = new OBOClassImpl(result.get(key));
+//				phenotype.setQuality(quality);
+//			}
+//			this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().add(phenotype);
+//			
+//			
+//		}
 
 	}
 

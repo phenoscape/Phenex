@@ -1,4 +1,4 @@
-package org.phenoscape.orb;
+package org.phenoscape.scigraph;
 
 import java.util.List;
 

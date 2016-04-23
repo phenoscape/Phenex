@@ -81,7 +81,8 @@ import org.phenoscape.model.Tree;
 import org.phenoscape.model.UndoObserver;
 import org.phenoscape.orb.ORBController;
 import org.phenoscape.orb.ProvisionalTermRequestPanel;
-import org.phenoscape.orb.SciGraphResponse;
+import org.phenoscape.scigraph.SciGraphController;
+import org.phenoscape.scigraph.SciGraphResponse;
 import org.phenoscape.util.DataMerger;
 import org.phenoscape.util.ProvisionalTermUtil;
 import org.phenoscape.util.TreeBuilder;
@@ -95,6 +96,7 @@ public class PhenexController extends DocumentController {
 
 	private final OntologyController ontologyController;
 	private final ORBController orbController;
+	private final SciGraphController sciGraphController;
 	private final DataSet dataSet = new DataSet();
 	private final SortedList<Character> sortedCharacters;
 	private final EventSelectionModel<Character> charactersSelectionModel;
@@ -115,13 +117,18 @@ public class PhenexController extends DocumentController {
 	private final SelectionManager phenoteSelectionManager;
 	private SwingWorker<WatchEvent<?>, Void> fileMonitor;
 	private MatrixCell selectedCell;
+	
+//	private static final CHARACTER_REQUEST = true;
+//	private static final CHARACTER_REQUEST = true;
 
 	public PhenexController(OntologyController ontologyController) {
 		super();
 		this.phenoteSelectionManager = new org.obo.annotation.view.SelectionManager();
 		this.ontologyController = ontologyController;
 		this.orbController = new ORBController(this);
-		this.sortedCharacters = new SortedList<Character>(this.dataSet.getCharacters(), new EverythingEqualComparator<Character>());
+		this.sciGraphController = new SciGraphController(this);
+		this.sortedCharacters = new SortedList<Character>(this.dataSet.getCharacters(),
+				new EverythingEqualComparator<Character>());
 		this.charactersSelectionModel = new EventSelectionModel<Character>(this.sortedCharacters);
 		new ListSelectionMaintainer<Character>(this.sortedCharacters, this.charactersSelectionModel);
 		this.charactersSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -129,35 +136,32 @@ public class PhenexController extends DocumentController {
 		this.taxaSelectionModel = new EventSelectionModel<Taxon>(this.sortedTaxa);
 		new ListSelectionMaintainer<Taxon>(this.sortedTaxa, this.taxaSelectionModel);
 		this.taxaSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		this.currentSpecimens = new SortedList<Specimen>(new CollectionList<Taxon, Specimen>(this.taxaSelectionModel.getSelected(),
-				new CollectionList.Model<Taxon, Specimen>(){
-			@Override
-			public List<Specimen> getChildren(Taxon parent) {
-				return parent.getSpecimens();
-			}
-		} 
-				), new EverythingEqualComparator<Specimen>());
+		this.currentSpecimens = new SortedList<Specimen>(new CollectionList<Taxon, Specimen>(
+				this.taxaSelectionModel.getSelected(), new CollectionList.Model<Taxon, Specimen>() {
+					@Override
+					public List<Specimen> getChildren(Taxon parent) {
+						return parent.getSpecimens();
+					}
+				}), new EverythingEqualComparator<Specimen>());
 		this.currentSpecimensSelectionModel = new EventSelectionModel<Specimen>(this.currentSpecimens);
 		new ListSelectionMaintainer<Specimen>(this.currentSpecimens, this.currentSpecimensSelectionModel);
-		this.currentStates = new SortedList<State>(new CollectionList<Character, State>(this.charactersSelectionModel.getSelected(),
-				new CollectionList.Model<Character, State>() {
-			@Override
-			public List<State> getChildren(Character parent) {
-				return parent.getStates();
-			}
-		}
-				), new EverythingEqualComparator<State>());
+		this.currentStates = new SortedList<State>(new CollectionList<Character, State>(
+				this.charactersSelectionModel.getSelected(), new CollectionList.Model<Character, State>() {
+					@Override
+					public List<State> getChildren(Character parent) {
+						return parent.getStates();
+					}
+				}), new EverythingEqualComparator<State>());
 		this.currentStatesSelectionModel = new EventSelectionModel<State>(this.currentStates);
 		new ListSelectionMaintainer<State>(this.currentStates, this.currentStatesSelectionModel);
 		this.currentStatesSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		this.currentPhenotypes = new SortedList<Phenotype>(new CollectionList<State, Phenotype>(this.currentStatesSelectionModel.getSelected(),
-				new CollectionList.Model<State, Phenotype>() {
-			@Override
-			public List<Phenotype> getChildren(State parent) {
-				return parent.getPhenotypes();
-			}
-		}
-				), new EverythingEqualComparator<Phenotype>());
+		this.currentPhenotypes = new SortedList<Phenotype>(new CollectionList<State, Phenotype>(
+				this.currentStatesSelectionModel.getSelected(), new CollectionList.Model<State, Phenotype>() {
+					@Override
+					public List<Phenotype> getChildren(State parent) {
+						return parent.getPhenotypes();
+					}
+				}), new EverythingEqualComparator<Phenotype>());
 		this.currentPhenotypesSelectionModel = new EventSelectionModel<Phenotype>(this.currentPhenotypes);
 		new ListSelectionMaintainer<Phenotype>(this.currentPhenotypes, this.currentPhenotypesSelectionModel);
 		this.currentPhenotypesSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -220,7 +224,7 @@ public class PhenexController extends DocumentController {
 		} catch (XmlException e) {
 			log().info("File not valid NeXML 2009, trying previous schema", e);
 			this.readNeXML_1_0(aFile);
-			//TODO should warn user that file format will be upgraded upon save
+			// TODO should warn user that file format will be upgraded upon save
 		}
 	}
 
@@ -247,11 +251,14 @@ public class PhenexController extends DocumentController {
 		}
 		this.xmlDoc = reader.getXMLDoc();
 		this.charactersBlockID = reader.getCharactersBlockID();
-		this.dataSet.getCharacters().clear(); //TODO this is not well encapsulated
+		this.dataSet.getCharacters().clear(); // TODO this is not well
+												// encapsulated
 		this.dataSet.getCharacters().addAll(reader.getDataSet().getCharacters());
-		this.getDataSet().getTaxa().clear(); //TODO this is not well encapsulated
+		this.getDataSet().getTaxa().clear(); // TODO this is not well
+												// encapsulated
 		this.getDataSet().getTaxa().addAll(reader.getDataSet().getTaxa());
-		this.getDataSet().getTrees().clear(); //TODO this is not well encapsulated
+		this.getDataSet().getTrees().clear(); // TODO this is not well
+												// encapsulated
 		this.getDataSet().getTrees().addAll(reader.getDataSet().getTrees());
 		this.getDataSet().setCurators(reader.getDataSet().getCurators());
 		this.getDataSet().setPublication(reader.getDataSet().getPublication());
@@ -262,11 +269,10 @@ public class PhenexController extends DocumentController {
 		this.getDataSet().setMatrixData(reader.getDataSet().getMatrixData());
 		this.getDataSet().getAssociationSupport().clear();
 		this.getDataSet().getAssociationSupport().putAll(reader.getDataSet().getAssociationSupport());
-		
-//		System.out.println(reader.getDataSet().getTaxa());
-//		System.out.println(reader.getDataSet().getTaxa().get(0).getPublicationName());
 
-		
+		// System.out.println(reader.getDataSet().getTaxa());
+		// System.out.println(reader.getDataSet().getTaxa().get(0).getPublicationName());
+
 		this.fireDataChanged();
 	}
 
@@ -288,9 +294,11 @@ public class PhenexController extends DocumentController {
 			}
 			this.xmlDoc = NexmlDocument.Factory.newInstance();
 			this.charactersBlockID = reader.getCharactersBlockID();
-			this.dataSet.getCharacters().clear(); //TODO this is not well encapsulated
+			this.dataSet.getCharacters().clear(); // TODO this is not well
+													// encapsulated
 			this.dataSet.getCharacters().addAll(reader.getDataSet().getCharacters());
-			this.getDataSet().getTaxa().clear(); //TODO this is not well encapsulated
+			this.getDataSet().getTaxa().clear(); // TODO this is not well
+													// encapsulated
 			this.getDataSet().getTaxa().addAll(reader.getDataSet().getTaxa());
 			this.getDataSet().setCurators(reader.getDataSet().getCurators());
 			this.getDataSet().setPublication(reader.getDataSet().getPublication());
@@ -310,26 +318,27 @@ public class PhenexController extends DocumentController {
 		System.out.println("writeData(" + aFile + ")");
 		final NeXMLWriter writer = new NeXMLWriter(this.charactersBlockID, this.xmlDoc);
 		writer.setDataSet(this.dataSet);
-//		System.out.println("toString");
-//		System.out.println(this.dataSet.toString());
-//		System.out.println("characters");
-//		System.out.println(this.dataSet.getCharacters());
-////		System.out.println(this.dataSet.getStateForTaxon(taxon, character));
-//		System.out.println(this.dataSet.getTaxa());
-//		
-//
-////		this.dataSet.addCharacter(new Character("test"));
-//		System.out.println();
-//		System.out.println("matrix data");
-//		System.out.println(this.dataSet.getMatrixData());
-//		for(String test: this.dataSet.getMatrixData().keySet()){
-//			System.out.println("-");
-//			System.out.println(test);
-//			System.out.println(this.dataSet.getValue(test)); //Map<String, State>
-//			
-//		}
-//		System.out.println("end ~~~~~~~~~~");
-//		
+		// System.out.println("toString");
+		// System.out.println(this.dataSet.toString());
+		// System.out.println("characters");
+		// System.out.println(this.dataSet.getCharacters());
+		//// System.out.println(this.dataSet.getStateForTaxon(taxon,
+		// character));
+		// System.out.println(this.dataSet.getTaxa());
+		//
+		//
+		//// this.dataSet.addCharacter(new Character("test"));
+		// System.out.println();
+		// System.out.println("matrix data");
+		// System.out.println(this.dataSet.getMatrixData());
+		// for(String test: this.dataSet.getMatrixData().keySet()){
+		// System.out.println("-");
+		// System.out.println(test);
+		// System.out.println(this.dataSet.getValue(test)); //Map<String, State>
+		//
+		// }
+		// System.out.println("end ~~~~~~~~~~");
+		//
 		writer.setGenerator(this.getAppName() + " " + this.getAppVersion());
 		this.monitorFileForChanges(null);
 		writer.write(aFile);
@@ -367,11 +376,18 @@ public class PhenexController extends DocumentController {
 	public void openMergeModifiedFile() {
 		log().debug("Data has changed - ask the user if we should merge.");
 		if (this.getUndoController().hasUnsavedChanges()) {
-			final int result = JOptionPane.showOptionDialog(this.getWindow(), String.format("The file for the document at %s has been modified by another application. Do you want to discard your unsaved changes and replace with the newly edited version, or instead save your copy to another file?", this.getCurrentFile()), "Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[] {"Replace with new data", "Save as a copy of this version"}, "Replace with new data");
+			final int result = JOptionPane.showOptionDialog(this.getWindow(),
+					String.format(
+							"The file for the document at %s has been modified by another application. Do you want to discard your unsaved changes and replace with the newly edited version, or instead save your copy to another file?",
+							this.getCurrentFile()),
+					"Warning", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+					new String[] { "Replace with new data", "Save as a copy of this version" },
+					"Replace with new data");
 			if (result == JOptionPane.OK_OPTION) {
 				this.loadModifiedFile();
 			} else {
-				this.saveAs(); //TODO if cancel this need to go back to previous dialog
+				this.saveAs(); // TODO if cancel this need to go back to
+								// previous dialog
 			}
 		} else {
 			final JDialog dialog = new JDialog(this.getWindow(), false);
@@ -379,7 +395,10 @@ public class PhenexController extends DocumentController {
 			dialog.setResizable(false);
 			dialog.setLayout(new GridBagLayout());
 			// surrounding with html tags makes the JLabel wrap its text
-			final JLabel label = new JLabel("<HTML>" + String.format("The file for the document at %s has been modified by another application.", this.getCurrentFile()) + "</HTML>");
+			final JLabel label = new JLabel("<HTML>"
+					+ String.format("The file for the document at %s has been modified by another application.",
+							this.getCurrentFile())
+					+ "</HTML>");
 			final GridBagConstraints labelConstraints = new GridBagConstraints();
 			labelConstraints.insets = new Insets(11, 11, 11, 11);
 			labelConstraints.fill = GridBagConstraints.BOTH;
@@ -453,7 +472,8 @@ public class PhenexController extends DocumentController {
 	}
 
 	private void importPhenotypeProposals(File file) {
-		final PhenotypeProposalsLoader loader = new PhenotypeProposalsLoader(this.getDataSet(), this.getOntologyController().getOBOSession());
+		final PhenotypeProposalsLoader loader = new PhenotypeProposalsLoader(this.getDataSet(),
+				this.getOntologyController().getOBOSession());
 		try {
 			loader.loadProposals(file);
 		} catch (IOException e) {
@@ -489,7 +509,8 @@ public class PhenexController extends DocumentController {
 	}
 
 	public OntologyCoordinator getOntologyCoordinator() {
-		return new DefaultOntologyCoordinator(this.getOntologyController().getOBOSession(), this.getPhenoteSelectionManager());
+		return new DefaultOntologyCoordinator(this.getOntologyController().getOBOSession(),
+				this.getPhenoteSelectionManager());
 	}
 
 	public void addNewDataListener(NewDataListener listener) {
@@ -510,150 +531,72 @@ public class PhenexController extends DocumentController {
 
 	public void runORBTermRequest() {
 		this.orbController.runORBTermRequest();
-		//       final NewTermRequestPanel panel = new NewTermRequestPanel(this.getOntologyCoordinator());
-		//       panel.init();
-		//       panel.setSize(400, 250);
-		//       final int result = JOptionPane.showConfirmDialog(this.getWindow(), panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		// final NewTermRequestPanel panel = new
+		// NewTermRequestPanel(this.getOntologyCoordinator());
+		// panel.init();
+		// panel.setSize(400, 250);
+		// final int result = JOptionPane.showConfirmDialog(this.getWindow(),
+		// panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION,
+		// JOptionPane.PLAIN_MESSAGE);
 
 	}
-	
-	private void runSciGraphRequest(ObservableEventList<Character> characterList, ObservableEventList<Taxon> taxonList){		
-		System.out.println("lilalilalila");
-		
+
+	private void runSciGraphRequest(ObservableEventList<Character> characterList,
+			ObservableEventList<Taxon> taxonList) {
 		// auto-fill characters
-		for(int i = 0; i < characterList.size(); i++){
+		for (int i = 0; i < characterList.size(); i++) {
 			String character = characterList.get(i).toString();
 			ObservableEventList<State> states = characterList.get(i).getStates();
-			for(int j = 0; j < states.size(); j++){
+			for (int j = 0; j < states.size(); j++) {
 				String request = character + " " + states.get(j).getLabel();
-				SciGraphResponse response = this.orbController.runSciGraphRequest(request);
+				SciGraphResponse response = this.sciGraphController.runSciGraphRequest(request);
 				updateCharacterEntityWithResponse(response, i, j);
 			}
 		}
-		
-		//auto-fill taxons
-		for(int i = 0; i < taxonList.size(); i++){
-			System.out.println("autofilltaxon request" + i);
+
+		// auto-fill taxons
+		for (int i = 0; i < taxonList.size(); i++) {
 			String request = taxonList.get(i).getPublicationName().toString();
-			System.out.println(request);
-			SciGraphResponse response = this.orbController.runSciGraphRequest(request);
+			SciGraphResponse response = this.sciGraphController.runSciGraphRequest(request);
 			List<String> list = response.getEntityList();
-			System.out.println("autofilltaxonlist");
-			System.out.println(list);
-			System.out.println(response.getQualityList());
-			for(int j = 0; j < list.size(); j++){
-				//TODO: currently only taking first result. 
+			for (int j = 0; j < list.size(); j++) {
+				// TODO: currently only taking first result.
 				OBOClass term = new OBOClassImpl(list.get(j));
-				if(j == 0){
+				if (j == 0) {
 					taxonList.get(i).setValidName(term);
-					break; //TODO
+					break; // TODO
 				}
 			}
 		}
 	}
-	
-	private void updateCharacterEntityWithResponse(SciGraphResponse response, int characterIndex, int stateIndex){
+
+	private void updateCharacterEntityWithResponse(SciGraphResponse response, int characterIndex, int stateIndex) {
 		List<String> qList = response.getQualityList();
 		List<String> eList = response.getEntityList();
-		
-		for (String e: eList){
-			for (String q: qList){
+		for (String e : eList) {
+			for (String q : qList) {
 				Phenotype phenotype = new Phenotype();
 				OBOClass entity = new OBOClassImpl(e);
 				phenotype.setEntity(entity);
 				OBOClass quality = new OBOClassImpl(q);
 				phenotype.setQuality(quality);
-				this.dataSet.getCharacters().get(characterIndex).getStates().get(stateIndex).getPhenotypes().add(phenotype);
+				this.dataSet.getCharacters().get(characterIndex).getStates().get(stateIndex).getPhenotypes()
+						.add(phenotype);
 			}
 		}
 	}
-	
 
 	public void generateTree() {
-		final Map<LinkedObject, LinkedObject> topology = TreeBuilder.buildTree(this.dataSet, this.getOntologyController().getOBOSession());
+		final Map<LinkedObject, LinkedObject> topology = TreeBuilder.buildTree(this.dataSet,
+				this.getOntologyController().getOBOSession());
 		final Tree tree = new Tree();
 		tree.setTopology(topology);
 		this.dataSet.addTree(tree);
 	}
-	
+
 	public void fillEntities() {
-//		System.out.println("PhenexController.fillEntities()");
-//		System.out.println("getChar");
-//		System.out.println(this.dataSet.getCharacters());
-////		System.out.println("getPub");
-////		System.out.println(this.dataSet.getCharacters().getPublisher());
-//		System.out.println("getTaxa");
-//		System.out.println(this.dataSet.getTaxa());
-//		System.out.println(this.dataSet.getCurators());
-//		System.out.println(this.dataSet.getPublicationNotes());
-//		System.out.println(this.dataSet.getPublicationLabel());
-//		System.out.println(this.dataSet.toString());
-//		System.out.println(this.dataSet.getTaxa());
-//		System.out.println(this.dataSet.getPublicationURI());
-//		System.out.println(this.dataSet.getTrees());
-//		
-//		System.out.println("data Matrix");
-//		Map<String, Map<String, State>> dataMatrix = this.dataSet.getMatrixData();
-//		for(String key: dataMatrix.keySet()){
-//			Map<String, State> value = dataMatrix.get(key);
-//			for(String s: value.keySet()){
-//				System.out.println(s);
-//			}
-//		}
-		
-		System.out.println("characters");
-		System.out.println(this.dataSet.getCharacters().get(0).getStates());
-		System.out.println(this.dataSet.getCharacters().get(0).getStates().get(0).getLabel()); //15-18
-		System.out.println(this.dataSet.getCharacters().get(0).getStates().get(0).getSymbol());
-//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getEntity());
-//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getQuality());
-//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getRelatedEntity());
-//		System.out.println(reader.getDataSet().getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).getComment());
-//		System.out.println(reader.getDataSet().getCharacters().get(5).getStates().get(0).getPhenotypes());
-		System.out.println("=========");
-//		OBOClass term = new OBOClassImpl("FAKE:42");
-//		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().get(0).setEntity(term);
-//		Phenotype phenotype2 = new Phenotype();
-//		phenotype2.setEntity(term);
-//		this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().add(phenotype2);
-		
-		System.out.println(this.dataSet.getTaxa().get(0));
-		
-//		final ProvisionalTermRequestPanel panel = new ProvisionalTermRequestPanel(this);
-//		panel.init();
-//		panel.setSize(400, 100);
-//		final int result = JOptionPane.showConfirmDialog(null, panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		
-//		post.setEntity(this.createPostEntity(term));
-		
-//		client.getConnectionManager().shutdown();
-//		final JSONObject json = new JSONObject(IOUtils.toString(response.getEntity().getContent(), "utf-8"));
-//		final OBOClass newTerm = ProvisionalTermUtil.createClassForProvisionalTerm(json, session);
-//		session.addObject(newTerm);
-	
 		runSciGraphRequest(this.dataSet.getCharacters(), this.dataSet.getTaxa());
-		
-		
-		
-		
-//		for(String key: result.keySet()){
-//			Phenotype phenotype = new Phenotype();
-//			
-//			OBOClass entity = new OBOClassImpl(key);
-//			phenotype.setEntity(entity);
-//			if(result.get(key) == null){
-//				System.out.println("set quality");
-//				OBOClass quality = new OBOClassImpl(result.get(key));
-//				phenotype.setQuality(quality);
-//			}
-//			this.dataSet.getCharacters().get(0).getStates().get(0).getPhenotypes().add(phenotype);
-//			
-//			
-//		}
-
 	}
-
-
 
 	public void setSelectedMatrixCell(MatrixCell cell) {
 		this.selectedCell = cell;
@@ -674,7 +617,8 @@ public class PhenexController extends DocumentController {
 
 	private void mergeTaxa(File aFile) {
 		try {
-			final TaxonTabReader reader = new TaxonTabReader(aFile, this.getOntologyController().getOBOSession(), this.getOntologyController().getCollectionTermSet());
+			final TaxonTabReader reader = new TaxonTabReader(aFile, this.getOntologyController().getOBOSession(),
+					this.getOntologyController().getCollectionTermSet());
 			DataMerger.mergeTaxa(reader.getDataSet(), this.getDataSet());
 		} catch (IOException e) {
 			log().error("Error reading taxon list file", e);
@@ -684,7 +628,8 @@ public class PhenexController extends DocumentController {
 
 	private void mergeCharacters(File aFile) {
 		try {
-			final CharacterTabReader reader = new CharacterTabReader(aFile, this.getOntologyController().getOBOSession());
+			final CharacterTabReader reader = new CharacterTabReader(aFile,
+					this.getOntologyController().getOBOSession());
 			DataMerger.mergeCharacters(reader.getDataSet(), this.getDataSet());
 		} catch (IOException e) {
 			log().error("Error reading character list file", e);
@@ -732,22 +677,27 @@ public class PhenexController extends DocumentController {
 	}
 
 	private boolean runDanglerAlert(File file, Collection<String> danglerIDs) {
-		final String[] options = {"Continue Opening", "Cancel"};
-		final String message = "The file \"" + file.getName() + "\" contains references to ontology term IDs which could not be found. You can safely edit other values in the file, but fields referring to \"dangling\" terms should not be edited. Proceed with caution.";
-		final int result = JOptionPane.showOptionDialog(null, message, "Missing Terms", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+		final String[] options = { "Continue Opening", "Cancel" };
+		final String message = "The file \"" + file.getName()
+				+ "\" contains references to ontology term IDs which could not be found. You can safely edit other values in the file, but fields referring to \"dangling\" terms should not be edited. Proceed with caution.";
+		final int result = JOptionPane.showOptionDialog(null, message, "Missing Terms", JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 		return result == JOptionPane.YES_OPTION;
 	}
 
 	private boolean runReplacedIDsAlert(File file, Collection<String> replacedIDs) {
-		final String[] options = {"Continue Opening", "Cancel"};
-		final String message = "The file \"" + file.getName() + "\" contains references to obsolete term IDs which have been automatically updated using the replaced_by tag.";
-		final int result = JOptionPane.showOptionDialog(null, message, "Replaced Obsolete Terms", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+		final String[] options = { "Continue Opening", "Cancel" };
+		final String message = "The file \"" + file.getName()
+				+ "\" contains references to obsolete term IDs which have been automatically updated using the replaced_by tag.";
+		final int result = JOptionPane.showOptionDialog(null, message, "Replaced Obsolete Terms",
+				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 		return result == JOptionPane.YES_OPTION;
 	}
 
 	private boolean runSecondaryIDAlert(File file, Collection<String> secondaryIDs) {
-		final String[] options = {"Continue Opening", "Cancel"};
-		final String message = "The file \"" + file.getName() + "\" contains references to some ontology terms by secondary IDs. When you save this file, these term references will be migrated to each term's primary ID.";
+		final String[] options = { "Continue Opening", "Cancel" };
+		final String message = "The file \"" + file.getName()
+				+ "\" contains references to some ontology terms by secondary IDs. When you save this file, these term references will be migrated to each term's primary ID.";
 		final JPanel panel = new JPanel(new BorderLayout());
 		final List<String> ids = new ArrayList<String>(secondaryIDs);
 		final TableModel model = new AbstractTableModel() {
@@ -776,7 +726,8 @@ public class PhenexController extends DocumentController {
 		panel.setPreferredSize(new Dimension(400, 200));
 		panel.add(new JLabel("<HTML>" + message + "</HTML"), BorderLayout.NORTH);
 		panel.add(new JScrollPane(new JTable(model)), BorderLayout.CENTER);
-		final int result = JOptionPane.showOptionDialog(null, panel, "Secondary Identifiers", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+		final int result = JOptionPane.showOptionDialog(null, panel, "Secondary Identifiers", JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 		return result == JOptionPane.YES_OPTION;
 	}
 
@@ -800,13 +751,14 @@ public class PhenexController extends DocumentController {
 						log().debug("Take returned - got an event.");
 						// get list of events from key
 						final List<WatchEvent<?>> events = signalledKey.pollEvents();
-						// VERY IMPORTANT! call reset() AFTER pollEvents() to allow the
+						// VERY IMPORTANT! call reset() AFTER pollEvents() to
+						// allow the
 						// key to be reported again by the watch service
 						signalledKey.reset();
 						for (WatchEvent<?> event : events) {
 							log().debug("Event: " + event);
 							if (event.kind().equals(StandardWatchEventKind.ENTRY_MODIFY)) {
-								final Path modifiedPath = (Path)(event.context());
+								final Path modifiedPath = (Path) (event.context());
 								log().debug("Modified path: " + event.context());
 								final File modifiedFile = new File(modifiedPath.toString());
 								log().debug("Modified file: " + modifiedFile);
@@ -822,17 +774,18 @@ public class PhenexController extends DocumentController {
 					log().error("Can't monitor file.", e);
 				} catch (InterruptedException e) {
 					log().error("Watch service interrupted.");
-				} 
+				}
 				return null;
 			}
-			/* (non-Javadoc)
-			 * This method runs on the Event Dispatch Thread
+
+			/*
+			 * (non-Javadoc) This method runs on the Event Dispatch Thread
 			 */
 			@Override
 			protected void done() {
 				super.done();
 				if (!this.isCancelled()) {
-					openMergeModifiedFile();                    
+					openMergeModifiedFile();
 				}
 			}
 

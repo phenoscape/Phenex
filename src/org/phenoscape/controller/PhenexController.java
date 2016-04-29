@@ -58,6 +58,7 @@ import org.obo.app.util.EverythingEqualComparator;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
 import org.obo.datamodel.OBOSession;
+import org.obo.datamodel.impl.NestedValueImpl;
 import org.obo.datamodel.impl.OBOClassImpl;
 import org.phenoscape.io.BioCreativeTabFormat;
 import org.phenoscape.io.CharacterTabReader;
@@ -117,9 +118,9 @@ public class PhenexController extends DocumentController {
 	private final SelectionManager phenoteSelectionManager;
 	private SwingWorker<WatchEvent<?>, Void> fileMonitor;
 	private MatrixCell selectedCell;
-	
-//	private static final CHARACTER_REQUEST = true;
-//	private static final CHARACTER_REQUEST = true;
+
+	// private static final CHARACTER_REQUEST = true;
+	// private static final CHARACTER_REQUEST = true;
 
 	public PhenexController(OntologyController ontologyController) {
 		super();
@@ -544,27 +545,29 @@ public class PhenexController extends DocumentController {
 	private void runSciGraphRequest(ObservableEventList<Character> characterList,
 			ObservableEventList<Taxon> taxonList) {
 		// auto-fill characters
-		for (int i = 0; i < characterList.size(); i++) {
-			String character = characterList.get(i).toString();
-			ObservableEventList<State> states = characterList.get(i).getStates();
-			for (int j = 0; j < states.size(); j++) {
-				String request = character + " " + states.get(j).getLabel();
-				SciGraphResponse response = this.sciGraphController.runSciGraphRequest(request);
-				updateCharacterEntityWithResponse(response, i, j);
+		if (characterList.size() > 0) {
+			for (int i = 0; i < characterList.size(); i++) {
+				String character = characterList.get(i).toString();
+				ObservableEventList<State> states = characterList.get(i).getStates();
+				for (int j = 0; j < states.size(); j++) {
+					String request = character + " " + states.get(j).getLabel();
+					SciGraphResponse response = this.sciGraphController.runSciGraphCharacterRequest(request);
+					updateCharacterEntityWithResponse(response, i, j);
+				}
 			}
 		}
 
 		// auto-fill taxons
-		for (int i = 0; i < taxonList.size(); i++) {
-			String request = taxonList.get(i).getPublicationName().toString();
-			SciGraphResponse response = this.sciGraphController.runSciGraphRequest(request);
-			List<String> list = response.getEntityList();
-			for (int j = 0; j < list.size(); j++) {
-				// TODO: currently only taking first result.
-				OBOClass term = new OBOClassImpl(list.get(j));
-				if (j == 0) {
-					taxonList.get(i).setValidName(term);
-					break; // TODO
+		if (taxonList.size() > 0) {
+			for (int i = 0; i < taxonList.size(); i++) {
+				String request = taxonList.get(i).getPublicationName().toString();
+				List<String> list = this.sciGraphController.runSciGraphTaxonRequest(request);
+				for (int j = 0; j < list.size(); j++) {
+					OBOClass term = new OBOClassImpl(list.get(j));
+					if (j == 0) {
+						taxonList.get(i).setValidName(term);
+						break; // TODO
+					}
 				}
 			}
 		}
@@ -577,9 +580,21 @@ public class PhenexController extends DocumentController {
 			for (String q : qList) {
 				Phenotype phenotype = new Phenotype();
 				OBOClass entity = new OBOClassImpl(e);
+				entity.setName("entity set name");
+				entity.setComment("entity set comment");
+				entity.setDefinition("entity set definition");
+				System.out.println("id " + entity.getID()); //this is it!!!
+//				entity.setIDExtension(new NestedValueImpl("nested value"));
+//				entity.setIDExtension("id extension");
 				phenotype.setEntity(entity);
 				OBOClass quality = new OBOClassImpl(q);
 				phenotype.setQuality(quality);
+				phenotype.setComment("comment");
+				phenotype.setCount(1000);
+				phenotype.setMeasurement(new Float(100));
+				phenotype.setRelatedEntity(new OBOClassImpl("related entity") );
+				phenotype.setUnit(new OBOClassImpl("5"));
+				
 				this.dataSet.getCharacters().get(characterIndex).getStates().get(stateIndex).getPhenotypes()
 						.add(phenotype);
 			}

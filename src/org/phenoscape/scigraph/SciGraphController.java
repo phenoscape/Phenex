@@ -30,31 +30,17 @@ public class SciGraphController {
 		this.controller = controller;
 	}
 
-	// public SciGraphResponse runSciGraphRequest(String req) { // boolean
-	// // isCharacterRequest
-	// SciGraphResponse returnedRequest = null;
-	// try {
-	// returnedRequest = this.sciGraphRequest(req);
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// JOptionPane.showMessageDialog(null, "Network connection unable to be
-	// established.", "Network Error",
-	// JOptionPane.ERROR_MESSAGE);
-	// e.printStackTrace();
-	// } catch (URISyntaxException e) {
-	// e.printStackTrace();
-	// }
-	// return returnedRequest;
-	// }
-
 	public SciGraphResponse runSciGraphCharacterRequest(String req) { // boolean
-		//TODO: entity map
+		// TODO: entity map
 		JSONArray responseJSON = sendRequest(req);
 
 		List<String> qualityList = new ArrayList<String>();
 		List<String> entityList = new ArrayList<String>();
 		Set<String> seenID = new HashSet<String>();
-
+		
+		System.out.println("runnnnnn " + req);
+		System.out.println(responseJSON);
+		
 		for (int i = 0; i < responseJSON.length(); i++) {
 			System.out.println("lila");
 			JSONObject jsonObj = (JSONObject) responseJSON.get(i);
@@ -80,11 +66,13 @@ public class SciGraphController {
 					String term = (String) terms.get(j);
 					qualityList.add(term);
 				}
-			}
-			else{ // for everything else (mainly UBERON)
+			} else { // for everything else (mainly UBERON)
 				for (int j = 0; j < terms.length(); j++) {
 					String term = (String) terms.get(j);
+					System.out.println("ADD UBERON!");
+					System.out.println(term);
 					entityList.add(term);
+					System.out.println(entityList);
 				}
 			}
 		}
@@ -110,7 +98,8 @@ public class SciGraphController {
 			// Only use taxon prefixes VTO and NCBITaxon
 			String prefix = id.substring(0, id.indexOf(":"));
 			seenID.add(id);
-			// Always prefer VTO over NCBITaxon. Otherwise take first result (for simplicity)
+			// Always prefer VTO over NCBITaxon. Otherwise take first result
+			// (for simplicity)
 			if (prefix.equals("VTO")
 					|| (prefix.equals("http") && id.substring(0, id.indexOf(":")).equals("NCBITaxon"))) {
 				for (int j = 0; j < terms.length(); j++) {
@@ -133,7 +122,9 @@ public class SciGraphController {
 			e.printStackTrace();
 		}
 		final HttpGet request = new HttpGet(uri);// ProvisionalTermUtil.SERVICE);
-		System.out.println(request.getRequestLine());
+		
+		System.out.println("REQUESTTT: " + request.getRequestLine());
+		
 		final DefaultHttpClient client = new DefaultHttpClient();
 		HttpResponse response = null;
 		try {
@@ -152,7 +143,7 @@ public class SciGraphController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("REPONSEEE");
+		System.out.println("REPONSEEE: " + request.getRequestLine());
 		// TODO: find out why abdominal _____ has no response
 		System.out.println(json);
 

@@ -315,31 +315,8 @@ public class PhenexController extends DocumentController {
 
 	@Override
 	public void writeData(File aFile) throws IOException {
-		System.out.println("start ~~~~~~~~~~");
-		System.out.println("writeData(" + aFile + ")");
 		final NeXMLWriter writer = new NeXMLWriter(this.charactersBlockID, this.xmlDoc);
 		writer.setDataSet(this.dataSet);
-		// System.out.println("toString");
-		// System.out.println(this.dataSet.toString());
-		// System.out.println("characters");
-		// System.out.println(this.dataSet.getCharacters());
-		//// System.out.println(this.dataSet.getStateForTaxon(taxon,
-		// character));
-		// System.out.println(this.dataSet.getTaxa());
-		//
-		//
-		//// this.dataSet.addCharacter(new Character("test"));
-		// System.out.println();
-		// System.out.println("matrix data");
-		// System.out.println(this.dataSet.getMatrixData());
-		// for(String test: this.dataSet.getMatrixData().keySet()){
-		// System.out.println("-");
-		// System.out.println(test);
-		// System.out.println(this.dataSet.getValue(test)); //Map<String, State>
-		//
-		// }
-		// System.out.println("end ~~~~~~~~~~");
-		//
 		writer.setGenerator(this.getAppName() + " " + this.getAppVersion());
 		this.monitorFileForChanges(null);
 		writer.write(aFile);
@@ -532,13 +509,10 @@ public class PhenexController extends DocumentController {
 
 	public void runORBTermRequest() {
 		this.orbController.runORBTermRequest();
-		// final NewTermRequestPanel panel = new
-		// NewTermRequestPanel(this.getOntologyCoordinator());
-		// panel.init();
-		// panel.setSize(400, 250);
-		// final int result = JOptionPane.showConfirmDialog(this.getWindow(),
-		// panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION,
-		// JOptionPane.PLAIN_MESSAGE);
+		//       final NewTermRequestPanel panel = new NewTermRequestPanel(this.getOntologyCoordinator());
+		//       panel.init();
+		//       panel.setSize(400, 250);
+		//       final int result = JOptionPane.showConfirmDialog(this.getWindow(), panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
 	}
 
@@ -552,6 +526,8 @@ public class PhenexController extends DocumentController {
 				for (int j = 0; j < states.size(); j++) {
 					String request = character + " " + states.get(j).getLabel();
 					SciGraphResponse response = this.sciGraphController.runSciGraphCharacterRequest(request);
+					System.out.println("runscigraph resp");
+					System.out.println(response.getEntityList());
 					updateCharacterEntityWithResponse(response, i, j);
 				}
 			}
@@ -576,24 +552,23 @@ public class PhenexController extends DocumentController {
 	private void updateCharacterEntityWithResponse(SciGraphResponse response, int characterIndex, int stateIndex) {
 		List<String> qList = response.getQualityList();
 		List<String> eList = response.getEntityList();
+		if (qList.isEmpty()){
+			qList.add("");
+		}
+		if (eList.isEmpty()){
+			eList.add("");
+		}
+		System.out.println("entity listttt " + eList);
 		for (String e : eList) {
 			for (String q : qList) {
 				Phenotype phenotype = new Phenotype();
 				OBOClass entity = new OBOClassImpl(e);
-				entity.setName("entity set name");
-				entity.setComment("entity set comment");
-				entity.setDefinition("entity set definition");
-				System.out.println("id " + entity.getID()); //this is it!!!
-//				entity.setIDExtension(new NestedValueImpl("nested value"));
-//				entity.setIDExtension("id extension");
+				System.out.println("entityyyy " + e);
 				phenotype.setEntity(entity);
+				System.out.println(phenotype.getEntity());
+				
 				OBOClass quality = new OBOClassImpl(q);
 				phenotype.setQuality(quality);
-				phenotype.setComment("comment");
-				phenotype.setCount(1000);
-				phenotype.setMeasurement(new Float(100));
-				phenotype.setRelatedEntity(new OBOClassImpl("related entity") );
-				phenotype.setUnit(new OBOClassImpl("5"));
 				
 				this.dataSet.getCharacters().get(characterIndex).getStates().get(stateIndex).getPhenotypes()
 						.add(phenotype);

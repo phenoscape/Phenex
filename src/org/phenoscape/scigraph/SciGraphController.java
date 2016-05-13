@@ -63,12 +63,12 @@ public class SciGraphController {
 			} else if (prefix.equals("PATO") || prefix.equals("BSPO") || prefix.equals("RO")) {
 				for (int j = 0; j < terms.length(); j++) {
 					String term = (String) terms.get(j);
-					qualityMap.put(term, id);
+					qualityMap.put(id, term);
 				}
 			} else { // for everything else (mainly UBERON)
 				for (int j = 0; j < terms.length(); j++) {
 					String term = (String) terms.get(j);
-					entityMap.put(term, id);
+					entityMap.put(id, term);
 				}
 			}
 		}

@@ -563,10 +563,10 @@ public class PhenexController extends DocumentController {
 		for (String e : eMap.keySet()) {
 			for (String q : qMap.keySet()) {
 				Phenotype phenotype = new Phenotype();
-				OBOClass entity = new OBOClassImpl(e, eMap.get(e));
+				OBOClass entity = new OBOClassImpl(eMap.get(e), e);
 				phenotype.setEntity(entity);
 
-				OBOClass quality = new OBOClassImpl(q, qMap.get(q));
+				OBOClass quality = new OBOClassImpl(qMap.get(q), q);
 				phenotype.setQuality(quality);
 
 				this.dataSet.getCharacters().get(characterIndex).getStates().get(stateIndex).getPhenotypes()

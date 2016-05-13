@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
@@ -34,20 +36,15 @@ public class SciGraphController {
 		// TODO: entity map
 		JSONArray responseJSON = sendRequest(req);
 
-		List<String> qualityList = new ArrayList<String>();
-		List<String> entityList = new ArrayList<String>();
+		Map<String, String> qualityMap = new HashMap<String, String>();
+		Map<String, String> entityMap = new HashMap<String, String>();
 		Set<String> seenID = new HashSet<String>();
-		
-		System.out.println("runnnnnn " + req);
-		System.out.println(responseJSON);
-		
+
 		for (int i = 0; i < responseJSON.length(); i++) {
-			System.out.println("lila");
 			JSONObject jsonObj = (JSONObject) responseJSON.get(i);
 			JSONObject tokenObj = jsonObj.getJSONObject("token");
 
 			String id = tokenObj.getString("id");
-			System.out.println(id);
 			if (seenID.contains(id))
 				continue;
 			JSONArray terms = tokenObj.getJSONArray("terms");
@@ -59,31 +56,28 @@ public class SciGraphController {
 			String prefix = id.substring(0, id.indexOf(":"));
 			seenID.add(id);
 			if (prefix.equals("VTO")
-					|| (prefix.equals("http") && id.substring(0, id.indexOf(":")).equals("NCBITaxon"))) {
+					|| (prefix.equals("http") && id.substring(0, id.indexOf(":")).equals("NCBITaxon"))) { //TODO: ignore NCBITaxon in scigraph taxon requests
 				// do nothing
 			} else if (prefix.equals("PATO") || prefix.equals("BSPO") || prefix.equals("RO")) {
 				for (int j = 0; j < terms.length(); j++) {
 					String term = (String) terms.get(j);
-					qualityList.add(term);
+					qualityMap.put(term, id);
 				}
 			} else { // for everything else (mainly UBERON)
 				for (int j = 0; j < terms.length(); j++) {
 					String term = (String) terms.get(j);
-					System.out.println("ADD UBERON!");
-					System.out.println(term);
-					entityList.add(term);
-					System.out.println(entityList);
+					entityMap.put(term, id);
 				}
 			}
 		}
-		SciGraphResponse packagedResponse = new SciGraphResponse(entityList, qualityList);
+		SciGraphResponse packagedResponse = new SciGraphResponse(entityMap, qualityMap);
 		return packagedResponse;
 	}
 
-	public List<String> runSciGraphTaxonRequest(String req) { // boolean
+	public Map<String, String> runSciGraphTaxonRequest(String req) { // boolean
 		JSONArray responseJSON = sendRequest(req);
 
-		List<String> taxonList = new ArrayList<String>();
+		Map<String, String> taxonMap = new HashMap<String, String>(); //TODO: should it be id mapped to name? Do Id's appear only once, or should a data structure be created
 		Set<String> seenID = new HashSet<String>();
 
 		for (int i = 0; i < responseJSON.length(); i++) {
@@ -95,20 +89,16 @@ public class SciGraphController {
 				continue;
 			JSONArray terms = tokenObj.getJSONArray("terms");
 
-			// Only use taxon prefixes VTO and NCBITaxon
 			String prefix = id.substring(0, id.indexOf(":"));
 			seenID.add(id);
-			// Always prefer VTO over NCBITaxon. Otherwise take first result
-			// (for simplicity)
-			if (prefix.equals("VTO")
-					|| (prefix.equals("http") && id.substring(0, id.indexOf(":")).equals("NCBITaxon"))) {
+			if (prefix.equals("VTO")) { //Ignore NCBITaxon
 				for (int j = 0; j < terms.length(); j++) {
 					String term = (String) terms.get(j);
-					taxonList.add(term);
+					taxonMap.put(term, id);
 				}
 			}
 		}
-		return taxonList;
+		return taxonMap;
 	}
 
 	private JSONArray sendRequest(String param) {
@@ -122,9 +112,9 @@ public class SciGraphController {
 			e.printStackTrace();
 		}
 		final HttpGet request = new HttpGet(uri);// ProvisionalTermUtil.SERVICE);
-		
+
 		System.out.println("REQUESTTT: " + request.getRequestLine());
-		
+
 		final DefaultHttpClient client = new DefaultHttpClient();
 		HttpResponse response = null;
 		try {
@@ -143,13 +133,8 @@ public class SciGraphController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("REPONSEEE: " + request.getRequestLine());
-		// TODO: find out why abdominal _____ has no response
-		System.out.println(json);
 
 		JSONArray responseJSON = new JSONArray(json);
-		System.out.println(responseJSON.toString());
-
 		return responseJSON;
 	}
 

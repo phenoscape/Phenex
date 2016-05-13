@@ -509,10 +509,13 @@ public class PhenexController extends DocumentController {
 
 	public void runORBTermRequest() {
 		this.orbController.runORBTermRequest();
-		//       final NewTermRequestPanel panel = new NewTermRequestPanel(this.getOntologyCoordinator());
-		//       panel.init();
-		//       panel.setSize(400, 250);
-		//       final int result = JOptionPane.showConfirmDialog(this.getWindow(), panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		// final NewTermRequestPanel panel = new
+		// NewTermRequestPanel(this.getOntologyCoordinator());
+		// panel.init();
+		// panel.setSize(400, 250);
+		// final int result = JOptionPane.showConfirmDialog(this.getWindow(),
+		// panel, "Submit new term request", JOptionPane.OK_CANCEL_OPTION,
+		// JOptionPane.PLAIN_MESSAGE);
 
 	}
 
@@ -526,8 +529,6 @@ public class PhenexController extends DocumentController {
 				for (int j = 0; j < states.size(); j++) {
 					String request = character + " " + states.get(j).getLabel();
 					SciGraphResponse response = this.sciGraphController.runSciGraphCharacterRequest(request);
-					System.out.println("runscigraph resp");
-					System.out.println(response.getEntityList());
 					updateCharacterEntityWithResponse(response, i, j);
 				}
 			}
@@ -537,12 +538,12 @@ public class PhenexController extends DocumentController {
 		if (taxonList.size() > 0) {
 			for (int i = 0; i < taxonList.size(); i++) {
 				String request = taxonList.get(i).getPublicationName().toString();
-				List<String> list = this.sciGraphController.runSciGraphTaxonRequest(request);
+				Map<String, String> list = this.sciGraphController.runSciGraphTaxonRequest(request);
 				for (int j = 0; j < list.size(); j++) {
 					OBOClass term = new OBOClassImpl(list.get(j));
-					if (j == 0) {
+					if (j == 0) { // select first entry
 						taxonList.get(i).setValidName(term);
-						break; // TODO
+						break;
 					}
 				}
 			}
@@ -550,26 +551,48 @@ public class PhenexController extends DocumentController {
 	}
 
 	private void updateCharacterEntityWithResponse(SciGraphResponse response, int characterIndex, int stateIndex) {
-		List<String> qList = response.getQualityList();
-		List<String> eList = response.getEntityList();
-		if (qList.isEmpty()){
-			qList.add("");
+		Map<String, String> qMap = response.getQualityList();
+		Map<String, String> eMap = response.getEntityList();
+		if (qMap.isEmpty()) {
+			qMap.put("", "");
 		}
-		if (eList.isEmpty()){
-			eList.add("");
+		if (eMap.isEmpty()) {
+			eMap.put("", "");
 		}
-		System.out.println("entity listttt " + eList);
-		for (String e : eList) {
-			for (String q : qList) {
+		for (String e : eMap.keySet()) {
+			for (String q : qMap.keySet()) {
 				Phenotype phenotype = new Phenotype();
-				OBOClass entity = new OBOClassImpl(e);
-				System.out.println("entityyyy " + e);
+				OBOClass entity = new OBOClassImpl(e, eMap.get(e));
+				phenotype.setEntity(entity);
+
+				OBOClass quality = new OBOClassImpl(q, qMap.get(q));
+				phenotype.setQuality(quality);
+
+				this.dataSet.getCharacters().get(characterIndex).getStates().get(stateIndex).getPhenotypes()
+						.add(phenotype);
+			}
+		}
+	}
+
+	private void updateTaxonWithResponse(SciGraphResponse response, int characterIndex, int stateIndex) {
+		Map<String, String> qMap = response.getQualityList();
+		Map<String, String> eMap = response.getEntityList();
+		if (qMap.isEmpty()) {
+			qMap.put("", "");
+		}
+		if (eMap.isEmpty()) {
+			eMap.put("", "");
+		}
+		for (String e : eMap.keySet()) {
+			for (String q : qMap.keySet()) {
+				Phenotype phenotype = new Phenotype();
+				OBOClass entity = new OBOClassImpl(e, eMap.get(e));
 				phenotype.setEntity(entity);
 				System.out.println(phenotype.getEntity());
-				
-				OBOClass quality = new OBOClassImpl(q);
+
+				OBOClass quality = new OBOClassImpl(q, qMap.get(q));
 				phenotype.setQuality(quality);
-				
+
 				this.dataSet.getCharacters().get(characterIndex).getStates().get(stateIndex).getPhenotypes()
 						.add(phenotype);
 			}

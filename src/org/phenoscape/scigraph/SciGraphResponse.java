@@ -1,22 +1,23 @@
 package org.phenoscape.scigraph;
 
 import java.util.List;
+import java.util.Map;
 
 public class SciGraphResponse {
 	
-	private List<String> entityList;
-	private List<String> qualityList;
+	private Map<String, String> entityList;
+	private Map<String, String> qualityList;
 
-	public SciGraphResponse (List<String> eList, List<String> qList){
+	public SciGraphResponse (Map<String, String> eList, Map<String, String> qList){
 		entityList = eList;
 		qualityList = qList;
 	}
 	
-	public List<String> getEntityList(){
+	public Map<String, String> getEntityList(){
 		return entityList;
 	}
 	
-	public List<String> getQualityList(){
+	public Map<String, String> getQualityList(){
 		return qualityList;
 	}
 }

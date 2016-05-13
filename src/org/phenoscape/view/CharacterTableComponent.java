@@ -85,21 +85,11 @@ public class CharacterTableComponent extends PhenoscapeGUIComponent {
 	}
 
 	private List<Character> getSelectedCharacters() {
-		System.out.println("getSelectedCharacters() ##############");
-		System.out.println(this.getController());
-		System.out.println(this.getController().getCharactersSelectionModel());
-		System.out.println(this.getController().getCharactersSelectionModel().getSelected());
-		for(Character c: this.getController().getCharactersSelectionModel().getSelected())
-			System.out.print(c + " ");
-		System.out.println();
-		System.out.println("##############");
 		return this.getController().getCharactersSelectionModel().getSelected();
 	}
 
 	private void updateButtonStates() {
 		this.deleteCharacterButton.setEnabled(!this.getSelectedCharacters().isEmpty());
-		System.out.println("===============================TODO");
-		System.out.println(this.getController());
 	}
 
 	private void selectFirstState() {

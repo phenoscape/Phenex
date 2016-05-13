@@ -230,7 +230,6 @@ public class PhenexController extends DocumentController {
 	}
 
 	private void readNeXML(File aFile) throws XmlException, IOException {
-		System.out.println("PhenexController.readneXML()" + aFile);
 		final NeXMLReader reader = new NeXMLReader(aFile, this.getOntologyController().getOBOSession());
 		if (reader.didCreateDanglers()) {
 			final boolean result = this.runDanglerAlert(aFile, reader.getDanglersList());
@@ -270,15 +269,10 @@ public class PhenexController extends DocumentController {
 		this.getDataSet().setMatrixData(reader.getDataSet().getMatrixData());
 		this.getDataSet().getAssociationSupport().clear();
 		this.getDataSet().getAssociationSupport().putAll(reader.getDataSet().getAssociationSupport());
-
-		// System.out.println(reader.getDataSet().getTaxa());
-		// System.out.println(reader.getDataSet().getTaxa().get(0).getPublicationName());
-
 		this.fireDataChanged();
 	}
 
 	private void readNeXML_1_0(File aFile) throws IOException {
-		System.out.println("PhenexController.readneXML_1_0()" + aFile);
 		try {
 			final NeXMLReader_1_0 reader = new NeXMLReader_1_0(aFile, this.getOntologyController().getOBOSession());
 			if (reader.didCreateDanglers()) {
@@ -320,7 +314,6 @@ public class PhenexController extends DocumentController {
 		writer.setGenerator(this.getAppName() + " " + this.getAppVersion());
 		this.monitorFileForChanges(null);
 		writer.write(aFile);
-		System.out.println(this.charactersBlockID);
 		this.monitorFileForChanges(this.getCurrentFile());
 	}
 
@@ -540,7 +533,7 @@ public class PhenexController extends DocumentController {
 				String request = taxonList.get(i).getPublicationName().toString();
 				List<OBOClass> list = this.sciGraphController.runSciGraphTaxonRequest(request);
 				for (int j = 0; j < list.size(); j++) {
-//					OBOClass term = new OBOClassImpl(list.get(j));
+					// OBOClass term = new OBOClassImpl(list.get(j));
 					OBOClass term = list.get(j);
 					if (j == 0) { // select first entry //TODO: revamp code
 						taxonList.get(i).setValidName(term);
@@ -552,7 +545,17 @@ public class PhenexController extends DocumentController {
 	}
 
 	private void updateCharacterEntityWithResponse(SciGraphResponse response, int characterIndex, int stateIndex) {
-		Map<String, String> qMap = response.getQualityList();  //TODO: simply get list of oboclass's -- can use this code elsewhere and/or earlier on in the implementation path
+		Map<String, String> qMap = response.getQualityList(); // TODO: simply
+																// get list of
+																// oboclass's --
+																// can use this
+																// code
+																// elsewhere
+																// and/or
+																// earlier on in
+																// the
+																// implementation
+																// path
 		Map<String, String> eMap = response.getEntityList();
 		if (qMap.isEmpty()) {
 			qMap.put("", "");
@@ -589,7 +592,6 @@ public class PhenexController extends DocumentController {
 				Phenotype phenotype = new Phenotype();
 				OBOClass entity = new OBOClassImpl(e, eMap.get(e));
 				phenotype.setEntity(entity);
-				System.out.println(phenotype.getEntity());
 
 				OBOClass quality = new OBOClassImpl(q, qMap.get(q));
 				phenotype.setQuality(quality);

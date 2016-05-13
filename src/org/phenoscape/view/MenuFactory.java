@@ -76,7 +76,7 @@ public class MenuFactory {
 		menu.add(new JMenuItem(saveAction));
 		final Action saveAsAction = new AbstractAction("Save As...") {
 			@Override
-			public void actionPerformed(ActionEvent e) { System.out.println(controller); controller.saveAs(); }
+			public void actionPerformed(ActionEvent e) { controller.saveAs(); }
 		};
 		saveAsAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK));
 		menu.add(new JMenuItem(saveAsAction));

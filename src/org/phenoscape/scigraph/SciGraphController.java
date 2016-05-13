@@ -114,9 +114,6 @@ public class SciGraphController {
 			e.printStackTrace();
 		}
 		final HttpGet request = new HttpGet(uri);// ProvisionalTermUtil.SERVICE);
-
-		System.out.println("REQUESTTT: " + request.getRequestLine());
-
 		final DefaultHttpClient client = new DefaultHttpClient();
 		HttpResponse response = null;
 		try {

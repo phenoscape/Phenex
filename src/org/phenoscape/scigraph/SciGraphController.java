@@ -21,6 +21,8 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.obo.datamodel.OBOClass;
+import org.obo.datamodel.impl.OBOClassImpl;
 import org.phenoscape.controller.PhenexController;
 
 public class SciGraphController {
@@ -74,10 +76,10 @@ public class SciGraphController {
 		return packagedResponse;
 	}
 
-	public Map<String, String> runSciGraphTaxonRequest(String req) { // boolean
+	public List<OBOClass> runSciGraphTaxonRequest(String req) { // boolean
 		JSONArray responseJSON = sendRequest(req);
 
-		Map<String, String> taxonMap = new HashMap<String, String>(); //TODO: should it be id mapped to name? Do Id's appear only once, or should a data structure be created
+		List<OBOClass> taxonMap = new ArrayList<OBOClass>(); //TODO: should it be id mapped to name? Do Id's appear only once, or should a data structure be created
 		Set<String> seenID = new HashSet<String>();
 
 		for (int i = 0; i < responseJSON.length(); i++) {
@@ -94,7 +96,7 @@ public class SciGraphController {
 			if (prefix.equals("VTO")) { //Ignore NCBITaxon
 				for (int j = 0; j < terms.length(); j++) {
 					String term = (String) terms.get(j);
-					taxonMap.put(term, id);
+					taxonMap.add(new OBOClassImpl(term, id));
 				}
 			}
 		}

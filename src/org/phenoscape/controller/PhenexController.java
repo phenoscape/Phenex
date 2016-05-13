@@ -538,10 +538,11 @@ public class PhenexController extends DocumentController {
 		if (taxonList.size() > 0) {
 			for (int i = 0; i < taxonList.size(); i++) {
 				String request = taxonList.get(i).getPublicationName().toString();
-				Map<String, String> list = this.sciGraphController.runSciGraphTaxonRequest(request);
+				List<OBOClass> list = this.sciGraphController.runSciGraphTaxonRequest(request);
 				for (int j = 0; j < list.size(); j++) {
-					OBOClass term = new OBOClassImpl(list.get(j));
-					if (j == 0) { // select first entry
+//					OBOClass term = new OBOClassImpl(list.get(j));
+					OBOClass term = list.get(j);
+					if (j == 0) { // select first entry //TODO: revamp code
 						taxonList.get(i).setValidName(term);
 						break;
 					}
@@ -551,7 +552,7 @@ public class PhenexController extends DocumentController {
 	}
 
 	private void updateCharacterEntityWithResponse(SciGraphResponse response, int characterIndex, int stateIndex) {
-		Map<String, String> qMap = response.getQualityList();
+		Map<String, String> qMap = response.getQualityList();  //TODO: simply get list of oboclass's -- can use this code elsewhere and/or earlier on in the implementation path
 		Map<String, String> eMap = response.getEntityList();
 		if (qMap.isEmpty()) {
 			qMap.put("", "");

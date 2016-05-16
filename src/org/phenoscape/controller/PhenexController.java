@@ -235,14 +235,11 @@ public class PhenexController extends DocumentController {
 		}
 		this.xmlDoc = reader.getXMLDoc();
 		this.charactersBlockID = reader.getCharactersBlockID();
-		this.dataSet.getCharacters().clear(); // TODO this is not well
-												// encapsulated
+		this.dataSet.getCharacters().clear(); // TODO this is not well encapsulated
 		this.dataSet.getCharacters().addAll(reader.getDataSet().getCharacters());
-		this.getDataSet().getTaxa().clear(); // TODO this is not well
-												// encapsulated
+		this.getDataSet().getTaxa().clear(); // TODO this is not well encapsulated
 		this.getDataSet().getTaxa().addAll(reader.getDataSet().getTaxa());
-		this.getDataSet().getTrees().clear(); // TODO this is not well
-												// encapsulated
+		this.getDataSet().getTrees().clear(); // TODO this is not well encapsulated
 		this.getDataSet().getTrees().addAll(reader.getDataSet().getTrees());
 		this.getDataSet().setCurators(reader.getDataSet().getCurators());
 		this.getDataSet().setPublication(reader.getDataSet().getPublication());
@@ -714,8 +711,7 @@ public class PhenexController extends DocumentController {
 						log().debug("Take returned - got an event.");
 						// get list of events from key
 						final List<WatchEvent<?>> events = signalledKey.pollEvents();
-						// VERY IMPORTANT! call reset() AFTER pollEvents() to
-						// allow the
+						// VERY IMPORTANT! call reset() AFTER pollEvents() to allow the
 						// key to be reported again by the watch service
 						signalledKey.reset();
 						for (WatchEvent<?> event : events) {

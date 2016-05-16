@@ -35,7 +35,6 @@ public class SciGraphController {
 	}
 
 	public SciGraphResponse runSciGraphCharacterRequest(String req) { // boolean
-		// TODO: entity map
 		JSONArray responseJSON = sendRequest(req);
 
 		Map<String, String> qualityMap = new HashMap<String, String>();
@@ -58,7 +57,7 @@ public class SciGraphController {
 			String prefix = id.substring(0, id.indexOf(":"));
 			seenID.add(id);
 			if (prefix.equals("VTO")
-					|| (prefix.equals("http") && id.substring(0, id.indexOf(":")).equals("NCBITaxon"))) { //TODO: ignore NCBITaxon in scigraph taxon requests
+					|| (prefix.equals("http") && id.substring(0, id.indexOf(":")).equals("NCBITaxon"))) {
 				// do nothing
 			} else if (prefix.equals("PATO") || prefix.equals("BSPO") || prefix.equals("RO")) {
 				for (int j = 0; j < terms.length(); j++) {
@@ -76,10 +75,10 @@ public class SciGraphController {
 		return packagedResponse;
 	}
 
-	public List<OBOClass> runSciGraphTaxonRequest(String req) { // boolean
+	public List<OBOClass> runSciGraphTaxonRequest(String req) {
 		JSONArray responseJSON = sendRequest(req);
 
-		List<OBOClass> taxonMap = new ArrayList<OBOClass>(); //TODO: should it be id mapped to name? Do Id's appear only once, or should a data structure be created
+		List<OBOClass> taxonMap = new ArrayList<OBOClass>();
 		Set<String> seenID = new HashSet<String>();
 
 		for (int i = 0; i < responseJSON.length(); i++) {
@@ -93,7 +92,7 @@ public class SciGraphController {
 
 			String prefix = id.substring(0, id.indexOf(":"));
 			seenID.add(id);
-			if (prefix.equals("VTO")) { //Ignore NCBITaxon
+			if (prefix.equals("VTO")) { // Ignore NCBITaxon
 				for (int j = 0; j < terms.length(); j++) {
 					String term = (String) terms.get(j);
 					taxonMap.add(new OBOClassImpl(term, id));
@@ -113,7 +112,7 @@ public class SciGraphController {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		final HttpGet request = new HttpGet(uri);// ProvisionalTermUtil.SERVICE);
+		final HttpGet request = new HttpGet(uri);
 		final DefaultHttpClient client = new DefaultHttpClient();
 		HttpResponse response = null;
 		try {

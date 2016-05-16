@@ -106,8 +106,6 @@ public class PhenotypeTableComponent extends PhenoscapeGUIComponent {
 	}
 
 	private OBOClass getAutofillEntity() {
-		System.out.println("PhenotypeTableComponent.getAutofillEntity()");
-		//TODO:
 		//check current state
 		for (State state : this.getController().getCurrentStatesSelectionModel().getSelected()) {
 			for (Phenotype phenotype : state.getPhenotypes()) {

@@ -22,10 +22,10 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.WindowConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
-import javax.xml.parsers.ParserConfigurationException;
-
 import name.pachler.nio.file.ClosedWatchServiceException;
 import name.pachler.nio.file.FileSystems;
 import name.pachler.nio.file.Path;
@@ -35,17 +35,10 @@ import name.pachler.nio.file.WatchEvent;
 import name.pachler.nio.file.WatchKey;
 import name.pachler.nio.file.WatchService;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.bbop.framework.GUIManager;
 import org.jdesktop.swingworker.SwingWorker;
-import org.json.JSONObject;
 import org.nexml.schema_2009.NexmlDocument;
 import org.obo.annotation.view.DefaultOntologyCoordinator;
 import org.obo.annotation.view.OntologyCoordinator;
@@ -57,8 +50,6 @@ import org.obo.app.swing.ListSelectionMaintainer;
 import org.obo.app.util.EverythingEqualComparator;
 import org.obo.datamodel.LinkedObject;
 import org.obo.datamodel.OBOClass;
-import org.obo.datamodel.OBOSession;
-import org.obo.datamodel.impl.NestedValueImpl;
 import org.obo.datamodel.impl.OBOClassImpl;
 import org.phenoscape.io.BioCreativeTabFormat;
 import org.phenoscape.io.CharacterTabReader;
@@ -81,14 +72,10 @@ import org.phenoscape.model.Taxon;
 import org.phenoscape.model.Tree;
 import org.phenoscape.model.UndoObserver;
 import org.phenoscape.orb.ORBController;
-import org.phenoscape.orb.ProvisionalTermRequestPanel;
 import org.phenoscape.scigraph.SciGraphController;
 import org.phenoscape.scigraph.SciGraphResponse;
 import org.phenoscape.util.DataMerger;
-import org.phenoscape.util.ProvisionalTermUtil;
 import org.phenoscape.util.TreeBuilder;
-import org.xml.sax.SAXException;
-
 import ca.odell.glazedlists.CollectionList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.swing.EventSelectionModel;
@@ -119,9 +106,6 @@ public class PhenexController extends DocumentController {
 	private SwingWorker<WatchEvent<?>, Void> fileMonitor;
 	private MatrixCell selectedCell;
 
-	// private static final CHARACTER_REQUEST = true;
-	// private static final CHARACTER_REQUEST = true;
-
 	public PhenexController(OntologyController ontologyController) {
 		super();
 		this.phenoteSelectionManager = new org.obo.annotation.view.SelectionManager();
@@ -132,11 +116,11 @@ public class PhenexController extends DocumentController {
 				new EverythingEqualComparator<Character>());
 		this.charactersSelectionModel = new EventSelectionModel<Character>(this.sortedCharacters);
 		new ListSelectionMaintainer<Character>(this.sortedCharacters, this.charactersSelectionModel);
-		this.charactersSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		this.charactersSelectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		this.sortedTaxa = new SortedList<Taxon>(this.dataSet.getTaxa(), new EverythingEqualComparator<Taxon>());
 		this.taxaSelectionModel = new EventSelectionModel<Taxon>(this.sortedTaxa);
 		new ListSelectionMaintainer<Taxon>(this.sortedTaxa, this.taxaSelectionModel);
-		this.taxaSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		this.taxaSelectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		this.currentSpecimens = new SortedList<Specimen>(new CollectionList<Taxon, Specimen>(
 				this.taxaSelectionModel.getSelected(), new CollectionList.Model<Taxon, Specimen>() {
 					@Override
@@ -155,7 +139,7 @@ public class PhenexController extends DocumentController {
 				}), new EverythingEqualComparator<State>());
 		this.currentStatesSelectionModel = new EventSelectionModel<State>(this.currentStates);
 		new ListSelectionMaintainer<State>(this.currentStates, this.currentStatesSelectionModel);
-		this.currentStatesSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		this.currentStatesSelectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		this.currentPhenotypes = new SortedList<Phenotype>(new CollectionList<State, Phenotype>(
 				this.currentStatesSelectionModel.getSelected(), new CollectionList.Model<State, Phenotype>() {
 					@Override
@@ -165,7 +149,7 @@ public class PhenexController extends DocumentController {
 				}), new EverythingEqualComparator<Phenotype>());
 		this.currentPhenotypesSelectionModel = new EventSelectionModel<Phenotype>(this.currentPhenotypes);
 		new ListSelectionMaintainer<Phenotype>(this.currentPhenotypes, this.currentPhenotypesSelectionModel);
-		this.currentPhenotypesSelectionModel.setSelectionMode(EventSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		this.currentPhenotypesSelectionModel.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		this.undoObserver = new UndoObserver(this.getUndoController());
 		this.undoObserver.setDataSet(this.dataSet);
 	}
@@ -362,7 +346,7 @@ public class PhenexController extends DocumentController {
 			}
 		} else {
 			final JDialog dialog = new JDialog(this.getWindow(), false);
-			dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+			dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 			dialog.setResizable(false);
 			dialog.setLayout(new GridBagLayout());
 			// surrounding with html tags makes the JLabel wrap its text
@@ -532,30 +516,17 @@ public class PhenexController extends DocumentController {
 			for (int i = 0; i < taxonList.size(); i++) {
 				String request = taxonList.get(i).getPublicationName().toString();
 				List<OBOClass> list = this.sciGraphController.runSciGraphTaxonRequest(request);
-				for (int j = 0; j < list.size(); j++) {
-					// OBOClass term = new OBOClassImpl(list.get(j));
-					OBOClass term = list.get(j);
-					if (j == 0) { // select first entry //TODO: revamp code
-						taxonList.get(i).setValidName(term);
-						break;
-					}
+				if (list.size() > 0) {
+					OBOClass term = list.get(0); // select first entry if one
+													// exists
+					taxonList.get(i).setValidName(term);
 				}
 			}
 		}
 	}
 
 	private void updateCharacterEntityWithResponse(SciGraphResponse response, int characterIndex, int stateIndex) {
-		Map<String, String> qMap = response.getQualityList(); // TODO: simply
-																// get list of
-																// oboclass's --
-																// can use this
-																// code
-																// elsewhere
-																// and/or
-																// earlier on in
-																// the
-																// implementation
-																// path
+		Map<String, String> qMap = response.getQualityList();
 		Map<String, String> eMap = response.getEntityList();
 		if (qMap.isEmpty()) {
 			qMap.put("", "");
@@ -570,30 +541,6 @@ public class PhenexController extends DocumentController {
 				phenotype.setEntity(entity);
 
 				OBOClass quality = new OBOClassImpl(qMap.get(q), q);
-				phenotype.setQuality(quality);
-
-				this.dataSet.getCharacters().get(characterIndex).getStates().get(stateIndex).getPhenotypes()
-						.add(phenotype);
-			}
-		}
-	}
-
-	private void updateTaxonWithResponse(SciGraphResponse response, int characterIndex, int stateIndex) {
-		Map<String, String> qMap = response.getQualityList();
-		Map<String, String> eMap = response.getEntityList();
-		if (qMap.isEmpty()) {
-			qMap.put("", "");
-		}
-		if (eMap.isEmpty()) {
-			eMap.put("", "");
-		}
-		for (String e : eMap.keySet()) {
-			for (String q : qMap.keySet()) {
-				Phenotype phenotype = new Phenotype();
-				OBOClass entity = new OBOClassImpl(e, eMap.get(e));
-				phenotype.setEntity(entity);
-
-				OBOClass quality = new OBOClassImpl(q, qMap.get(q));
 				phenotype.setQuality(quality);
 
 				this.dataSet.getCharacters().get(characterIndex).getStates().get(stateIndex).getPhenotypes()

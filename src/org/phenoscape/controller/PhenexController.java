@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -46,6 +47,7 @@ import org.obo.annotation.view.SelectionManager;
 import org.obo.app.controller.DocumentController;
 import org.obo.app.controller.UserCancelledReadException;
 import org.obo.app.model.ObservableEventList;
+import org.obo.app.swing.BlockingProgressDialog;
 import org.obo.app.swing.ListSelectionMaintainer;
 import org.obo.app.util.EverythingEqualComparator;
 import org.obo.datamodel.LinkedObject;
@@ -235,11 +237,14 @@ public class PhenexController extends DocumentController {
 		}
 		this.xmlDoc = reader.getXMLDoc();
 		this.charactersBlockID = reader.getCharactersBlockID();
-		this.dataSet.getCharacters().clear(); // TODO this is not well encapsulated
+		this.dataSet.getCharacters().clear(); // TODO this is not well
+												// encapsulated
 		this.dataSet.getCharacters().addAll(reader.getDataSet().getCharacters());
-		this.getDataSet().getTaxa().clear(); // TODO this is not well encapsulated
+		this.getDataSet().getTaxa().clear(); // TODO this is not well
+												// encapsulated
 		this.getDataSet().getTaxa().addAll(reader.getDataSet().getTaxa());
-		this.getDataSet().getTrees().clear(); // TODO this is not well encapsulated
+		this.getDataSet().getTrees().clear(); // TODO this is not well
+												// encapsulated
 		this.getDataSet().getTrees().addAll(reader.getDataSet().getTrees());
 		this.getDataSet().setCurators(reader.getDataSet().getCurators());
 		this.getDataSet().setPublication(reader.getDataSet().getPublication());
@@ -555,7 +560,13 @@ public class PhenexController extends DocumentController {
 	}
 
 	public void fillEntities() {
-		runSciGraphRequest(this.dataSet.getCharacters(), this.dataSet.getTaxa());
+		SciGraphLoader fillEntitiesLoader = new SciGraphLoader(this.dataSet.getCharacters(), this.dataSet.getTaxa());
+		final BlockingProgressDialog<Integer, Void> dialog = new BlockingProgressDialog<Integer, Void>(
+				fillEntitiesLoader, "Auto-filling currently in progress. It may take some time to recognize and fill all entities.");
+		dialog.setTitle("Auto-fill Entities");
+		dialog.setSize(400, 150);
+		dialog.setLocationRelativeTo(null);
+		dialog.run();
 	}
 
 	public void setSelectedMatrixCell(MatrixCell cell) {
@@ -711,7 +722,8 @@ public class PhenexController extends DocumentController {
 						log().debug("Take returned - got an event.");
 						// get list of events from key
 						final List<WatchEvent<?>> events = signalledKey.pollEvents();
-						// VERY IMPORTANT! call reset() AFTER pollEvents() to allow the
+						// VERY IMPORTANT! call reset() AFTER pollEvents() to
+						// allow the
 						// key to be reported again by the watch service
 						signalledKey.reset();
 						for (WatchEvent<?> event : events) {
@@ -760,6 +772,26 @@ public class PhenexController extends DocumentController {
 
 	private Logger log() {
 		return Logger.getLogger(this.getClass());
+	}
+
+	private class SciGraphLoader extends SwingWorker<Integer, Void> {
+
+		private ObservableEventList<Character> characterList;
+		private ObservableEventList<Taxon> taxonList;
+
+		public SciGraphLoader(ObservableEventList<Character> charList, ObservableEventList<Taxon> taxonList) {
+			this.characterList = charList;
+			this.taxonList = taxonList;
+		}
+
+		protected Integer doInBackground() {
+			// TODO: setProgress doesn't fully work
+			setProgress(1);
+			setProgress(10);
+			runSciGraphRequest(characterList, taxonList);
+			setProgress(100);
+			return 1;
+		}
 	}
 
 }

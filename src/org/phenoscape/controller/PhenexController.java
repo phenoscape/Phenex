@@ -786,10 +786,10 @@ public class PhenexController extends DocumentController {
 
 		protected Integer doInBackground() {
 			// TODO: setProgress doesn't fully work
-			setProgress(1);
+			setProgress(0);
 			setProgress(10);
 			runSciGraphRequest(characterList, taxonList);
-			setProgress(100);
+//			setProgress(100);
 			return 1;
 		}
 	}

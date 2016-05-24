@@ -562,7 +562,8 @@ public class PhenexController extends DocumentController {
 	public void fillEntities() {
 		SciGraphLoader fillEntitiesLoader = new SciGraphLoader(this.dataSet.getCharacters(), this.dataSet.getTaxa());
 		final BlockingProgressDialog<Integer, Void> dialog = new BlockingProgressDialog<Integer, Void>(
-				fillEntitiesLoader, "Auto-filling currently in progress. It may take some time to recognize and fill all entities.");
+				fillEntitiesLoader,
+				"Auto-filling currently in progress. It may take some time to recognize and fill all entities.");
 		dialog.setTitle("Auto-fill Entities");
 		dialog.setSize(400, 150);
 		dialog.setLocationRelativeTo(null);
@@ -785,11 +786,7 @@ public class PhenexController extends DocumentController {
 		}
 
 		protected Integer doInBackground() {
-			// TODO: setProgress doesn't fully work
-			setProgress(0);
-			setProgress(10);
 			runSciGraphRequest(characterList, taxonList);
-//			setProgress(100);
 			return 1;
 		}
 	}

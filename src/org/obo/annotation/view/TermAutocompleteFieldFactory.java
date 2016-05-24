@@ -50,6 +50,7 @@ public class TermAutocompleteFieldFactory {
 					final Object value = menu.getSelectedValue();
 					if ((value instanceof SearchHit<?>) && (((SearchHit<?>)value).getHit() instanceof OBOClass)) {
 						updateGlobalTermSelection(this, (OBOClass)((SearchHit<?>)value).getHit(), this.selectionManager);
+						// TODO: code that updates the global term upon selection outside of the autocomplete box
 					} else {
 						// sometimes the selection is a String instead
 					}

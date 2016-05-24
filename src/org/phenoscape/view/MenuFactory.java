@@ -149,7 +149,12 @@ public class MenuFactory {
 			@Override
 			public void actionPerformed(ActionEvent e) { controller.generateTree(); }
 		};
+		final Action fillEntities = new AbstractAction("Auto-fill Entities") {
+			@Override
+			public void actionPerformed(ActionEvent e) { controller.fillEntities(); }
+		};
 		menu.add(new JMenuItem(generateTreeAction));
+		menu.add(new JMenuItem(fillEntities));
 		return menu;
 	}
 

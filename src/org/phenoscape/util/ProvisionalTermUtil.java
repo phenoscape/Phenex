@@ -64,16 +64,17 @@ public class ProvisionalTermUtil {
 			final List<NameValuePair> values = new ArrayList<NameValuePair>();
 			values.add(new BasicNameValuePair("apikey", getAPIKey()));
 			//values.add(new BasicNameValuePair("submittedby", getUserID()));
-			values.add(new BasicNameValuePair("pagesize", "9999"));
+			values.add(new BasicNameValuePair("pagesize", "5000"));
 			final String paramString = URLEncodedUtils.format(values, "utf-8");
 			final HttpGet get = new HttpGet(SERVICE + "?" + paramString);
 			final DefaultHttpClient client = new DefaultHttpClient();
 			final HttpResponse response = new DefaultHttpClient().execute(get);
 			client.getConnectionManager().shutdown();
-			final JSONArray json = new JSONArray(IOUtils.toString(response.getEntity().getContent(), "utf-8"));
+			final JSONObject json = new JSONObject(IOUtils.toString(response.getEntity().getContent(), "utf-8"));
+			final JSONArray termResults = json.getJSONArray("collection");
 			final List<OBOClass> terms = new ArrayList<OBOClass>();
-			for (int i = 0; i < json.length(); i++) {
-				final JSONObject provisionalTerm = json.getJSONObject(i);
+			for (int i = 0; i < termResults.length(); i++) {
+				final JSONObject provisionalTerm = termResults.getJSONObject(i);
 				// this check should be removed once Bioportal implements server-side filtering by creator
 				final String creator = provisionalTerm.getString("creator");
 				if (creator.equals(getUserID())) {

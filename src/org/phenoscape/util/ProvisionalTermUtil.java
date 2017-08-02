@@ -76,13 +76,14 @@ public class ProvisionalTermUtil {
 			for (int i = 0; i < termResults.length(); i++) {
 				final JSONObject provisionalTerm = termResults.getJSONObject(i);
 				// this check should be removed once Bioportal implements server-side filtering by creator
-				final String creator = provisionalTerm.getString("creator");
-				if (creator.equals(getUserID())) {
-					terms.add(createClassForProvisionalTerm(provisionalTerm, session));
+				if (!provisionalTerm.isNull("creator")) {
+					final String creator = provisionalTerm.getString("creator");
+					if (creator.equals(getUserID())) {
+						terms.add(createClassForProvisionalTerm(provisionalTerm, session));
+					}
 				}
 			}
 			return terms;
-
 		}
 	}
 

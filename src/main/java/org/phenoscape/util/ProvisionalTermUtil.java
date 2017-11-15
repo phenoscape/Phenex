@@ -133,7 +133,7 @@ public class ProvisionalTermUtil {
 	}
 
 	public static String toOBOID(String uri) {
-		if (uri.contains("http://purl.obolibrary.org/obo/")) {
+		if (uri.contains("http://purl.obolibrary.org/obo/") && uri.contains("_")) {
 			final String id = uri.split("http://purl.obolibrary.org/obo/")[1];
 			final int underscore = id.lastIndexOf("_");
 			return id.substring(0, underscore) + ":"

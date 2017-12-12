@@ -4,7 +4,7 @@ organization  := "org.phenoscape"
 
 name          := "Phenex"
 
-version       := "1.21-beta.3"
+version       := "1.21.0"
 
 mainClass in Compile := Some("org.phenoscape.main.Phenex")
 

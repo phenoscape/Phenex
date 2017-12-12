@@ -16,9 +16,9 @@ publishArtifact in Test := false
 
 jdkPackagerJVMArgs := Seq("-Xmx8g")
 
-//licenses := Seq("BSD-3-Clause" -> url("https://opensource.org/licenses/BSD-3-Clause"))
+licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
 
-//homepage := Some(url("https://github.com/phenoscape/sparql-interpolator"))
+homepage := Some(url("https://wiki.phenoscape/wiki/Phenex"))
 
 crossPaths := false // drop off Scala suffix from artifact names.
 autoScalaLibrary := false // exclude scala-library from dependencies

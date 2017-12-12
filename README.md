@@ -38,7 +38,7 @@ If you use Phenex in your research, please cite the following publications:
 * Balhoff, James, Wasila Dahdul, T. Alexander Dececchi, Hilmar Lapp, Paula Mabee, and Todd Vision. 2014. “Annotation of Phenotypic Diversity: Decoupling Data Curation and Ontology Curation Using Phenex.” Journal of Biomedical Semantics 5 (1): 45. http://dx.doi.org/10.1186/2041-1480-5-45
 
 [NeXML]: http://www.nexml.org
-[Phenex website]: http://phenoscape.org/wiki/Phenex
+[Phenex website]: http://phenex.phenoscape.org/
 [Phenoscape project]: http://phenoscape.org
 [OBO project]: https://sourceforge.net/projects/obo/
 [Scala Build Tool]: http://www.scala-sbt.org

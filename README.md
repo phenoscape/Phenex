@@ -5,6 +5,19 @@ Phenex is an application for annotating character matrix files with ontology ter
 
 More information, including documentation of system requirements, installation, and usage, can be found at the [Phenex website].
 
+Installation
+============
+
+[Phenex releases](https://github.com/phenoscape/Phenex/releases) include installers for certain platforms.
+
+To install on platforms for which an installer is not provided, Phenex needs to be built from source. To do so, you must have `sbt` (the [Scala Build Tool]) installed. (On MacOSX, a convenient way to do so is using Homebrew: `brew install sbt`.) Then run the following command:
+
+```
+$ sbt jdkPackager:packageBin
+```
+
+The build process wil automatically download all dependencies, and hence may take some time when you run it for the first time.
+
 History
 =======
 

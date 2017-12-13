@@ -16,7 +16,7 @@ To install on platforms for which an installer is not provided, Phenex needs to 
 $ sbt jdkPackager:packageBin
 ```
 
-The build process wil automatically download all dependencies, and hence may take some time when you run it for the first time.
+The build process will automatically download all dependencies, and hence may take some time when you run it for the first time.
 
 History
 =======

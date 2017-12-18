@@ -98,7 +98,7 @@ public class PhenexController extends DocumentController {
 	private final EventSelectionModel<State> currentStatesSelectionModel;
 	private final SortedList<Phenotype> currentPhenotypes;
 	private final EventSelectionModel<Phenotype> currentPhenotypesSelectionModel;
-	private String charactersBlockID = UUID.randomUUID().toString();
+	private String charactersBlockID = "cb" + UUID.randomUUID().toString();
 	private NexmlDocument xmlDoc = NexmlDocument.Factory.newInstance();
 	private String appName;
 	private final List<NewDataListener> newDataListeners = new ArrayList<NewDataListener>();

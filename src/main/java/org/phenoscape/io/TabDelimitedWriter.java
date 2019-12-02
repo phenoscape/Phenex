@@ -195,6 +195,15 @@ public class TabDelimitedWriter {
 	}
 
 	private OBOClass getCharacterAttributeForValue(OBOClass valueTerm) {
+		OBOClass attribute = getCharacterAttributeForValueRecurse(valueTerm);
+		if (attribute != null) {
+			return attribute;
+		} else {
+			return valueTerm;
+		}
+	}
+
+	private OBOClass getCharacterAttributeForValueRecurse(OBOClass valueTerm) {
 		@SuppressWarnings("unchecked")
 		final Set<TermSubset> categories = valueTerm.getSubsets() != null ? valueTerm.getSubsets() : Collections.EMPTY_SET;
 		final Set<String> categoryNames = new HashSet<String>();
@@ -204,12 +213,14 @@ public class TabDelimitedWriter {
 		if (categoryNames.contains("character_slim")) {
 			return valueTerm;
 		} else {
-			final OBOClass parent = OBOUtil.getIsaParentForTerm(valueTerm);
-			if (parent != null) {
-				return getCharacterAttributeForValue(parent);
-			} else {
-				return valueTerm;
+			final Set<OBOClass> parents = OBOUtil.getIsaParentsForTerm(valueTerm);
+			final Set<OBOClass> attributes = new HashSet<>();
+			for (OBOClass parent : parents) {
+				final OBOClass attribute = getCharacterAttributeForValueRecurse(parent);
+				if (attribute != null) attributes.add(attribute);
 			}
+			if (parents.isEmpty()) return null;
+			else return parents.iterator().next();
 		}
 	}
 

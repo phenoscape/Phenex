@@ -262,6 +262,17 @@ public class OBOUtil {
 		return null;
 	}
 
+	public static Set<OBOClass> getIsaParentsForTerm(OBOClass term) {
+		final Collection<Link> parents = term.getParents();
+		final Set<OBOClass> isaParents = new HashSet<>();
+		for (Link link : parents) {
+			if (link.getType().getName().equals("is_a")) {
+				isaParents.add((OBOClass) (link.getParent()));
+			}
+		}
+		return isaParents;
+	}
+
 	// if (ObjectUtils.equals(this.validName, validName)) return;
 	// final OBOClass oldValue = this.validName;
 	// this.validName = validName;

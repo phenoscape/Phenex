@@ -219,8 +219,8 @@ public class TabDelimitedWriter {
 				final OBOClass attribute = getCharacterAttributeForValueRecurse(parent);
 				if (attribute != null) attributes.add(attribute);
 			}
-			if (parents.isEmpty()) return null;
-			else return parents.iterator().next();
+			if (attributes.isEmpty()) return null;
+			else return attributes.iterator().next();
 		}
 	}
 

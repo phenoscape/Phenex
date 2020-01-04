@@ -27,8 +27,8 @@ public class StateSupportInKBComponent extends PhenoscapeGUIComponent {
 
 	private JPanel panel;
 	private CellSelectionListener cellListener = new CellSelectionListener();
-	private String absenceLink = "http://kb.phenoscape.org/#/taxon/%%TAXONURI%%?tab=phenotypes&phenotypes.quality_type=entailing-absence&phenotypes.entity=%%ENTITYURI%%";
-	private String presenceLink = "http://kb.phenoscape.org/#/taxon/%%TAXONURI%%?tab=phenotypes&phenotypes.quality_type=entailing-presence&phenotypes.entity=%%ENTITYURI%%";
+	private String absenceLink = "https://kb.phenoscape.org/#/facet?tab=taxonannotations&entity=%%ENTITYURI%%&taxon=%%TAXONURI%%&quality=ps:inferred_absence";
+	private String presenceLink = "https://kb.phenoscape.org/#/facet?tab=taxonannotations&entity=%%ENTITYURI%%&taxon=%%TAXONURI%%&quality=ps:inferred_presence";
 
 	public StateSupportInKBComponent(String id, PhenexController controller) {
 		super(id, controller);
@@ -72,19 +72,11 @@ public class StateSupportInKBComponent extends PhenoscapeGUIComponent {
 	private void displaySupportForCell(MatrixCell cell) {
 		String taxonURL = "";
 		if (cell.getTaxon().getValidName() != null) {
-			try {
-				taxonURL = URLEncoder.encode("http://purl.obolibrary.org/obo/" + cell.getTaxon().getValidName().getID().replaceAll(":", "_"), "utf-8");
-			} catch (UnsupportedEncodingException e) {
-				log().error("Bad encoding", e);
-			} 
+			taxonURL = cell.getTaxon().getValidName().getID();
 		}
 		String entityURL = "";
 		if (cell.getCharacter().getDenotes() != null) {
-			try {
-				entityURL = URLEncoder.encode(cell.getCharacter().getDenotes().toString(), "utf-8");
-			} catch (UnsupportedEncodingException e) {
-				log().error("Bad encoding", e);
-			}
+			entityURL = cell.getCharacter().getDenotes().toString().replaceAll("http://purl.obolibrary.org/obo/", "").replaceAll("_", ":");
 		} 
 		for (State state : this.stateValuesForCell(cell)) {
 			if (state.getLabel().equals("present") || state.getLabel().equals("absent")) {

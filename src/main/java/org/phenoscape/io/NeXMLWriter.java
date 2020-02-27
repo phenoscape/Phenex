@@ -215,6 +215,7 @@ public class NeXMLWriter {
 		if(this.data.getCurators() != null) {
 			NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.CURATORS_PREDICATE,
 					this.data.getCurators());
+		}
 		NeXMLUtil.unsetMetadata(annotatableNexml,
 				NeXMLUtil.PUBLICATION_SOURCE_PREDICATE);
 		final Map<QName, Object> publicationData = new HashMap<QName, Object>();

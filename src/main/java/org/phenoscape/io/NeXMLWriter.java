@@ -212,8 +212,9 @@ public class NeXMLWriter {
 			cursor.setAttributeText(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), "http://www.nexml.org/2009 http://www.nexml.org/2009/nexml.xsd http://www.bioontologies.org/obd/schema/pheno http://purl.org/phenoscape/phenoxml.xsd");
 		}
 		final Annotatable annotatableNexml = new Annotatable(newDoc.getNexml());
-		NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.CURATORS_PREDICATE,
-				this.data.getCurators());
+		if(this.data.getCurators() != null) {
+			NeXMLUtil.setMetadata(annotatableNexml, NeXMLUtil.CURATORS_PREDICATE,
+					this.data.getCurators());
 		NeXMLUtil.unsetMetadata(annotatableNexml,
 				NeXMLUtil.PUBLICATION_SOURCE_PREDICATE);
 		final Map<QName, Object> publicationData = new HashMap<QName, Object>();
